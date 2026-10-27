@@ -263,9 +263,9 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
                 <h2 style="font-size:2rem;font-weight:800;">Admin <span style="color:var(--red);">Dashboard</span></h2>
                 <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="adminLogoutBtn">Logout</button>
             </div>
-            <div class="admin-section"><h3><i class="fa-solid fa-ticket"></i> Tickets</h3><div id="adminTickets"></div></div>
+            <div class="admin-section"><h3><i class="fa-solid fa-ticket"></i> Tickets & Apps</h3><div id="adminTickets"></div></div>
             <div class="admin-section"><h3><i class="fa-solid fa-video"></i> Streamers</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Username"><button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addStreamerBtn">Add</button></div><div id="adminStreamers"></div></div>
-            <div class="admin-section"><h3><i class="fa-solid fa-box"></i> Shop Stock</h3><div id="adminShop"></div></div>
+            <div class="admin-section"><h3><i class="fa-solid fa-box"></i> Shop Stock</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item Name"><input class="admin-input" style="margin:0;width:80px;" type="number" id="newShopPrice" placeholder="Price"><button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addShopBtn">Add Item</button></div><div id="adminShop"></div></div>
         </div>
     </div>
 </main>
@@ -362,7 +362,6 @@ async function loadStats(){
     try {
         var res = await fetch('/api/stats');
         var data = await res.json();
-
         if (data.online) {
             document.getElementById('playerCount').textContent = data.players + ' / ' + data.maxPlayers;
             document.getElementById('barFill').style.width = (data.players / data.maxPlayers * 100) + '%';
@@ -371,7 +370,6 @@ async function loadStats(){
         } else {
             document.getElementById('playerCount').textContent = 'OFFLINE';
             document.getElementById('barFill').style.width = '0%';
-            document.getElementById('serverName').textContent = 'SouthSide S2';
             document.getElementById('statusText').textContent = 'Offline';
         }
     } catch (e) {
@@ -386,17 +384,14 @@ setInterval(loadStats, 60000);
 async function loadShop(category){
     var grid = document.getElementById('shopGrid');
     grid.innerHTML = '<p class="loading-text">Loading...</p>';
-
     try {
         var url = category ? '/api/shop?category=' + encodeURIComponent(category) : '/api/shop';
         var res = await fetch(url);
         var items = await res.json();
-
         if (!items.length) {
             grid.innerHTML = '<p class="loading-text">No items.</p>';
             return;
         }
-
         grid.innerHTML = items.map(function(item){
             return '<div class="shop-item">' +
                 '<div class="shop-img"><i class="fa-solid fa-car"></i></div>' +
@@ -423,16 +418,13 @@ document.getElementById('shopCats').addEventListener('click', function(e){
 async function loadStreamers(){
     var grid = document.getElementById('streamersGrid');
     grid.innerHTML = '<p class="loading-text">Loading...</p>';
-
     try {
         var res = await fetch('/api/streamers');
         var streamers = await res.json();
-
         if (!streamers.length) {
             grid.innerHTML = '<p class="loading-text">Ma fammech streamers taw.</p>';
             return;
         }
-
         grid.innerHTML = streamers.map(function(s){
             return '<div class="streamer">' +
                 '<div class="streamer-img"><i class="fa-brands fa-kickstarter"></i></div>' +
@@ -457,28 +449,20 @@ document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
 document.getElementById('ticketModal').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
 
 document.querySelectorAll('[data-ticket]').forEach(function(el){
-    el.addEventListener('click', function(){
-        openModal(this.getAttribute('data-ticket'), 'Fill in details');
-    });
+    el.addEventListener('click', function(){ openModal(this.getAttribute('data-ticket'), 'Fill in details'); });
 });
-
 document.querySelectorAll('[data-app]').forEach(function(el){
-    el.addEventListener('click', function(){
-        openModal(this.getAttribute('data-app'), 'Submit your application');
-    });
+    el.addEventListener('click', function(){ openModal(this.getAttribute('data-app'), 'Submit your application'); });
 });
 
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
     var subject = document.getElementById('ticketSubject').value.trim();
     var msg = document.getElementById('ticketMessage').value.trim();
-
     if (!subject || !msg) { alert('Please fill all fields'); return; }
-
     try {
         var res = await fetch('/api/tickets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: currentType, subject: subject, message: msg })
         });
         var data = await res.json();
@@ -486,38 +470,26 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
             alert('✅ Ticket submitted!');
             closeModal();
             document.getElementById('ticketForm').reset();
-        } else {
-            alert('❌ ' + (data.error || 'Error'));
-        }
-    } catch (e) {
-        alert('❌ Network error');
-    }
+        } else { alert('❌ ' + (data.error || 'Error')); }
+    } catch (e) { alert('❌ Network error'); }
 });
 
-// ===== ADMIN (REAL login b env password) =====
+// ===== ADMIN =====
 document.getElementById('adminLoginBtn').addEventListener('click', async function(){
     var password = document.getElementById('adminPassword').value;
-
     if (!password) { alert('Enter password'); return; }
-
     try {
         var res = await fetch('/api/admin-login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password: password })
         });
         var data = await res.json();
-
         if (data.success) {
             document.getElementById('adminLoginView').style.display = 'none';
             document.getElementById('adminPanelView').style.display = 'block';
             loadAdmin();
-        } else {
-            alert('❌ ' + (data.error || 'Wrong password'));
-        }
-    } catch (e) {
-        alert('❌ Network error');
-    }
+        } else { alert('❌ Wrong password'); }
+    } catch (e) { alert('❌ Network error'); }
 });
 
 document.getElementById('adminLogoutBtn').addEventListener('click', function(){
@@ -529,105 +501,100 @@ document.getElementById('adminLogoutBtn').addEventListener('click', function(){
 document.getElementById('addStreamerBtn').addEventListener('click', async function(){
     var name = document.getElementById('newStreamerName').value.trim();
     if (!name) return;
-
-    try {
-        var res = await fetch('/api/streamers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: name })
-        });
-        if (res.ok) {
-            document.getElementById('newStreamerName').value = '';
-            loadAdmin();
-            loadStreamers();
-        } else {
-            var data = await res.json();
-            alert('❌ ' + (data.error || 'Error'));
-        }
-    } catch (e) {
-        alert('❌ Network error');
-    }
+    await fetch('/api/streamers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: name })
+    });
+    document.getElementById('newStreamerName').value = '';
+    loadAdmin(); loadStreamers();
 });
 
+document.getElementById('addShopBtn').addEventListener('click', async function(){
+    var name = document.getElementById('newShopName').value.trim();
+    var price = document.getElementById('newShopPrice').value;
+    if (!name || !price) return alert('Fill name and price');
+    await fetch('/api/shop', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, price: parseInt(price), category: 'Vehicles', stock: 1 })
+    });
+    document.getElementById('newShopName').value = '';
+    document.getElementById('newShopPrice').value = '';
+    loadAdmin(); loadShop();
+});
+
+async function updateTicket(id, status) {
+    await fetch('/api/tickets/' + id, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: status })
+    });
+    loadAdmin();
+}
+
 async function loadAdmin() {
+    // Tickets
     try {
         var tRes = await fetch('/api/tickets');
         var tickets = await tRes.json();
         if (tickets.length) {
-            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>Status</th></tr></thead><tbody>' +
-                tickets.map(function(t){ return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td>' + t.status + '</td></tr>'; }).join('') +
-                '</tbody></table>';
-        } else {
-            document.getElementById('adminTickets').innerHTML = '<p class="loading-text">No tickets yet.</p>';
-        }
-    } catch (e) {
-        document.getElementById('adminTickets').innerHTML = '<p class="loading-text">Error.</p>';
-    }
+            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
+                tickets.map(function(t){ 
+                    var color = t.status === 'accepted' ? 'green' : t.status === 'rejected' ? 'red' : 'orange';
+                    return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td style="color:'+color+'">' + t.status + '</td>' +
+                    '<td>' +
+                    '<button onclick="updateTicket(\'' + t.id + '\', \'accepted\')" style="background:#22c55e; margin-right:5px;">Accept</button>' +
+                    '<button onclick="updateTicket(\'' + t.id + '\', \'rejected\')" style="background:#ff003c;">Reject</button>' +
+                    '</td></tr>'; 
+                }).join('') + '</tbody></table>';
+        } else { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">No tickets yet.</p>'; }
+    } catch (e) { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">Error.</p>'; }
 
+    // Streamers
     try {
         var sRes = await fetch('/api/streamers');
         var streamers = await sRes.json();
         if (streamers.length) {
             document.getElementById('adminStreamers').innerHTML = '<table class="admin-table"><thead><tr><th>Username</th><th>Actions</th></tr></thead><tbody>' +
-                streamers.map(function(s){ return '<tr><td>' + s.username + '</td><td><button onclick="removeStreamer(\'' + s.id + '\')">Delete</button></td></tr>'; }).join('') +
-                '</tbody></table>';
-        } else {
-            document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">No streamers.</p>';
-        }
-    } catch (e) {
-        document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">Error.</p>';
-    }
+                streamers.map(function(s){ return '<tr><td>' + s.username + '</td><td><button onclick="removeStreamer(\'' + s.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
+        } else { document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">No streamers.</p>'; }
+    } catch (e) { document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">Error.</p>'; }
 
+    // Shop
     try {
         var shRes = await fetch('/api/shop');
         var items = await shRes.json();
         if (items.length) {
-            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Stock</th></tr></thead><tbody>' +
-                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td></tr>'; }).join('') +
-                '</tbody></table>';
-        } else {
-            document.getElementById('adminShop').innerHTML = '<p class="loading-text">No items.</p>';
-        }
-    } catch (e) {
-        document.getElementById('adminShop').innerHTML = '<p class="loading-text">Error.</p>';
-    }
+            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Actions</th></tr></thead><tbody>' +
+                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td><button onclick="removeShop(\'' + item.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
+        } else { document.getElementById('adminShop').innerHTML = '<p class="loading-text">No items.</p>'; }
+    } catch (e) { document.getElementById('adminShop').innerHTML = '<p class="loading-text">Error.</p>'; }
 }
 
 async function removeStreamer(id) {
     if (!confirm('Delete this streamer?')) return;
-    try {
-        var res = await fetch('/api/streamers?id=' + encodeURIComponent(id), { method: 'DELETE' });
-        if (res.ok) {
-            loadAdmin();
-            loadStreamers();
-        } else {
-            alert('❌ Error deleting');
-        }
-    } catch (e) {
-        alert('❌ Network error');
-    }
+    await fetch('/api/streamers/' + id, { method: 'DELETE' });
+    loadAdmin(); loadStreamers();
+}
+async function removeShop(id) {
+    if (!confirm('Delete this item?')) return;
+    await fetch('/api/shop/' + id, { method: 'DELETE' });
+    loadAdmin(); loadShop();
 }
 window.removeStreamer = removeStreamer;
+window.removeShop = removeShop;
+window.updateTicket = updateTicket;
 
-// ===== DISCORD LOGIN (REAL OAuth2) =====
+// ===== DISCORD LOGIN =====
 document.getElementById('loginBtn').addEventListener('click', function(){
     window.location.href = '/api/auth/login';
 });
-
-// Check login status mel URL
 (function(){
     var params = new URLSearchParams(window.location.search);
     var login = params.get('login');
     if (login === 'success') {
         document.getElementById('loginText').textContent = 'Logged In';
         window.history.replaceState({}, '', '/');
-    } else if (login === 'denied' || login === 'failed' || login === 'error') {
-        alert('❌ Discord login failed');
-        window.history.replaceState({}, '', '/');
     }
 })();
-
-console.log('✅ SouthSide S2 loaded');
 </script>
 
 </body>
