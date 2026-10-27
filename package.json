@@ -1,12 +1,9 @@
 {
-  "name": "southside-website",
+  "name": "southside-s2",
   "version": "1.0.0",
-  "description": "SouthSide S2 Website",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "private": true,
   "dependencies": {
-    "express": "^4.18.2"
+    "cfx-api": "^1.3.0",
+    "@supabase/supabase-js": "^2.39.0"
   }
 }

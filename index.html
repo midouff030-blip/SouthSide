@@ -87,6 +87,7 @@ main{padding:10rem 4rem 4rem 4rem;max-width:1400px;margin:0 auto;min-height:85vh
 .streamer-info{padding:1.2rem;display:flex;justify-content:space-between;align-items:center;}
 .streamer-name{font-size:1rem;font-weight:800;}
 .live-dot{width:10px;height:10px;background:#666;border-radius:50%;}
+.live-dot.on{background:#22c55e;box-shadow:0 0 8px #22c55e;}
 .generic{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:3rem;margin-bottom:1.5rem;}
 .generic h2{font-size:2rem;font-weight:800;margin-bottom:1rem;}
 .generic h2 em{color:var(--red);font-family:'Playfair Display',serif;font-style:italic;}
@@ -124,6 +125,7 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
 .modal-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--muted);cursor:pointer;font-size:1.2rem;background:none;border:none;}
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--red);color:#fff;padding:0.9rem 1.8rem;border-radius:8px;font-weight:700;font-size:0.9rem;transform:translateY(150%);transition:transform 0.3s;z-index:3000;}
 .toast.show{transform:translateY(0);}
+.loading-text{color:var(--muted);font-size:0.9rem;}
 @media(max-width:1200px){.apps{grid-template-columns:repeat(3,1fr);}.streamers-grid{grid-template-columns:repeat(2,1fr);}.leads-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:992px){header{padding:1rem 2rem;flex-direction:column;gap:1rem;}nav{width:100%;overflow-x:auto;justify-content:flex-start;}main{padding:12rem 1rem 2rem 1rem;}.status-box{grid-template-columns:1fr;}.leads-grid{grid-template-columns:1fr;}.apps{grid-template-columns:1fr;}.streamers-grid{grid-template-columns:1fr;}.shop-grid{grid-template-columns:1fr;}.tickets{grid-template-columns:1fr;}footer{grid-template-columns:1fr;padding:2rem;}.footer-bottom{grid-column:span 1;flex-direction:column;gap:0.5rem;}}
 </style>
@@ -155,7 +157,7 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
         <div class="hero"><h1>Join The <em>Community</em> Everyone Talks About.</h1><p>Meet dedicated roleplayers, share your clips, and become part of one of the most active FiveM communities.</p></div>
         <div class="status-box">
             <div class="status-left">
-                <h4 id="statusLabel"><span class="dot"></span> Online</h4>
+                <h4 id="statusLabel"><span class="dot"></span> <span id="statusText">Loading...</span></h4>
                 <div class="stat"><span>PLAYER COUNT</span><span id="playerCount">Loading...</span></div>
                 <div class="bar"><div class="bar-fill" id="barFill"></div></div>
                 <div class="stat"><span>SERVER NAME</span><span id="serverName" style="color:#fff;font-size:0.8rem;">-</span></div>
@@ -225,7 +227,7 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
 
     <div id="tab-streamers" class="tab">
         <div class="page-head"><h2>SouthSide S2 <em>Streamers</em></h2><p>Official content creators.</p></div>
-        <div class="streamers-grid" id="streamersGrid"></div>
+        <div class="streamers-grid" id="streamersGrid"><p class="loading-text">Loading...</p></div>
     </div>
 
     <div id="tab-rules" class="tab">
@@ -251,8 +253,7 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
         <div id="adminLoginView">
             <div class="admin-login">
                 <h2>Admin <em>Login</em></h2>
-                <p>Demo: admin@southside.com / admin123</p>
-                <input class="admin-input" type="email" id="adminEmail" placeholder="Email">
+                <p>Enter your admin password.</p>
                 <input class="admin-input" type="password" id="adminPassword" placeholder="Password">
                 <button class="admin-btn" id="adminLoginBtn">Login</button>
             </div>
@@ -356,42 +357,58 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     setTimeout(function(){ t.classList.remove('show'); }, 3000);
 });
 
-// ===== FIVEM STATS (mock for demo) =====
-function loadStats(){
-    setTimeout(function(){
-        var clients = Math.floor(Math.random() * 150) + 30;
-        document.getElementById('playerCount').textContent = clients + ' / 200';
-        document.getElementById('barFill').style.width = (clients/200*100) + '%';
-        document.getElementById('serverName').textContent = 'SouthSide S2';
-    }, 500);
+// ===== FIVEM STATS (REAL) =====
+async function loadStats(){
+    try {
+        var res = await fetch('/api/stats');
+        var data = await res.json();
+
+        if (data.online) {
+            document.getElementById('playerCount').textContent = data.players + ' / ' + data.maxPlayers;
+            document.getElementById('barFill').style.width = (data.players / data.maxPlayers * 100) + '%';
+            document.getElementById('serverName').textContent = data.name;
+            document.getElementById('statusText').textContent = 'Online';
+        } else {
+            document.getElementById('playerCount').textContent = 'OFFLINE';
+            document.getElementById('barFill').style.width = '0%';
+            document.getElementById('serverName').textContent = 'SouthSide S2';
+            document.getElementById('statusText').textContent = 'Offline';
+        }
+    } catch (e) {
+        document.getElementById('playerCount').textContent = 'N/A';
+        document.getElementById('statusText').textContent = 'N/A';
+    }
 }
 loadStats();
-setInterval(loadStats, 30000);
+setInterval(loadStats, 60000);
 
-// ===== SHOP =====
-var ITEMS = [
-    { id: 1, name: 'Audi RS700', price: 140, stock: 5, category: 'Vehicles', is_out_of_stock: false },
-    { id: 2, name: 'Skyline GT-R 32', price: 140, stock: 3, category: 'Vehicles', is_out_of_stock: false },
-    { id: 3, name: 'Can Drag 3', price: 110, stock: 10, category: 'Vehicles', is_out_of_stock: false },
-    { id: 4, name: 'BMW GT4', price: 100, stock: 7, category: 'Vehicles', is_out_of_stock: false },
-    { id: 5, name: 'BMW M5 2021', price: 100, stock: 0, category: 'Vehicles', is_out_of_stock: true },
-    { id: 6, name: 'BMW XM 2024', price: 110, stock: 4, category: 'Vehicles', is_out_of_stock: false }
-];
-
-function loadShop(category){
+// ===== SHOP (REAL mel API) =====
+async function loadShop(category){
     var grid = document.getElementById('shopGrid');
-    var items = ITEMS;
-    if (category) items = items.filter(function(i){ return i.category === category; });
-    if (items.length === 0) { grid.innerHTML = '<p style="color:var(--muted);">No items.</p>'; return; }
-    grid.innerHTML = items.map(function(item){
-        return '<div class="shop-item">' +
-            '<div class="shop-img"><i class="fa-solid fa-car"></i></div>' +
-            '<div class="shop-body">' +
-            (item.is_out_of_stock ? '<span class="shop-badge" style="background:#666;">OUT OF STOCK</span>' : (item.stock > 0 ? '<span class="shop-badge">STOCK: ' + item.stock + '</span>' : '')) +
-            '<div class="shop-price">' + item.price + ' DT</div>' +
-            '<div class="shop-title">' + item.name + '</div>' +
-            '</div></div>';
-    }).join('');
+    grid.innerHTML = '<p class="loading-text">Loading...</p>';
+
+    try {
+        var url = category ? '/api/shop?category=' + encodeURIComponent(category) : '/api/shop';
+        var res = await fetch(url);
+        var items = await res.json();
+
+        if (!items.length) {
+            grid.innerHTML = '<p class="loading-text">No items.</p>';
+            return;
+        }
+
+        grid.innerHTML = items.map(function(item){
+            return '<div class="shop-item">' +
+                '<div class="shop-img"><i class="fa-solid fa-car"></i></div>' +
+                '<div class="shop-body">' +
+                (item.stock === 0 ? '<span class="shop-badge" style="background:#666;">OUT OF STOCK</span>' : '<span class="shop-badge">STOCK: ' + item.stock + '</span>') +
+                '<div class="shop-price">' + item.price + ' DT</div>' +
+                '<div class="shop-title">' + item.name + '</div>' +
+                '</div></div>';
+        }).join('');
+    } catch (e) {
+        grid.innerHTML = '<p class="loading-text">Error loading shop.</p>';
+    }
 }
 
 document.getElementById('shopCats').addEventListener('click', function(e){
@@ -402,20 +419,32 @@ document.getElementById('shopCats').addEventListener('click', function(e){
     loadShop(btn.getAttribute('data-cat') || null);
 });
 
-// ===== STREAMERS =====
-var STREAMERS = ['zg13','zgougou','pirate','yumidavenci','kid','zo9la','rafa','9haya'];
-
-function loadStreamers(){
+// ===== STREAMERS (REAL mel API) =====
+async function loadStreamers(){
     var grid = document.getElementById('streamersGrid');
-    grid.innerHTML = STREAMERS.map(function(name){
-        return '<div class="streamer">' +
-            '<div class="streamer-img"><i class="fa-brands fa-kickstarter"></i></div>' +
-            '<div class="streamer-info"><span class="streamer-name">' + name.toUpperCase() + '</span><div class="live-dot"></div></div>' +
-            '</div>';
-    }).join('');
+    grid.innerHTML = '<p class="loading-text">Loading...</p>';
+
+    try {
+        var res = await fetch('/api/streamers');
+        var streamers = await res.json();
+
+        if (!streamers.length) {
+            grid.innerHTML = '<p class="loading-text">Ma fammech streamers taw.</p>';
+            return;
+        }
+
+        grid.innerHTML = streamers.map(function(s){
+            return '<div class="streamer">' +
+                '<div class="streamer-img"><i class="fa-brands fa-kickstarter"></i></div>' +
+                '<div class="streamer-info"><span class="streamer-name">' + s.username.toUpperCase() + '</span><div class="live-dot on"></div></div>' +
+                '</div>';
+        }).join('');
+    } catch (e) {
+        grid.innerHTML = '<p class="loading-text">Error loading streamers.</p>';
+    }
 }
 
-// ===== TICKETS =====
+// ===== TICKETS (REAL POST) =====
 var currentType = '';
 function openModal(title, desc) {
     currentType = title;
@@ -439,60 +468,166 @@ document.querySelectorAll('[data-app]').forEach(function(el){
     });
 });
 
-document.getElementById('ticketForm').addEventListener('submit', function(e){
+document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    var msg = document.getElementById('ticketMessage').value;
-    if (!msg.trim()) { alert('Please write a message'); return; }
-    alert('✅ Ticket submitted! (Demo mode - configure Supabase to save)');
-    closeModal();
+    var subject = document.getElementById('ticketSubject').value.trim();
+    var msg = document.getElementById('ticketMessage').value.trim();
+
+    if (!subject || !msg) { alert('Please fill all fields'); return; }
+
+    try {
+        var res = await fetch('/api/tickets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: currentType, subject: subject, message: msg })
+        });
+        var data = await res.json();
+        if (res.ok) {
+            alert('✅ Ticket submitted!');
+            closeModal();
+            document.getElementById('ticketForm').reset();
+        } else {
+            alert('❌ ' + (data.error || 'Error'));
+        }
+    } catch (e) {
+        alert('❌ Network error');
+    }
 });
 
-// ===== ADMIN =====
-document.getElementById('adminLoginBtn').addEventListener('click', function(){
-    var email = document.getElementById('adminEmail').value;
-    var pass = document.getElementById('adminPassword').value;
-    if (email === 'admin@southside.com' && pass === 'admin123') {
-        document.getElementById('adminLoginView').style.display = 'none';
-        document.getElementById('adminPanelView').style.display = 'block';
-        loadAdmin();
-    } else {
-        alert('❌ Wrong credentials. Demo: admin@southside.com / admin123');
+// ===== ADMIN (REAL login b env password) =====
+document.getElementById('adminLoginBtn').addEventListener('click', async function(){
+    var password = document.getElementById('adminPassword').value;
+
+    if (!password) { alert('Enter password'); return; }
+
+    try {
+        var res = await fetch('/api/admin-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: password })
+        });
+        var data = await res.json();
+
+        if (data.success) {
+            document.getElementById('adminLoginView').style.display = 'none';
+            document.getElementById('adminPanelView').style.display = 'block';
+            loadAdmin();
+        } else {
+            alert('❌ ' + (data.error || 'Wrong password'));
+        }
+    } catch (e) {
+        alert('❌ Network error');
     }
 });
 
 document.getElementById('adminLogoutBtn').addEventListener('click', function(){
     document.getElementById('adminLoginView').style.display = 'block';
     document.getElementById('adminPanelView').style.display = 'none';
+    document.getElementById('adminPassword').value = '';
 });
 
-document.getElementById('addStreamerBtn').addEventListener('click', function(){
+document.getElementById('addStreamerBtn').addEventListener('click', async function(){
     var name = document.getElementById('newStreamerName').value.trim();
     if (!name) return;
-    STREAMERS.push(name.toLowerCase());
-    document.getElementById('newStreamerName').value = '';
-    loadAdmin();
-    loadStreamers();
+
+    try {
+        var res = await fetch('/api/streamers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: name })
+        });
+        if (res.ok) {
+            document.getElementById('newStreamerName').value = '';
+            loadAdmin();
+            loadStreamers();
+        } else {
+            var data = await res.json();
+            alert('❌ ' + (data.error || 'Error'));
+        }
+    } catch (e) {
+        alert('❌ Network error');
+    }
 });
 
-function loadAdmin() {
-    document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>ID</th><th>Type</th><th>Status</th></tr></thead><tbody><tr><td colspan="3" style="color:var(--muted);text-align:center;padding:1rem;">No tickets yet (Demo)</td></tr></tbody></table>';
-    document.getElementById('adminStreamers').innerHTML = '<table class="admin-table"><thead><tr><th>Username</th><th>Actions</th></tr></thead><tbody>' + STREAMERS.map(function(s, i){ return '<tr><td>' + s + '</td><td><button onclick="removeStreamer(' + i + ')">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
-    document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Stock</th></tr></thead><tbody>' + ITEMS.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td></tr>'; }).join('') + '</tbody></table>';
+async function loadAdmin() {
+    try {
+        var tRes = await fetch('/api/tickets');
+        var tickets = await tRes.json();
+        if (tickets.length) {
+            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>Status</th></tr></thead><tbody>' +
+                tickets.map(function(t){ return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td>' + t.status + '</td></tr>'; }).join('') +
+                '</tbody></table>';
+        } else {
+            document.getElementById('adminTickets').innerHTML = '<p class="loading-text">No tickets yet.</p>';
+        }
+    } catch (e) {
+        document.getElementById('adminTickets').innerHTML = '<p class="loading-text">Error.</p>';
+    }
+
+    try {
+        var sRes = await fetch('/api/streamers');
+        var streamers = await sRes.json();
+        if (streamers.length) {
+            document.getElementById('adminStreamers').innerHTML = '<table class="admin-table"><thead><tr><th>Username</th><th>Actions</th></tr></thead><tbody>' +
+                streamers.map(function(s){ return '<tr><td>' + s.username + '</td><td><button onclick="removeStreamer(\'' + s.id + '\')">Delete</button></td></tr>'; }).join('') +
+                '</tbody></table>';
+        } else {
+            document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">No streamers.</p>';
+        }
+    } catch (e) {
+        document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">Error.</p>';
+    }
+
+    try {
+        var shRes = await fetch('/api/shop');
+        var items = await shRes.json();
+        if (items.length) {
+            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Stock</th></tr></thead><tbody>' +
+                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td></tr>'; }).join('') +
+                '</tbody></table>';
+        } else {
+            document.getElementById('adminShop').innerHTML = '<p class="loading-text">No items.</p>';
+        }
+    } catch (e) {
+        document.getElementById('adminShop').innerHTML = '<p class="loading-text">Error.</p>';
+    }
 }
 
-function removeStreamer(i) {
-    STREAMERS.splice(i, 1);
-    loadAdmin();
-    loadStreamers();
+async function removeStreamer(id) {
+    if (!confirm('Delete this streamer?')) return;
+    try {
+        var res = await fetch('/api/streamers?id=' + encodeURIComponent(id), { method: 'DELETE' });
+        if (res.ok) {
+            loadAdmin();
+            loadStreamers();
+        } else {
+            alert('❌ Error deleting');
+        }
+    } catch (e) {
+        alert('❌ Network error');
+    }
 }
 window.removeStreamer = removeStreamer;
 
-// ===== LOGIN =====
+// ===== DISCORD LOGIN (REAL OAuth2) =====
 document.getElementById('loginBtn').addEventListener('click', function(){
-    alert('⚠️ Discord Login: configure Supabase to enable');
+    window.location.href = '/api/auth/login';
 });
 
-console.log('✅ SouthSide S2 loaded successfully');
+// Check login status mel URL
+(function(){
+    var params = new URLSearchParams(window.location.search);
+    var login = params.get('login');
+    if (login === 'success') {
+        document.getElementById('loginText').textContent = 'Logged In';
+        window.history.replaceState({}, '', '/');
+    } else if (login === 'denied' || login === 'failed' || login === 'error') {
+        alert('❌ Discord login failed');
+        window.history.replaceState({}, '', '/');
+    }
+})();
+
+console.log('✅ SouthSide S2 loaded');
 </script>
 
 </body>
