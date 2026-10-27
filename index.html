@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SouthSide RolePlay S2 | Official Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#030305;--card:#0a0b10;--red:#ff003c;--grad:linear-gradient(135deg,#ff003c,#b3002d);--txt:#fff;--muted:#8a8d9b;--border:rgba(255,255,255,0.08);--border-red:rgba(255,0,60,0.35);}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
+body{background:var(--bg);color:var(--txt);overflow-x:hidden;min-height:100vh;}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.wrapper{position:relative;z-index:1;}
+.marquee{background:rgba(255,0,60,0.05);border-bottom:1px solid var(--border);padding:0.5rem 0;overflow:hidden;white-space:nowrap;margin-top:75px;position:fixed;width:100%;z-index:999;backdrop-filter:blur(10px);}
+.marquee-inner{display:inline-block;animation:scroll 30s linear infinite;font-size:0.8rem;font-weight:700;letter-spacing:2px;color:var(--red);text-transform:uppercase;}
+@keyframes scroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+header{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(3,3,5,0.95);backdrop-filter:blur(16px);position:fixed;top:0;width:100%;z-index:1000;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:0.9rem;}
+.logo{width:44px;height:44px;background:var(--grad);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;color:#fff;}
+.brand h1{font-size:1.25rem;font-weight:800;line-height:1.1;}
+.brand span{color:var(--red);font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;}
+nav{display:flex;gap:0.8rem;background:rgba(255,255,255,0.02);padding:0.3rem;border-radius:10px;border:1px solid var(--border);}
+.nav-btn{color:var(--muted);font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:0.6rem 1rem;border-radius:7px;cursor:pointer;transition:all 0.2s;background:none;border:1px solid transparent;font-family:inherit;}
+.nav-btn:hover{color:#fff;background:rgba(255,0,60,0.08);}
+.nav-btn.active{color:#fff;background:rgba(255,0,60,0.12);border:1px solid var(--border-red);}
+.btn-login{background:var(--grad);color:#fff;border:none;padding:0.7rem 1.6rem;font-weight:700;font-size:0.85rem;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-family:inherit;}
+main{padding:10rem 4rem 4rem 4rem;max-width:1400px;margin:0 auto;min-height:85vh;}
+.tab{display:none;}
+.tab.active{display:block;animation:fadeIn 0.4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.hero{text-align:center;margin-bottom:3rem;padding-top:1rem;}
+.hero h1{font-size:3.8rem;font-weight:800;line-height:1.15;margin-bottom:1rem;}
+.hero h1 em{color:var(--red);font-family:'Playfair Display',serif;font-style:italic;}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:650px;margin:0 auto 2.5rem;line-height:1.6;}
+.status-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:3rem;align-items:center;margin-bottom:4rem;}
+.status-left h4{font-size:0.8rem;font-weight:800;color:#22c55e;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 8px #22c55e;}
+.stat{display:flex;justify-content:space-between;font-size:0.9rem;font-weight:700;margin-bottom:0.5rem;}
+.stat span:last-child{color:var(--red);}
+.bar{width:100%;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-bottom:1.5rem;}
+.bar-fill{width:0%;height:100%;background:var(--grad);transition:width 0.5s;}
+.status-right h5{font-size:0.75rem;font-weight:800;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.8rem;}
+.ip-row{display:flex;background:#030305;border:1px solid var(--border);border-radius:8px;padding:0.6rem 1rem;align-items:center;justify-content:space-between;margin-bottom:1rem;font-family:monospace;font-size:0.9rem;}
+.btn-copy{width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;font-family:inherit;}
+.leads{text-align:center;margin-bottom:4rem;}
+.leads h2{font-size:3rem;font-weight:800;margin-bottom:3rem;}
+.leads h2 em{font-family:'Playfair Display',serif;font-style:italic;color:var(--red);}
+.leads-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
+.lead{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:left;transition:0.2s;}
+.lead:hover{border-color:var(--border-red);transform:translateY(-3px);}
+.lead h4{font-size:1.15rem;font-weight:800;margin-bottom:0.8rem;}
+.lead p{color:var(--muted);font-size:0.85rem;line-height:1.6;}
+.page-head{text-align:center;margin-bottom:3rem;}
+.page-head h2{font-size:3.5rem;font-weight:800;text-transform:uppercase;}
+.page-head h2 em{font-family:'Playfair Display',serif;font-style:italic;color:var(--red);text-transform:none;}
+.page-head p{color:var(--muted);font-size:0.95rem;margin-top:0.5rem;}
+.tickets{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;max-width:1000px;margin:0 auto;}
+.ticket{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:0.25s;}
+.ticket:hover{border-color:var(--red);background:#0d0f17;transform:translateY(-2px);}
+.ticket h3{font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;}
+.ticket p{color:var(--muted);font-size:0.85rem;}
+.ticket i{color:var(--red);font-size:1.1rem;}
+.apps{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;}
+.app{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:0.3s;min-height:280px;display:flex;flex-direction:column;justify-content:space-between;}
+.app:hover{border-color:var(--red);transform:translateY(-5px);background:#0e1017;}
+.app i{font-size:2rem;color:var(--red);margin-bottom:1.5rem;}
+.app h4{font-size:1.05rem;font-weight:800;margin-bottom:1rem;}
+.app-badge{font-size:0.7rem;font-weight:800;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.shop-cats{display:flex;justify-content:center;gap:0.8rem;margin-bottom:2.5rem;flex-wrap:wrap;}
+.cat-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit;transition:0.2s;}
+.cat-btn.active,.cat-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.shop-item{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
+.shop-item:hover{border-color:var(--border-red);transform:translateY(-4px);}
+.shop-img{height:180px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;}
+.shop-img i{font-size:3rem;color:var(--red);}
+.shop-body{padding:1.5rem;}
+.shop-badge{background:var(--red);color:#fff;font-size:0.65rem;font-weight:900;padding:0.2rem 0.5rem;border-radius:4px;display:inline-block;margin-bottom:0.5rem;}
+.shop-price{font-size:0.85rem;font-weight:800;color:var(--muted);margin-bottom:0.3rem;}
+.shop-title{font-size:1.05rem;font-weight:800;}
+.streamers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
+.streamer{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
+.streamer:hover{border-color:var(--red);transform:translateY(-3px);}
+.streamer-img{height:260px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;}
+.streamer-img i{font-size:4rem;color:var(--red);}
+.streamer-info{padding:1.2rem;display:flex;justify-content:space-between;align-items:center;}
+.streamer-name{font-size:1rem;font-weight:800;}
+.live-dot{width:10px;height:10px;background:#666;border-radius:50%;}
+.generic{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:3rem;margin-bottom:1.5rem;}
+.generic h2{font-size:2rem;font-weight:800;margin-bottom:1rem;}
+.generic h2 em{color:var(--red);font-family:'Playfair Display',serif;font-style:italic;}
+.generic p{color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:1.5rem;}
+.generic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.info{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:1.5rem;}
+.info h4{font-size:1.1rem;font-weight:800;margin-bottom:0.4rem;}
+.info p{color:var(--muted);font-size:0.85rem;}
+.admin-login{max-width:420px;margin:4rem auto;background:var(--card);border:1px solid var(--border-red);border-radius:14px;padding:2.5rem;}
+.admin-login h2{font-size:1.8rem;font-weight:800;margin-bottom:0.5rem;}
+.admin-login h2 em{color:var(--red);font-style:italic;}
+.admin-login p{color:var(--muted);font-size:0.85rem;margin-bottom:2rem;}
+.admin-input{width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;margin-bottom:1rem;font-family:inherit;}
+.admin-btn{width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;margin-bottom:0.5rem;font-family:inherit;}
+.admin-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
+.admin-section h3{font-size:1.2rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.admin-section h3 i{color:var(--red);}
+.admin-table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+.admin-table th{text-align:left;padding:0.6rem;color:var(--muted);text-transform:uppercase;font-size:0.7rem;letter-spacing:1px;border-bottom:1px solid var(--border);}
+.admin-table td{padding:0.6rem;border-bottom:1px solid rgba(255,255,255,0.03);}
+.admin-table button{background:var(--grad);color:#fff;border:none;padding:0.4rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;}
+footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background:rgba(3,3,5,0.9);margin-top:5rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;}
+.footer-brand p{color:var(--muted);font-size:0.85rem;margin-top:0.5rem;max-width:350px;}
+.footer-links h4,.footer-social h4{font-size:0.9rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;}
+.footer-links ul{list-style:none;}
+.footer-links ul li{margin-bottom:0.5rem;}
+.footer-links ul li a{color:var(--muted);font-size:0.85rem;cursor:pointer;}
+.footer-links ul li a:hover{color:#fff;}
+.socials{display:flex;gap:0.8rem;}
+.social{width:38px;height:38px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;}
+.footer-bottom{grid-column:span 3;border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;color:var(--muted);font-size:0.8rem;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(3,3,5,0.85);backdrop-filter:blur(10px);z-index:2000;display:none;align-items:center;justify-content:center;padding:2rem;}
+.modal.active{display:flex;}
+.modal-body{background:var(--card);border:1px solid var(--border-red);border-radius:14px;width:100%;max-width:650px;padding:2.5rem;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--muted);cursor:pointer;font-size:1.2rem;background:none;border:none;}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--red);color:#fff;padding:0.9rem 1.8rem;border-radius:8px;font-weight:700;font-size:0.9rem;transform:translateY(150%);transition:transform 0.3s;z-index:3000;}
+.toast.show{transform:translateY(0);}
+@media(max-width:1200px){.apps{grid-template-columns:repeat(3,1fr);}.streamers-grid{grid-template-columns:repeat(2,1fr);}.leads-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:992px){header{padding:1rem 2rem;flex-direction:column;gap:1rem;}nav{width:100%;overflow-x:auto;justify-content:flex-start;}main{padding:12rem 1rem 2rem 1rem;}.status-box{grid-template-columns:1fr;}.leads-grid{grid-template-columns:1fr;}.apps{grid-template-columns:1fr;}.streamers-grid{grid-template-columns:1fr;}.shop-grid{grid-template-columns:1fr;}.tickets{grid-template-columns:1fr;}footer{grid-template-columns:1fr;padding:2rem;}.footer-bottom{grid-column:span 1;flex-direction:column;gap:0.5rem;}}
+</style>
+</head>
+<body>
+
+<div class="marquee"><div class="marquee-inner">SOUTHSIDE ROLEPLAY S2 / TOP TIER SERIOUS ROLEPLAY / OPTIMIZED CUSTOM SYSTEMS / ACTIVE STAFF 24/7 / COMPETITIVE ECONOMY / JOIN THE BEST CITY /</div></div>
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+<header>
+    <div class="brand"><div class="logo">SS</div><div><h1>SouthSide S2</h1><span>Roleplay</span></div></div>
+    <nav id="mainNav">
+        <button class="nav-btn active" data-tab="home">Home</button>
+        <button class="nav-btn" data-tab="events">Events</button>
+        <button class="nav-btn" data-tab="rules">Rules</button>
+        <button class="nav-btn" data-tab="apps">Applications</button>
+        <button class="nav-btn" data-tab="shop">Shop</button>
+        <button class="nav-btn" data-tab="team">Team</button>
+        <button class="nav-btn" data-tab="streamers">Streamers</button>
+        <button class="nav-btn" data-tab="support">Support</button>
+        <button class="nav-btn" data-tab="admin">Admin</button>
+    </nav>
+    <button class="btn-login" id="loginBtn"><i class="fa-brands fa-discord"></i> <span id="loginText">Login</span></button>
+</header>
+
+<main>
+    <div id="tab-home" class="tab active">
+        <div class="hero"><h1>Join The <em>Community</em> Everyone Talks About.</h1><p>Meet dedicated roleplayers, share your clips, and become part of one of the most active FiveM communities.</p></div>
+        <div class="status-box">
+            <div class="status-left">
+                <h4 id="statusLabel"><span class="dot"></span> Online</h4>
+                <div class="stat"><span>PLAYER COUNT</span><span id="playerCount">Loading...</span></div>
+                <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+                <div class="stat"><span>SERVER NAME</span><span id="serverName" style="color:#fff;font-size:0.8rem;">-</span></div>
+            </div>
+            <div class="status-right">
+                <h5>Server IP</h5>
+                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal" style="color:var(--red);"></i></div>
+                <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy Server IP</button>
+            </div>
+        </div>
+        <div class="leads"><h2>Why SouthSide S2 <em>Leads</em></h2>
+            <div class="leads-grid">
+                <div class="lead"><h4>Elite Roleplay Standard</h4><p>Serious story-driven roleplay with real consequences.</p></div>
+                <div class="lead"><h4>Performance First</h4><p>Hand-crafted scripts and constant optimization.</p></div>
+                <div class="lead"><h4>Balanced Progression</h4><p>A fair economy where effort decides your growth.</p></div>
+                <div class="lead"><h4>Staff That Shows Up</h4><p>Fast support and active moderation 24/7.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-support" class="tab">
+        <div class="page-head"><span style="font-size:0.8rem;font-weight:800;letter-spacing:2px;color:var(--red);text-transform:uppercase;">SouthSide S2 Support</span><h2>How can we <em>help?</em></h2></div>
+        <div class="tickets">
+            <div class="ticket" data-ticket="Donation"><div><h3>Donation</h3><p>Support the server</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Refund"><div><h3>Refund</h3><p>Request a refund</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Bug Report"><div><h3>Bug Report</h3><p>Report a bug</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Gang Application"><div><h3>Gang Application</h3><p>Apply for a gang</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Staff Application"><div><h3>Staff Application</h3><p>Join the staff</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Bad Admin"><div><h3>Bad Admin</h3><p>Report an admin</p></div><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="ticket" data-ticket="Other" style="grid-column:span 2;"><div><h3>Other</h3><p>Other issues</p></div><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+    </div>
+
+    <div id="tab-shop" class="tab">
+        <div class="page-head"><h2>Shop <em>Catalog</em></h2><p>Cosmetic items and quality-of-life features.</p></div>
+        <div class="shop-cats" id="shopCats">
+            <button class="cat-btn active" data-cat="">All</button>
+            <button class="cat-btn" data-cat="Vehicles">Vehicles</button>
+            <button class="cat-btn" data-cat="Gang Donation">Gang Donation</button>
+            <button class="cat-btn" data-cat="Mansions">Mansions</button>
+            <button class="cat-btn" data-cat="Peds">Peds</button>
+            <button class="cat-btn" data-cat="Other">Other</button>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+    </div>
+
+    <div id="tab-apps" class="tab">
+        <div class="page-head"><h2>SouthSide S2 <em>Applications</em></h2><p>Select a department to submit your application</p></div>
+        <div class="apps">
+            <div class="app" data-app="Whitelist App"><i class="fa-solid fa-user"></i><h4>WHITELIST</h4><div class="app-badge">FORMS ↓</div></div>
+            <div class="app" data-app="Gang & Family App"><i class="fa-solid fa-users-rectangle"></i><h4>GANG & FAMILY</h4><div class="app-badge">FORMS ↓</div></div>
+            <div class="app" data-app="Police App"><i class="fa-solid fa-shield-halved"></i><h4>POLICE DEPT</h4><div class="app-badge">FORMS ↓</div></div>
+            <div class="app" data-app="EMS App"><i class="fa-solid fa-briefcase-medical"></i><h4>EMS DEPT</h4><div class="app-badge">FORMS ↓</div></div>
+            <div class="app" data-app="Creator App"><i class="fa-solid fa-video"></i><h4>CREATOR</h4><div class="app-badge">FORMS ↓</div></div>
+        </div>
+    </div>
+
+    <div id="tab-team" class="tab">
+        <div class="generic"><h2>Administration <em>Team</em></h2><p>Meet the dedicated staff members.</p>
+            <div class="generic-grid">
+                <div class="info"><h4>Zigrilou</h4><p>Founder & Lead Developer</p></div>
+                <div class="info"><h4>Admin Team</h4><p>Senior Administrators</p></div>
+                <div class="info"><h4>Support Team</h4><p>Community Helpers</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-streamers" class="tab">
+        <div class="page-head"><h2>SouthSide S2 <em>Streamers</em></h2><p>Official content creators.</p></div>
+        <div class="streamers-grid" id="streamersGrid"></div>
+    </div>
+
+    <div id="tab-rules" class="tab">
+        <div class="generic"><h2>Server <em>Rules</em></h2><p>Read carefully.</p>
+            <div class="generic-grid">
+                <div class="info"><h4>1. FearRP</h4><p>Value your character's life.</p></div>
+                <div class="info"><h4>2. No RDM / VDM</h4><p>Random Deathmatch prohibited.</p></div>
+                <div class="info"><h4>3. Immersion</h4><p>Maintain character integrity.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-events" class="tab">
+        <div class="generic"><h2>Weekly <em>Events</em></h2><p>Participate in weekend tournaments.</p>
+            <div class="generic-grid">
+                <div class="info"><h4>Saturday Street Meet</h4><p>Weekly car showcase.</p></div>
+                <div class="info"><h4>Gang Turf War</h4><p>Territory control battles.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-admin" class="tab">
+        <div id="adminLoginView">
+            <div class="admin-login">
+                <h2>Admin <em>Login</em></h2>
+                <p>Demo: admin@southside.com / admin123</p>
+                <input class="admin-input" type="email" id="adminEmail" placeholder="Email">
+                <input class="admin-input" type="password" id="adminPassword" placeholder="Password">
+                <button class="admin-btn" id="adminLoginBtn">Login</button>
+            </div>
+        </div>
+        <div id="adminPanelView" style="display:none;">
+            <div style="margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="font-size:2rem;font-weight:800;">Admin <span style="color:var(--red);">Dashboard</span></h2>
+                <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="adminLogoutBtn">Logout</button>
+            </div>
+            <div class="admin-section"><h3><i class="fa-solid fa-ticket"></i> Tickets</h3><div id="adminTickets"></div></div>
+            <div class="admin-section"><h3><i class="fa-solid fa-video"></i> Streamers</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Username"><button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addStreamerBtn">Add</button></div><div id="adminStreamers"></div></div>
+            <div class="admin-section"><h3><i class="fa-solid fa-box"></i> Shop Stock</h3><div id="adminShop"></div></div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-brand"><div class="brand"><div class="logo" style="width:36px;height:36px;font-size:1rem;">SS</div><div><h1 style="font-size:1.1rem;">SouthSide S2</h1><span>Roleplay</span></div></div><p>A living city where your story becomes reality.</p></div>
+    <div class="footer-links"><h4>Navigation</h4><ul><li><a data-footer="home">Home</a></li><li><a data-footer="shop">Shop</a></li><li><a data-footer="support">Support</a></li></ul></div>
+    <div class="footer-social"><h4>Community</h4><div class="socials"><a href="https://discord.gg" class="social"><i class="fa-brands fa-discord"></i></a><a href="https://instagram.com" class="social"><i class="fa-brands fa-instagram"></i></a><a href="https://youtube.com" class="social"><i class="fa-brands fa-youtube"></i></a></div></div>
+    <div class="footer-bottom"><p>&copy; 2026 SouthSide S2.</p><span>Built with 🔥</span></div>
+</footer>
+</div>
+
+<div id="ticketModal" class="modal">
+    <div class="modal-body">
+        <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+        <div style="font-size:0.75rem;color:var(--red);font-weight:800;letter-spacing:1px;margin-bottom:0.3rem;">SOUTHSIDE S2 SUPPORT</div>
+        <h2 id="modalTitle" style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem;">Bug Report</h2>
+        <p id="modalDesc" style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">Fill in details.</p>
+        <form id="ticketForm">
+            <input type="text" id="ticketSubject" placeholder="Subject" style="width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;margin-bottom:1rem;font-family:inherit;">
+            <textarea id="ticketMessage" placeholder="Message..." rows="4" style="width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;resize:vertical;margin-bottom:1rem;font-family:inherit;"></textarea>
+            <button type="submit" style="width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;font-family:inherit;">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div id="toast" class="toast">Server IP copied!</div>
+
+<script>
+// ===== PARTICLES =====
+(function(){
+    var c = document.getElementById('bg-canvas');
+    if (!c) return;
+    var ctx = c.getContext('2d');
+    function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+    var p = [];
+    for (var i = 0; i < 50; i++) {
+        p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.8+0.5, vy: -Math.random()*0.6-0.2, a: Math.random()*0.4+0.1 });
+    }
+    function loop(){
+        ctx.clearRect(0,0,c.width,c.height);
+        for (var i = 0; i < p.length; i++) {
+            var q = p[i];
+            q.y += q.vy;
+            if (q.y < 0) q.y = c.height;
+            ctx.beginPath();
+            ctx.arc(q.x, q.y, q.r, 0, Math.PI*2);
+            ctx.fillStyle = 'rgba(255,0,60,'+q.a+')';
+            ctx.fill();
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+})();
+
+// ===== TABS =====
+function switchTab(name) {
+    var i;
+    var tabs = document.querySelectorAll('.tab');
+    for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+    var btns = document.querySelectorAll('.nav-btn');
+    for (i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+    var target = document.getElementById('tab-' + name);
+    if (target) target.classList.add('active');
+    var btn = document.querySelector('.nav-btn[data-tab="' + name + '"]');
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'shop') loadShop();
+    if (name === 'streamers') loadStreamers();
+}
+
+var navBtns = document.querySelectorAll('.nav-btn');
+for (var i = 0; i < navBtns.length; i++) {
+    navBtns[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+}
+
+var footerLinks = document.querySelectorAll('[data-footer]');
+for (var i = 0; i < footerLinks.length; i++) {
+    footerLinks[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-footer')); });
+}
+
+// ===== COPY IP =====
+document.getElementById('copyBtn').addEventListener('click', function(){
+    var ip = document.getElementById('serverIP').innerText;
+    if (navigator.clipboard) navigator.clipboard.writeText(ip);
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+});
+
+// ===== FIVEM STATS (mock for demo) =====
+function loadStats(){
+    setTimeout(function(){
+        var clients = Math.floor(Math.random() * 150) + 30;
+        document.getElementById('playerCount').textContent = clients + ' / 200';
+        document.getElementById('barFill').style.width = (clients/200*100) + '%';
+        document.getElementById('serverName').textContent = 'SouthSide S2';
+    }, 500);
+}
+loadStats();
+setInterval(loadStats, 30000);
+
+// ===== SHOP =====
+var ITEMS = [
+    { id: 1, name: 'Audi RS700', price: 140, stock: 5, category: 'Vehicles', is_out_of_stock: false },
+    { id: 2, name: 'Skyline GT-R 32', price: 140, stock: 3, category: 'Vehicles', is_out_of_stock: false },
+    { id: 3, name: 'Can Drag 3', price: 110, stock: 10, category: 'Vehicles', is_out_of_stock: false },
+    { id: 4, name: 'BMW GT4', price: 100, stock: 7, category: 'Vehicles', is_out_of_stock: false },
+    { id: 5, name: 'BMW M5 2021', price: 100, stock: 0, category: 'Vehicles', is_out_of_stock: true },
+    { id: 6, name: 'BMW XM 2024', price: 110, stock: 4, category: 'Vehicles', is_out_of_stock: false }
+];
+
+function loadShop(category){
+    var grid = document.getElementById('shopGrid');
+    var items = ITEMS;
+    if (category) items = items.filter(function(i){ return i.category === category; });
+    if (items.length === 0) { grid.innerHTML = '<p style="color:var(--muted);">No items.</p>'; return; }
+    grid.innerHTML = items.map(function(item){
+        return '<div class="shop-item">' +
+            '<div class="shop-img"><i class="fa-solid fa-car"></i></div>' +
+            '<div class="shop-body">' +
+            (item.is_out_of_stock ? '<span class="shop-badge" style="background:#666;">OUT OF STOCK</span>' : (item.stock > 0 ? '<span class="shop-badge">STOCK: ' + item.stock + '</span>' : '')) +
+            '<div class="shop-price">' + item.price + ' DT</div>' +
+            '<div class="shop-title">' + item.name + '</div>' +
+            '</div></div>';
+    }).join('');
+}
+
+document.getElementById('shopCats').addEventListener('click', function(e){
+    var btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    loadShop(btn.getAttribute('data-cat') || null);
+});
+
+// ===== STREAMERS =====
+var STREAMERS = ['zg13','zgougou','pirate','yumidavenci','kid','zo9la','rafa','9haya'];
+
+function loadStreamers(){
+    var grid = document.getElementById('streamersGrid');
+    grid.innerHTML = STREAMERS.map(function(name){
+        return '<div class="streamer">' +
+            '<div class="streamer-img"><i class="fa-brands fa-kickstarter"></i></div>' +
+            '<div class="streamer-info"><span class="streamer-name">' + name.toUpperCase() + '</span><div class="live-dot"></div></div>' +
+            '</div>';
+    }).join('');
+}
+
+// ===== TICKETS =====
+var currentType = '';
+function openModal(title, desc) {
+    currentType = title;
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalDesc').innerText = desc;
+    document.getElementById('ticketModal').classList.add('active');
+}
+function closeModal() { document.getElementById('ticketModal').classList.remove('active'); }
+document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+document.getElementById('ticketModal').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
+
+document.querySelectorAll('[data-ticket]').forEach(function(el){
+    el.addEventListener('click', function(){
+        openModal(this.getAttribute('data-ticket'), 'Fill in details');
+    });
+});
+
+document.querySelectorAll('[data-app]').forEach(function(el){
+    el.addEventListener('click', function(){
+        openModal(this.getAttribute('data-app'), 'Submit your application');
+    });
+});
+
+document.getElementById('ticketForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = document.getElementById('ticketMessage').value;
+    if (!msg.trim()) { alert('Please write a message'); return; }
+    alert('✅ Ticket submitted! (Demo mode - configure Supabase to save)');
+    closeModal();
+});
+
+// ===== ADMIN =====
+document.getElementById('adminLoginBtn').addEventListener('click', function(){
+    var email = document.getElementById('adminEmail').value;
+    var pass = document.getElementById('adminPassword').value;
+    if (email === 'admin@southside.com' && pass === 'admin123') {
+        document.getElementById('adminLoginView').style.display = 'none';
+        document.getElementById('adminPanelView').style.display = 'block';
+        loadAdmin();
+    } else {
+        alert('❌ Wrong credentials. Demo: admin@southside.com / admin123');
+    }
+});
+
+document.getElementById('adminLogoutBtn').addEventListener('click', function(){
+    document.getElementById('adminLoginView').style.display = 'block';
+    document.getElementById('adminPanelView').style.display = 'none';
+});
+
+document.getElementById('addStreamerBtn').addEventListener('click', function(){
+    var name = document.getElementById('newStreamerName').value.trim();
+    if (!name) return;
+    STREAMERS.push(name.toLowerCase());
+    document.getElementById('newStreamerName').value = '';
+    loadAdmin();
+    loadStreamers();
+});
+
+function loadAdmin() {
+    document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>ID</th><th>Type</th><th>Status</th></tr></thead><tbody><tr><td colspan="3" style="color:var(--muted);text-align:center;padding:1rem;">No tickets yet (Demo)</td></tr></tbody></table>';
+    document.getElementById('adminStreamers').innerHTML = '<table class="admin-table"><thead><tr><th>Username</th><th>Actions</th></tr></thead><tbody>' + STREAMERS.map(function(s, i){ return '<tr><td>' + s + '</td><td><button onclick="removeStreamer(' + i + ')">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
+    document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Stock</th></tr></thead><tbody>' + ITEMS.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td></tr>'; }).join('') + '</tbody></table>';
+}
+
+function removeStreamer(i) {
+    STREAMERS.splice(i, 1);
+    loadAdmin();
+    loadStreamers();
+}
+window.removeStreamer = removeStreamer;
+
+// ===== LOGIN =====
+document.getElementById('loginBtn').addEventListener('click', function(){
+    alert('⚠️ Discord Login: configure Supabase to enable');
+});
+
+console.log('✅ SouthSide S2 loaded successfully');
+</script>
+
+</body>
+</html>
