@@ -14,7 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== Supabase Connection =====
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -24,7 +23,6 @@ pool.connect()
   .then(() => console.log('✅ Supabase connected successfully'))
   .catch(err => console.error('❌ DB error:', err.message));
 
-// ===== Session =====
 app.use(session({
   store: new PgSession({ pool: pool, tableName: 'session', createTableIfMissing: true }),
   secret: process.env.SESSION_SECRET || 'southside-secret',
@@ -36,7 +34,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== Routes =====
 app.use('/api', require('./routes/auth'));
 app.use('/api', require('./routes/shop'));
 app.use('/api', require('./routes/tickets'));
