@@ -22,7 +22,7 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions & Auth =====
+// ===== Sessions =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,13 +30,14 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
+// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 passport.use(new DiscordStrategy({
   clientID: process.env.DISCORD_CLIENT_ID,
   clientSecret: process.env.DISCORD_CLIENT_SECRET,
-  callbackURL: process.env.DISCORD_CALLBACK_URL,
+  callbackURL: process.env.DISCORD_CALLBACK_URL, // كيتقرا من Render
   scope: ['identify']
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
@@ -63,7 +64,16 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers (Manual Live/Ofline) =====
+// ===== Auth Routes =====
+app.get('/api/auth/discord', passport.authenticate('discord'));
+app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
+app.get('/api/auth/me', (req, res) => {
+  if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
+  else res.json({ loggedIn: false });
+});
+app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
+
+// ===== Streamers =====
 app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
 app.post('/api/streamers', (req, res) => {
   const db = getDB(); if (!db.streamers) db.streamers = [];
@@ -75,7 +85,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs & Members (Auto Fetch Avatar via Bot) =====
+// ===== Gangs & Members =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -93,9 +103,9 @@ app.post('/api/gangs/:id/members', async (req, res) => {
     if (!gang) return res.status(404).json({ error: 'Gang not found' });
 
     const discordId = req.body.discordId;
-    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; // Default
+    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-    // محاولة جلب الصورة بالبوت
+    // جلب الصورة بالبوت
     const botToken = process.env.DISCORD_BOT_TOKEN;
     if (botToken && discordId) {
         try {
@@ -109,7 +119,7 @@ app.post('/api/gangs/:id/members', async (req, res) => {
                     avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
                 }
             }
-        } catch (e) { console.log('Discord Bot Error:', e.message); }
+        } catch (e) { }
     }
 
     gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
