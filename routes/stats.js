@@ -1,39 +1,46 @@
 const express = require('express');
-const fetch = require('node-fetch');
 const router = express.Router();
+const fs = require('fs-extra');
+const path = require('path');
 
-const FIVEM_IP = process.env.FIVEM_IP;
-const FIVEM_PORT = process.env.FIVEM_PORT || '30120';
+const dbPath = path.join(__dirname, '..', 'data.json');
 
-router.get('/stats', async (req, res) => {
+router.get('/tickets', async (req, res) => {
   try {
-    if (!FIVEM_IP) {
-      return res.json({ online: false, players: 0, maxPlayers: 128, name: 'Not configured', ip: '' });
+    const db = await fs.readJson(dbPath);
+    res.json(db.tickets || []);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/tickets', async (req, res) => {
+  try {
+    const db = await fs.readJson(dbPath);
+    const { type, subject, message } = req.body;
+    const newTicket = {
+      id: Date.now().toString(),
+      type, subject, message,
+      status: 'pending',
+      reason: '',
+      user: req.user ? req.user.username : 'anonymous'
+    };
+    db.tickets.push(newTicket);
+    await fs.writeJson(dbPath, db);
+    res.json(newTicket);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.put('/tickets/:id', async (req, res) => {
+  try {
+    const db = await fs.readJson(dbPath);
+    const { status, reason } = req.body;
+    const ticket = db.tickets.find(t => t.id === req.params.id);
+    if (ticket) {
+      ticket.status = status;
+      ticket.reason = reason || '';
+      await fs.writeJson(dbPath, db);
     }
-    const base = `http://${FIVEM_IP}:${FIVEM_PORT}`;
-    const dynRes = await fetch(`${base}/dynamic.json`, { timeout: 5000 });
-    if (!dynRes.ok) throw new Error('unreachable');
-    const dyn = await dynRes.json();
-
-    let name = 'SouthSide S2';
-    try {
-      const infoRes = await fetch(`${base}/info.json`, { timeout: 3000 });
-      if (infoRes.ok) {
-        const info = await infoRes.json();
-        name = info.hostname || name;
-      }
-    } catch (_) {}
-
-    res.json({
-      online: true,
-      players: dyn.clients || 0,
-      maxPlayers: dyn.sv_maxclients || 128,
-      name,
-      ip: `connect ${FIVEM_IP}:${FIVEM_PORT}`
-    });
-  } catch (e) {
-    res.json({ online: false, players: 0, maxPlayers: 128, name: 'Offline', ip: '' });
-  }
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 module.exports = router;
