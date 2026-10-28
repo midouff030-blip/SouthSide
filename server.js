@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== الداتابيز (JSON) =====
+// ===== قاعدة البيانات (JSON) =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [] }, null, 2));
@@ -44,11 +44,31 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== الروابط =====
+// ===== المسارات (Routes) =====
 app.get('/api/auth/discord', passport.authenticate('discord'));
-app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
-app.get('/api/auth/me', (req, res) => res.json(req.user ? { loggedIn: true, username: req.user.username } : { loggedIn: false }));
-app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
+
+app.get('/api/auth/discord/callback', 
+  passport.authenticate('discord', { failureRedirect: '/?login=failed' }), 
+  (req, res) => res.redirect('/?login=success')
+);
+
+// هاد الرابط هو اللي كيصيفط الـ ID و الصورة للـ HTML
+app.get('/api/auth/me', (req, res) => {
+  if (req.user) {
+    res.json({ 
+      loggedIn: true, 
+      username: req.user.username, 
+      id: req.user.id, 
+      avatar: req.user.avatar 
+    });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+app.get('/api/auth/logout', (req, res) => {
+  req.logout(() => res.redirect('/'));
+});
 
 // Shop
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
@@ -74,11 +94,12 @@ app.put('/api/tickets/:id', (req, res) => {
   res.json(t);
 });
 
-// Admin Login
+// Admin
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === process.env.ADMIN_PASSWORD) res.json({ success: true });
   else res.status(401).json({ success: false });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
 app.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
