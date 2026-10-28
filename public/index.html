@@ -688,12 +688,28 @@ async function removeGang(id) {
 
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
-    if(discordId) { 
-        const memberName = prompt("Member Name (e.g. John):") || 'Member';
-        const avatar = prompt("Member Avatar URL (Leave empty for default):") || 'https://cdn.discordapp.com/embed/avatars/0.png';
-        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId, memberName:memberName, avatar:avatar})}); 
-        loadAdmin(); 
-    } 
+    if(!discordId) return;
+
+    const memberName = prompt("Member Name (e.g. John):") || 'Member';
+    
+    // هنا كيسولك على رابط الصورة
+    const avatar = prompt("Member Avatar URL (e.g. https://cdn.discordapp.com/avatars/.../...png):");
+    
+    if(!avatar) {
+        alert("You must provide an Avatar URL for the image to show up.");
+        return;
+    }
+
+    await fetch('/api/gangs/'+id+'/members', {
+        method:'POST', 
+        headers:{'Content-Type':'application/json'}, 
+        body:JSON.stringify({
+            discordId: discordId, 
+            memberName: memberName, 
+            avatar: avatar
+        })
+    }); 
+    loadAdmin(); 
 }
 
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
