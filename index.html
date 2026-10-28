@@ -73,7 +73,8 @@ main{padding:10rem 4rem 4rem 4rem;max-width:1400px;margin:0 auto;min-height:85vh
 .shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
 .shop-item{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
 .shop-item:hover{border-color:var(--border-red);transform:translateY(-4px);}
-.shop-img{height:180px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;}
+.shop-img{height:180px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.shop-img img{width:100%;height:100%;object-fit:cover;}
 .shop-img i{font-size:3rem;color:var(--red);}
 .shop-body{padding:1.5rem;}
 .shop-badge{background:var(--red);color:#fff;font-size:0.65rem;font-weight:900;padding:0.2rem 0.5rem;border-radius:4px;display:inline-block;margin-bottom:0.5rem;}
@@ -82,7 +83,8 @@ main{padding:10rem 4rem 4rem 4rem;max-width:1400px;margin:0 auto;min-height:85vh
 .streamers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
 .streamer{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
 .streamer:hover{border-color:var(--red);transform:translateY(-3px);}
-.streamer-img{height:260px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;}
+.streamer-img{height:260px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.streamer-img img{width:100%;height:100%;object-fit:cover;}
 .streamer-img i{font-size:4rem;color:var(--red);}
 .streamer-info{padding:1.2rem;display:flex;justify-content:space-between;align-items:center;}
 .streamer-name{font-size:1rem;font-weight:800;}
@@ -196,8 +198,8 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
         <div class="shop-cats" id="shopCats">
             <button class="cat-btn active" data-cat="">All</button>
             <button class="cat-btn" data-cat="Vehicles">Vehicles</button>
-            <button class="cat-btn" data-cat="Gang Donation">Gang Donation</button>
             <button class="cat-btn" data-cat="Mansions">Mansions</button>
+            <button class="cat-btn" data-cat="Motorcycles">Motorcycles</button>
             <button class="cat-btn" data-cat="Peds">Peds</button>
             <button class="cat-btn" data-cat="Other">Other</button>
         </div>
@@ -263,9 +265,30 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
                 <h2 style="font-size:2rem;font-weight:800;">Admin <span style="color:var(--red);">Dashboard</span></h2>
                 <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="adminLogoutBtn">Logout</button>
             </div>
-            <div class="admin-section"><h3><i class="fa-solid fa-ticket"></i> Tickets & Apps</h3><div id="adminTickets"></div></div>
-            <div class="admin-section"><h3><i class="fa-solid fa-video"></i> Streamers</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Username"><button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addStreamerBtn">Add</button></div><div id="adminStreamers"></div></div>
-            <div class="admin-section"><h3><i class="fa-solid fa-box"></i> Shop Stock</h3><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item Name"><input class="admin-input" style="margin:0;width:80px;" type="number" id="newShopPrice" placeholder="Price"><button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addShopBtn">Add Item</button></div><div id="adminShop"></div></div>
+
+            <div class="admin-section">
+                <h3><i class="fa-solid fa-ticket"></i> Applications / Tickets</h3>
+                <div id="adminTickets"></div>
+            </div>
+
+            <div class="admin-section">
+                <h3><i class="fa-solid fa-box"></i> Shop Items</h3>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr 2fr auto;gap:0.5rem;margin-bottom:1rem;">
+                    <input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item name">
+                    <input class="admin-input" style="margin:0;" type="number" id="newShopPrice" placeholder="Price DT">
+                    <select class="admin-input" style="margin:0;" id="newShopCategory">
+                        <option value="Vehicles">Vehicles</option>
+                        <option value="Mansions">Mansions</option>
+                        <option value="Motorcycles">Motorcycles</option>
+                        <option value="Peds">Peds</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input class="admin-input" style="margin:0;" type="number" id="newShopStock" placeholder="Stock" value="1">
+                    <input class="admin-input" style="margin:0;" type="text" id="newShopImage" placeholder="Image URL">
+                    <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addShopBtn">Add</button>
+                </div>
+                <div id="adminShop"></div>
+            </div>
         </div>
     </div>
 </main>
@@ -336,13 +359,13 @@ function switchTab(name) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (name === 'shop') loadShop();
     if (name === 'streamers') loadStreamers();
+    if (name === 'admin') loadAdmin();
 }
 
 var navBtns = document.querySelectorAll('.nav-btn');
 for (var i = 0; i < navBtns.length; i++) {
     navBtns[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
 }
-
 var footerLinks = document.querySelectorAll('[data-footer]');
 for (var i = 0; i < footerLinks.length; i++) {
     footerLinks[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-footer')); });
@@ -357,30 +380,7 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     setTimeout(function(){ t.classList.remove('show'); }, 3000);
 });
 
-// ===== FIVEM STATS (REAL) =====
-async function loadStats(){
-    try {
-        var res = await fetch('/api/stats');
-        var data = await res.json();
-        if (data.online) {
-            document.getElementById('playerCount').textContent = data.players + ' / ' + data.maxPlayers;
-            document.getElementById('barFill').style.width = (data.players / data.maxPlayers * 100) + '%';
-            document.getElementById('serverName').textContent = data.name;
-            document.getElementById('statusText').textContent = 'Online';
-        } else {
-            document.getElementById('playerCount').textContent = 'OFFLINE';
-            document.getElementById('barFill').style.width = '0%';
-            document.getElementById('statusText').textContent = 'Offline';
-        }
-    } catch (e) {
-        document.getElementById('playerCount').textContent = 'N/A';
-        document.getElementById('statusText').textContent = 'N/A';
-    }
-}
-loadStats();
-setInterval(loadStats, 60000);
-
-// ===== SHOP (REAL mel API) =====
+// ===== SHOP =====
 async function loadShop(category){
     var grid = document.getElementById('shopGrid');
     grid.innerHTML = '<p class="loading-text">Loading...</p>';
@@ -388,22 +388,14 @@ async function loadShop(category){
         var url = category ? '/api/shop?category=' + encodeURIComponent(category) : '/api/shop';
         var res = await fetch(url);
         var items = await res.json();
-        if (!items.length) {
-            grid.innerHTML = '<p class="loading-text">No items.</p>';
-            return;
-        }
+        if (!items.length) { grid.innerHTML = '<p class="loading-text">No items.</p>'; return; }
         grid.innerHTML = items.map(function(item){
-            return '<div class="shop-item">' +
-                '<div class="shop-img"><i class="fa-solid fa-car"></i></div>' +
-                '<div class="shop-body">' +
+            var imgHtml = item.image ? '<img src="' + item.image + '" alt="' + item.name + '">' : '<i class="fa-solid fa-car"></i>';
+            return '<div class="shop-item"><div class="shop-img">' + imgHtml + '</div><div class="shop-body">' +
                 (item.stock === 0 ? '<span class="shop-badge" style="background:#666;">OUT OF STOCK</span>' : '<span class="shop-badge">STOCK: ' + item.stock + '</span>') +
-                '<div class="shop-price">' + item.price + ' DT</div>' +
-                '<div class="shop-title">' + item.name + '</div>' +
-                '</div></div>';
+                '<div class="shop-price">' + item.price + ' DT</div><div class="shop-title">' + item.name + '</div></div></div>';
         }).join('');
-    } catch (e) {
-        grid.innerHTML = '<p class="loading-text">Error loading shop.</p>';
-    }
+    } catch (e) { grid.innerHTML = '<p class="loading-text">Error.</p>'; }
 }
 
 document.getElementById('shopCats').addEventListener('click', function(e){
@@ -414,29 +406,7 @@ document.getElementById('shopCats').addEventListener('click', function(e){
     loadShop(btn.getAttribute('data-cat') || null);
 });
 
-// ===== STREAMERS (REAL mel API) =====
-async function loadStreamers(){
-    var grid = document.getElementById('streamersGrid');
-    grid.innerHTML = '<p class="loading-text">Loading...</p>';
-    try {
-        var res = await fetch('/api/streamers');
-        var streamers = await res.json();
-        if (!streamers.length) {
-            grid.innerHTML = '<p class="loading-text">Ma fammech streamers taw.</p>';
-            return;
-        }
-        grid.innerHTML = streamers.map(function(s){
-            return '<div class="streamer">' +
-                '<div class="streamer-img"><i class="fa-brands fa-kickstarter"></i></div>' +
-                '<div class="streamer-info"><span class="streamer-name">' + s.username.toUpperCase() + '</span><div class="live-dot on"></div></div>' +
-                '</div>';
-        }).join('');
-    } catch (e) {
-        grid.innerHTML = '<p class="loading-text">Error loading streamers.</p>';
-    }
-}
-
-// ===== TICKETS (REAL POST) =====
+// ===== TICKETS =====
 var currentType = '';
 function openModal(title, desc) {
     currentType = title;
@@ -465,12 +435,8 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: currentType, subject: subject, message: msg })
         });
-        var data = await res.json();
-        if (res.ok) {
-            alert('✅ Ticket submitted!');
-            closeModal();
-            document.getElementById('ticketForm').reset();
-        } else { alert('❌ ' + (data.error || 'Error')); }
+        if (res.ok) { alert('✅ Submitted!'); closeModal(); document.getElementById('ticketForm').reset(); }
+        else { alert('❌ Error'); }
     } catch (e) { alert('❌ Network error'); }
 });
 
@@ -498,104 +464,88 @@ document.getElementById('adminLogoutBtn').addEventListener('click', function(){
     document.getElementById('adminPassword').value = '';
 });
 
-document.getElementById('addStreamerBtn').addEventListener('click', async function(){
-    var name = document.getElementById('newStreamerName').value.trim();
-    if (!name) return;
-    await fetch('/api/streamers', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: name })
-    });
-    document.getElementById('newStreamerName').value = '';
-    loadAdmin(); loadStreamers();
-});
-
 document.getElementById('addShopBtn').addEventListener('click', async function(){
     var name = document.getElementById('newShopName').value.trim();
     var price = document.getElementById('newShopPrice').value;
+    var category = document.getElementById('newShopCategory').value;
+    var stock = document.getElementById('newShopStock').value || 1;
+    var image = document.getElementById('newShopImage').value.trim();
     if (!name || !price) return alert('Fill name and price');
     await fetch('/api/shop', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, price: parseInt(price), category: 'Vehicles', stock: 1 })
+        body: JSON.stringify({ name, price: parseInt(price), category, stock: parseInt(stock), image })
     });
     document.getElementById('newShopName').value = '';
     document.getElementById('newShopPrice').value = '';
+    document.getElementById('newShopStock').value = '1';
+    document.getElementById('newShopImage').value = '';
     loadAdmin(); loadShop();
 });
 
 async function updateTicket(id, status) {
+    var reason = '';
+    if (status === 'rejected') {
+        reason = prompt('Reason for rejection:');
+        if (reason === null) return;
+    }
     await fetch('/api/tickets/' + id, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: status })
+        body: JSON.stringify({ status, reason })
     });
     loadAdmin();
 }
 
 async function loadAdmin() {
-    // Tickets
     try {
         var tRes = await fetch('/api/tickets');
         var tickets = await tRes.json();
         if (tickets.length) {
-            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
-                tickets.map(function(t){ 
-                    var color = t.status === 'accepted' ? 'green' : t.status === 'rejected' ? 'red' : 'orange';
-                    return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td style="color:'+color+'">' + t.status + '</td>' +
-                    '<td>' +
-                    '<button onclick="updateTicket(\'' + t.id + '\', \'accepted\')" style="background:#22c55e; margin-right:5px;">Accept</button>' +
-                    '<button onclick="updateTicket(\'' + t.id + '\', \'rejected\')" style="background:#ff003c;">Reject</button>' +
-                    '</td></tr>'; 
+            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>User</th><th>Status</th><th>Reason</th><th>Action</th></tr></thead><tbody>' +
+                tickets.map(function(t){
+                    var color = t.status === 'accepted' ? '#22c55e' : t.status === 'rejected' ? '#ff003c' : '#f59e0b';
+                    return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td>' + (t.user || 'Guest') + '</td><td style="color:'+color+';font-weight:700;">' + t.status + '</td><td>' + (t.reason || '-') + '</td>' +
+                    '<td><button onclick="updateTicket(\'' + t.id + '\', \'accepted\')" style="background:#22c55e;margin-right:5px;">Accept</button>' +
+                    '<button onclick="updateTicket(\'' + t.id + '\', \'rejected\')" style="background:#ff003c;">Reject</button></td></tr>';
                 }).join('') + '</tbody></table>';
         } else { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">No tickets yet.</p>'; }
     } catch (e) { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">Error.</p>'; }
 
-    // Streamers
-    try {
-        var sRes = await fetch('/api/streamers');
-        var streamers = await sRes.json();
-        if (streamers.length) {
-            document.getElementById('adminStreamers').innerHTML = '<table class="admin-table"><thead><tr><th>Username</th><th>Actions</th></tr></thead><tbody>' +
-                streamers.map(function(s){ return '<tr><td>' + s.username + '</td><td><button onclick="removeStreamer(\'' + s.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
-        } else { document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">No streamers.</p>'; }
-    } catch (e) { document.getElementById('adminStreamers').innerHTML = '<p class="loading-text">Error.</p>'; }
-
-    // Shop
     try {
         var shRes = await fetch('/api/shop');
         var items = await shRes.json();
         if (items.length) {
-            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Actions</th></tr></thead><tbody>' +
-                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.price + ' DT</td><td><button onclick="removeShop(\'' + item.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
+            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>' +
+                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.category + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td><td><button onclick="removeShop(\'' + item.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
         } else { document.getElementById('adminShop').innerHTML = '<p class="loading-text">No items.</p>'; }
     } catch (e) { document.getElementById('adminShop').innerHTML = '<p class="loading-text">Error.</p>'; }
 }
 
-async function removeStreamer(id) {
-    if (!confirm('Delete this streamer?')) return;
-    await fetch('/api/streamers/' + id, { method: 'DELETE' });
-    loadAdmin(); loadStreamers();
-}
 async function removeShop(id) {
     if (!confirm('Delete this item?')) return;
     await fetch('/api/shop/' + id, { method: 'DELETE' });
     loadAdmin(); loadShop();
 }
-window.removeStreamer = removeStreamer;
 window.removeShop = removeShop;
 window.updateTicket = updateTicket;
 
-// ===== DISCORD LOGIN =====
+// ===== DISCORD LOGIN (تم تصليحه) =====
 document.getElementById('loginBtn').addEventListener('click', function(){
-    window.location.href = '/api/auth/login';
+    window.location.href = '/api/auth/discord'; 
 });
-(function(){
-    var params = new URLSearchParams(window.location.search);
-    var login = params.get('login');
-    if (login === 'success') {
-        document.getElementById('loginText').textContent = 'Logged In';
-        window.history.replaceState({}, '', '/');
-    }
+
+// التحقق من حالة الدخول
+(async function checkLogin(){
+    try {
+        var res = await fetch('/api/auth/me');
+        var data = await res.json();
+        if (data.loggedIn) {
+            document.getElementById('loginText').textContent = data.username;
+            document.getElementById('loginBtn').onclick = function(){
+                window.location.href = '/api/auth/logout';
+            };
+        }
+    } catch (_) {}
 })();
 </script>
-
 </body>
 </html>
