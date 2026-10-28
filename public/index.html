@@ -113,7 +113,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .live-badge { position: absolute; top: 10px; left: 10px; background: #ff002b; color: #fff; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
 .offline-badge { position: absolute; top: 10px; left: 10px; background: #222; color: #888; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
 
-/* Gangs */
+/* Gangs (Illegal Network) */
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; backdrop-filter: blur(10px); }
 .gang-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -311,10 +311,13 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminTickets"></div>
             </div>
 
+            <!-- إدارة الجانغ (Boss, Underboss) -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-skull"></i> Manage Gangs</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangName" placeholder="Gang Name">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss Discord ID">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss Discord ID">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo Letter (e.g. S)">
                     <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addGangBtn">Add Gang</button>
                 </div>
@@ -332,7 +335,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminShop"></div>
             </div>
 
-            <!-- إدارة الستريمرز -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-video"></i> Manage Streamers</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto auto; gap:0.5rem; margin-bottom:2rem;">
@@ -528,7 +530,11 @@ async function loadGangs() {
         document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
             <div class="gang-card">
                 <div class="gang-header"><div class="gang-logo">${g.logo || 'G'}</div><div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members.length} MEMBERS</div></div></div>
-                <div class="gang-roster">${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}</div>
+                <div class="gang-roster">
+                    ${(g.boss ? `<div class="gang-member" title="Boss"><img src="https://cdn.discordapp.com/embed/avatars/0.png"></div>` : '')}
+                    ${(g.underboss ? `<div class="gang-member" title="Underboss"><img src="https://cdn.discordapp.com/embed/avatars/0.png"></div>` : '')}
+                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}
+                </div>
             </div>`).join('') : '<p>No gangs.</p>';
     } catch(e){}
 }
@@ -629,10 +635,19 @@ async function updateTicket(id, st) {
     loadAdmin(); 
 }
 
+// إضافة جانغ جديد مع الـ Boss و الـ Underboss
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
-    await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newGangName').value, logo:document.getElementById('newGangLogo').value})}); 
+    const name = document.getElementById('newGangName').value;
+    const boss = document.getElementById('newGangBoss').value;
+    const underboss = document.getElementById('newGangUnderboss').value;
+    const logo = document.getElementById('newGangLogo').value;
+
+    if(!name) return alert('Gang name is required');
+
+    await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:name, boss:boss, underboss:underboss, logo:logo})}); 
     loadAdmin(); 
 });
+
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
