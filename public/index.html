@@ -117,7 +117,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; backdrop-filter: blur(10px); }
 .gang-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--border); }
-.gang-logo-img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; border: 2px solid var(--primary); }
+.gang-logo { width: 50px; height: 50px; background: #000; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 1.8rem; color: #fff; border-radius: 4px; }
 .gang-title { font-family: var(--font-title); font-size: 1.8rem; font-weight: 700; text-transform: uppercase; line-height: 1; }
 .gang-members-count { font-family: var(--font-sub); font-size: 0.9rem; color: var(--primary); font-weight: 700; background: rgba(255,0,43,0.1); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.3rem; }
 .gang-roster { padding: 1.5rem; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
@@ -312,14 +312,15 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminTickets"></div>
             </div>
 
-            <!-- إدارة الجانغ -->
+            <!-- إدارة الجانغ (Boss, Underboss, Members) -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-skull"></i> Manage Gangs</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangName" placeholder="Gang Name">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss Name">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangBossId" placeholder="Boss Discord ID">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss Name">
-                    <input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo Letter (e.g. S)">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangUnderbossId" placeholder="Underboss Discord ID">
                     <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addGangBtn">Add Gang</button>
                 </div>
                 <div id="adminGangs"></div>
