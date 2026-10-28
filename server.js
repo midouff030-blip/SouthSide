@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
-const { Pool } = require('pg'); // تأكد من تثبيت pg: npm install pg
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,22 +16,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== اتصال Supabase (PostgreSQL) =====
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // ضروري لـ Supabase
-});
+// ===== MongoDB Connection =====
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ MongoDB connected successfully');
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    // ما نطيحوش السيرفر، نخليوه يخدم (باش الموقع يبان على الأقل)
+  }
+};
+connectDB();
 
-pool.connect()
-  .then(() => console.log('✅ Supabase (PostgreSQL) connected'))
-  .catch(err => console.error('❌ Database connection error:', err));
-
-// ===== SESSION (بدون MongoStore، استعمل MemoryStore مؤقتاً) =====
-// ⚠️ MemoryStore ماشي مناسب للإنتاج، ولكن كيخدم مؤقتاً حتى تربط Redis أو غيره
+// ===== SESSION =====
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'southside-secret',
+  secret: process.env.SESSION_SECRET || 'southside-secret-2026',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({ 
+    mongoUrl: process.env.MONGODB_URI,
+    ttl: 14 * 24 * 60 * 60 // 14 days
+  }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
@@ -50,11 +56,12 @@ app.use('/api', require('./routes/tickets'));
 app.use('/api', require('./routes/admin'));
 app.use('/api', require('./routes/auth'));
 
-// ===== FALLBACK =====
+// ===== FALLBACK (لـ React/Vue، كيرجع index.html) =====
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ===== START =====
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🔥 SouthSide S2 running on port ${PORT}`);
 });
