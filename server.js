@@ -89,43 +89,36 @@ app.delete('/api/streamers/:id', (req, res) => {
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
-  const newGang = { id: Date.now().toString(), name: req.body.name, boss: req.body.boss, bossId: req.body.bossId, underboss: req.body.underboss, underbossId: req.body.underbossId, members: [] };
-  db.gangs.push(newGang); saveDB(db); res.json(newGang);
+  const gang = { 
+      id: Date.now().toString(), 
+      name: req.body.name || 'Unknown',
+      boss: req.body.boss || '', 
+      bossId: req.body.bossId || '',
+      underboss: req.body.underboss || '', 
+      underbossId: req.body.underbossId || '',
+      members: [] 
+  };
+  db.gangs.push(gang); saveDB(db); res.json(gang);
 });
+
 app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
-// إضافة عضو مع جلب الصورة أوتوماتيك بالبوت
-app.post('/api/gangs/:id/members', async (req, res) => {
-  try {
-    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-    if (!gang) return res.status(404).json({ error: 'Gang not found' });
-
-    const discordId = req.body.discordId;
-    const memberName = req.body.memberName || 'Member';
-    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; 
-
-    const botToken = process.env.DISCORD_BOT_TOKEN;
-    if (botToken) {
-        try {
-            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
-                headers: { Authorization: `Bot ${botToken}` }
-            });
-            if (discordRes.ok) {
-                const userData = await discordRes.json();
-                if (userData.avatar) {
-                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
-                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
-                }
-            }
-        } catch (e) { }
-    }
-
-    gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); 
-    saveDB(db); res.json(gang);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+// إضافة عضو (مع الصورة اللي كتحطها نتا)
+app.post('/api/gangs/:id/members', (req, res) => {
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+  if (!gang) return res.status(404).json({ error: 'Gang not found' });
+  
+  const avatar = req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+  
+  gang.members.push({ 
+      discordId: req.body.discordId, 
+      name: req.body.memberName || 'Member', 
+      avatar: avatar 
+  }); 
+  saveDB(db); res.json(gang);
 });
 
 // ===== Shop =====
