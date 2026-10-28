@@ -106,19 +106,40 @@ app.delete('/api/gangs/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// إضافة عضو (مع الصورة اللي كتحطها نتا)
-app.post('/api/gangs/:id/members', (req, res) => {
-  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-  if (!gang) return res.status(404).json({ error: 'Gang not found' });
-  
-  const avatar = req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-  
-  gang.members.push({ 
-      discordId: req.body.discordId, 
-      name: req.body.memberName || 'Member', 
-      avatar: avatar 
-  }); 
-  saveDB(db); res.json(gang);
+// 🔥 إضافة عضو مع جلب الصورة أوتوماتيك بالبوت
+app.post('/api/gangs/:id/members', async (req, res) => {
+  try {
+    const db = getDB(); 
+    const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+
+    const discordId = req.body.discordId;
+    const memberName = req.body.memberName || 'Member';
+    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; // صورة افتراضية
+
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    
+    if (botToken) {
+        try {
+            // السيرفر كيطلب الداتا من ديسكورد بالبوت
+            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
+                headers: { Authorization: `Bot ${botToken}` }
+            });
+            
+            if (discordRes.ok) {
+                const userData = await discordRes.json();
+                if (userData.avatar) {
+                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
+                }
+            }
+        } catch (e) { console.log("Discord API Error:", e.message); }
+    }
+
+    gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); 
+    saveDB(db); 
+    res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ===== Shop =====
