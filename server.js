@@ -22,7 +22,7 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions =====
+// ===== Sessions & Auth =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,7 +30,6 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -44,7 +43,7 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== FiveM Stats API =====
+// ===== FiveM Stats =====
 app.get('/api/stats', async (req, res) => {
     try {
         const FIVEM_IP = process.env.FIVEM_IP || '127.0.0.1';
@@ -64,20 +63,56 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Routes =====
-app.get('/api/auth/discord', passport.authenticate('discord'));
-app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
-app.get('/api/auth/me', (req, res) => {
-  if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
-  else res.json({ loggedIn: false });
-});
-app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
+// ===== Streamers (مع Automatic Live Check) =====
+app.get('/api/streamers', async (req, res) => {
+    try {
+        const db = getDB();
+        let streamers = db.streamers || [];
+        
+        // هاد الجزء كيشيك أوتوماتيكياً على Kick
+        const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
+        const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
+        
+        if (KICK_CLIENT_ID && KICK_CLIENT_SECRET) {
+            // 1. جيب التوكن ديال Kick
+            let token = null;
+            try {
+                const tokenRes = await fetch('https://id.kick.com/oauth/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `grant_type=client_credentials&client_id=${KICK_CLIENT_ID}&client_secret=${KICK_CLIENT_SECRET}`
+                });
+                const tokenData = await tokenRes.json();
+                token = tokenData.access_token;
+            } catch (e) { console.log('Kick Token Error', e); }
 
-// Streamers
-app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
+            // 2. شيك على كل ستريمر
+            if (token) {
+                streamers = await Promise.all(streamers.map(async (s) => {
+                    try {
+                        const kickRes = await fetch(`https://api.kick.com/public/v1/channels?slug=${s.name}`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        const kickData = await kickRes.json();
+                        // واش كاين لايف فـ الداتا
+                        const isLive = kickData.data && kickData.data[0] && kickData.data[0].livestream !== null;
+                        return { ...s, isLive: isLive };
+                    } catch (e) {
+                        return { ...s, isLive: false };
+                    }
+                }));
+            }
+        }
+        res.json(streamers);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// إضافة ستريمر (بلا isLive، حيت غادي يتحسب أوتوماتيك)
 app.post('/api/streamers', (req, res) => {
   const db = getDB(); if (!db.streamers) db.streamers = [];
-  const st = { id: Date.now().toString(), ...req.body };
+  const st = { id: Date.now().toString(), name: req.body.name, url: req.body.url, image: req.body.image };
   db.streamers.push(st); saveDB(db); res.json(st);
 });
 app.delete('/api/streamers/:id', (req, res) => {
@@ -85,7 +120,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// Gangs & Members (مع Lanyard API للصورة)
+// ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -96,7 +131,6 @@ app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
-
 app.post('/api/gangs/:id/members', async (req, res) => {
   try {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
@@ -110,7 +144,6 @@ app.post('/api/gangs/:id/members', async (req, res) => {
             avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
         }
       } catch (e) { console.log('Lanyard error:', e); }
-      
       gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
       saveDB(db); 
       res.json(gang);
@@ -120,7 +153,7 @@ app.post('/api/gangs/:id/members', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Shop
+// ===== Shop =====
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
 app.post('/api/shop', (req, res) => {
   const db = getDB(); const item = { id: Date.now().toString(), ...req.body };
@@ -131,7 +164,7 @@ app.delete('/api/shop/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// Tickets
+// ===== Tickets =====
 app.get('/api/tickets', (req, res) => res.json(getDB().tickets));
 app.post('/api/tickets', (req, res) => {
   const db = getDB();
@@ -144,7 +177,7 @@ app.put('/api/tickets/:id', (req, res) => {
   res.json(t);
 });
 
-// Admin
+// ===== Admin =====
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === process.env.ADMIN_PASSWORD) res.json({ success: true });
   else res.status(401).json({ success: false });
