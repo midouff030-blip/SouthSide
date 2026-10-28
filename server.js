@@ -22,7 +22,7 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions =====
+// ===== Sessions & Auth =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,7 +30,6 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -64,7 +63,7 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers (Automatic Live via DecAPI) =====
+// ===== Streamers =====
 app.get('/api/streamers', async (req, res) => {
     try {
         const db = getDB();
@@ -73,17 +72,14 @@ app.get('/api/streamers', async (req, res) => {
         streamers = await Promise.all(streamers.map(async (s) => {
             let isLive = false;
             try {
-                // DecAPI كيشيك على Kick بشكل أوتوماتيكي
                 const decapiRes = await fetch(`https://decapi.me/kick/uptime/${s.name}`);
                 const text = await decapiRes.text();
-                // إلا كان الرد مافيهش "offline" أو "User not found"، فمعناها راه لايف
                 if (text && !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('not found')) {
                     isLive = true;
                 }
-            } catch (e) { console.log('DecAPI Error'); }
+            } catch (e) { }
             return { ...s, isLive: isLive };
         }));
-        
         res.json(streamers);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -98,7 +94,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs =====
+// ===== Gangs & Members =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -121,10 +117,9 @@ app.post('/api/gangs/:id/members', async (req, res) => {
         if (lanyardData.success && lanyardData.data.discord_user.avatar) {
             avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
         }
-      } catch (e) { console.log('Lanyard error'); }
+      } catch (e) { }
       gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
-      saveDB(db); 
-      res.json(gang);
+      saveDB(db); res.json(gang);
     } else { res.status(404).json({ error: 'Gang not found' }); }
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
