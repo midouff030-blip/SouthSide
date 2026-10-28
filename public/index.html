@@ -691,22 +691,13 @@ async function addMember(id) {
     if(!discordId) return;
 
     const memberName = prompt("Member Name (e.g. John):") || 'Member';
-    
-    // هنا كيسولك على رابط الصورة
-    const avatar = prompt("Member Avatar URL (e.g. https://cdn.discordapp.com/avatars/.../...png):");
-    
-    if(!avatar) {
-        alert("You must provide an Avatar URL for the image to show up.");
-        return;
-    }
 
     await fetch('/api/gangs/'+id+'/members', {
         method:'POST', 
         headers:{'Content-Type':'application/json'}, 
         body:JSON.stringify({
             discordId: discordId, 
-            memberName: memberName, 
-            avatar: avatar
+            memberName: memberName
         })
     }); 
     loadAdmin(); 
