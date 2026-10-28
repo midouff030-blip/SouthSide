@@ -10,6 +10,7 @@
     "cors": "^2.8.5",
     "express-session": "^1.18.0",
     "passport": "^0.7.0",
-    "passport-discord": "^0.1.4"
+    "passport-discord": "^0.1.4",
+    "fs-extra": "^11.2.0"
   }
 }
