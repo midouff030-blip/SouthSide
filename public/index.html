@@ -312,7 +312,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminTickets"></div>
             </div>
 
-            <!-- إدارة الجانغ (Boss, Underboss, Members) -->
+            <!-- إدارة الجانغ -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-skull"></i> Manage Gangs</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
@@ -655,14 +655,25 @@ async function updateTicket(id, st) {
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
     const name = document.getElementById('newGangName').value;
     const boss = document.getElementById('newGangBoss').value;
+    const bossId = document.getElementById('newGangBossId').value;
     const underboss = document.getElementById('newGangUnderboss').value;
-    const logo = document.getElementById('newGangLogo').value;
+    const underbossId = document.getElementById('newGangUnderbossId').value;
 
     if(!name) return alert('Gang name is required');
+    if(!boss) return alert('Boss name is required');
+    if(!bossId) return alert('Boss ID is required');
+    if(!underboss) return alert('Underboss name is required');
+    if(!underbossId) return alert('Underboss ID is required');
 
     await fetch('/api/gangs', {
         method:'POST', headers:{'Content-Type':'application/json'}, 
-        body:JSON.stringify({name:name, boss:boss, underboss:underboss, logo:logo})
+        body:JSON.stringify({
+            name: name, 
+            boss: boss, 
+            bossId: bossId,
+            underboss: underboss, 
+            underbossId: underbossId
+        })
     }); 
     loadAdmin(); 
 });
