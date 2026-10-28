@@ -3,289 +3,333 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SouthSide RolePlay S2 | Official Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+<title>SouthSide S2 | Elite Roleplay</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--bg:#030305;--card:#0a0b10;--red:#ff003c;--grad:linear-gradient(135deg,#ff003c,#b3002d);--txt:#fff;--muted:#8a8d9b;--border:rgba(255,255,255,0.08);--border-red:rgba(255,0,60,0.35);}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
-body{background:var(--bg);color:var(--txt);overflow-x:hidden;min-height:100vh;}
-#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-.wrapper{position:relative;z-index:1;}
-.marquee{background:rgba(255,0,60,0.05);border-bottom:1px solid var(--border);padding:0.5rem 0;overflow:hidden;white-space:nowrap;margin-top:75px;position:fixed;width:100%;z-index:999;backdrop-filter:blur(10px);}
-.marquee-inner{display:inline-block;animation:scroll 30s linear infinite;font-size:0.8rem;font-weight:700;letter-spacing:2px;color:var(--red);text-transform:uppercase;}
-@keyframes scroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
-header{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(3,3,5,0.95);backdrop-filter:blur(16px);position:fixed;top:0;width:100%;z-index:1000;border-bottom:1px solid var(--border);}
-.brand{display:flex;align-items:center;gap:0.9rem;}
-.logo{width:44px;height:44px;background:var(--grad);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;color:#fff;}
-.brand h1{font-size:1.25rem;font-weight:800;line-height:1.1;}
-.brand span{color:var(--red);font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;}
-nav{display:flex;gap:0.8rem;background:rgba(255,255,255,0.02);padding:0.3rem;border-radius:10px;border:1px solid var(--border);}
-.nav-btn{color:var(--muted);font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:0.6rem 1rem;border-radius:7px;cursor:pointer;transition:all 0.2s;background:none;border:1px solid transparent;font-family:inherit;}
-.nav-btn:hover{color:#fff;background:rgba(255,0,60,0.08);}
-.nav-btn.active{color:#fff;background:rgba(255,0,60,0.12);border:1px solid var(--border-red);}
-.btn-login{background:var(--grad);color:#fff;border:none;padding:0.7rem 1.6rem;font-weight:700;font-size:0.85rem;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:0.5rem;font-family:inherit;}
-main{padding:10rem 4rem 4rem 4rem;max-width:1400px;margin:0 auto;min-height:85vh;}
-.tab{display:none;}
-.tab.active{display:block;animation:fadeIn 0.4s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.hero{text-align:center;margin-bottom:3rem;padding-top:1rem;}
-.hero h1{font-size:3.8rem;font-weight:800;line-height:1.15;margin-bottom:1rem;}
-.hero h1 em{color:var(--red);font-family:'Playfair Display',serif;font-style:italic;}
-.hero p{color:var(--muted);font-size:1.05rem;max-width:650px;margin:0 auto 2.5rem;line-height:1.6;}
-.status-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:3rem;align-items:center;margin-bottom:4rem;}
-.status-left h4{font-size:0.8rem;font-weight:800;color:#22c55e;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
-.dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 8px #22c55e;}
-.stat{display:flex;justify-content:space-between;font-size:0.9rem;font-weight:700;margin-bottom:0.5rem;}
-.stat span:last-child{color:var(--red);}
-.bar{width:100%;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-bottom:1.5rem;}
-.bar-fill{width:0%;height:100%;background:var(--grad);transition:width 0.5s;}
-.status-right h5{font-size:0.75rem;font-weight:800;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.8rem;}
-.ip-row{display:flex;background:#030305;border:1px solid var(--border);border-radius:8px;padding:0.6rem 1rem;align-items:center;justify-content:space-between;margin-bottom:1rem;font-family:monospace;font-size:0.9rem;}
-.btn-copy{width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;font-family:inherit;}
-.leads{text-align:center;margin-bottom:4rem;}
-.leads h2{font-size:3rem;font-weight:800;margin-bottom:3rem;}
-.leads h2 em{font-family:'Playfair Display',serif;font-style:italic;color:var(--red);}
-.leads-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
-.lead{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:left;transition:0.2s;}
-.lead:hover{border-color:var(--border-red);transform:translateY(-3px);}
-.lead h4{font-size:1.15rem;font-weight:800;margin-bottom:0.8rem;}
-.lead p{color:var(--muted);font-size:0.85rem;line-height:1.6;}
-.page-head{text-align:center;margin-bottom:3rem;}
-.page-head h2{font-size:3.5rem;font-weight:800;text-transform:uppercase;}
-.page-head h2 em{font-family:'Playfair Display',serif;font-style:italic;color:var(--red);text-transform:none;}
-.page-head p{color:var(--muted);font-size:0.95rem;margin-top:0.5rem;}
-.tickets{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;max-width:1000px;margin:0 auto;}
-.ticket{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:0.25s;}
-.ticket:hover{border-color:var(--red);background:#0d0f17;transform:translateY(-2px);}
-.ticket h3{font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;}
-.ticket p{color:var(--muted);font-size:0.85rem;}
-.ticket i{color:var(--red);font-size:1.1rem;}
-.apps{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;}
-.app{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:0.3s;min-height:280px;display:flex;flex-direction:column;justify-content:space-between;}
-.app:hover{border-color:var(--red);transform:translateY(-5px);background:#0e1017;}
-.app i{font-size:2rem;color:var(--red);margin-bottom:1.5rem;}
-.app h4{font-size:1.05rem;font-weight:800;margin-bottom:1rem;}
-.app-badge{font-size:0.7rem;font-weight:800;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
-.shop-cats{display:flex;justify-content:center;gap:0.8rem;margin-bottom:2.5rem;flex-wrap:wrap;}
-.cat-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit;transition:0.2s;}
-.cat-btn.active,.cat-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
-.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-.shop-item{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
-.shop-item:hover{border-color:var(--border-red);transform:translateY(-4px);}
-.shop-img{height:180px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.shop-img img{width:100%;height:100%;object-fit:cover;}
-.shop-img i{font-size:3rem;color:var(--red);}
-.shop-body{padding:1.5rem;}
-.shop-badge{background:var(--red);color:#fff;font-size:0.65rem;font-weight:900;padding:0.2rem 0.5rem;border-radius:4px;display:inline-block;margin-bottom:0.5rem;}
-.shop-price{font-size:0.85rem;font-weight:800;color:var(--muted);margin-bottom:0.3rem;}
-.shop-title{font-size:1.05rem;font-weight:800;}
-.streamers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
-.streamer{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.3s;}
-.streamer:hover{border-color:var(--red);transform:translateY(-3px);}
-.streamer-img{height:260px;background:linear-gradient(135deg,#1a1b25,#0a0b10);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.streamer-img img{width:100%;height:100%;object-fit:cover;}
-.streamer-img i{font-size:4rem;color:var(--red);}
-.streamer-info{padding:1.2rem;display:flex;justify-content:space-between;align-items:center;}
-.streamer-name{font-size:1rem;font-weight:800;}
-.live-dot{width:10px;height:10px;background:#666;border-radius:50%;}
-.live-dot.on{background:#22c55e;box-shadow:0 0 8px #22c55e;}
-.generic{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:3rem;margin-bottom:1.5rem;}
-.generic h2{font-size:2rem;font-weight:800;margin-bottom:1rem;}
-.generic h2 em{color:var(--red);font-family:'Playfair Display',serif;font-style:italic;}
-.generic p{color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:1.5rem;}
-.generic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
-.info{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:1.5rem;}
-.info h4{font-size:1.1rem;font-weight:800;margin-bottom:0.4rem;}
-.info p{color:var(--muted);font-size:0.85rem;}
-.admin-login{max-width:420px;margin:4rem auto;background:var(--card);border:1px solid var(--border-red);border-radius:14px;padding:2.5rem;}
-.admin-login h2{font-size:1.8rem;font-weight:800;margin-bottom:0.5rem;}
-.admin-login h2 em{color:var(--red);font-style:italic;}
-.admin-login p{color:var(--muted);font-size:0.85rem;margin-bottom:2rem;}
-.admin-input{width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;margin-bottom:1rem;font-family:inherit;}
-.admin-btn{width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;margin-bottom:0.5rem;font-family:inherit;}
-.admin-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
-.admin-section h3{font-size:1.2rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
-.admin-section h3 i{color:var(--red);}
-.admin-table{width:100%;border-collapse:collapse;font-size:0.85rem;}
-.admin-table th{text-align:left;padding:0.6rem;color:var(--muted);text-transform:uppercase;font-size:0.7rem;letter-spacing:1px;border-bottom:1px solid var(--border);}
-.admin-table td{padding:0.6rem;border-bottom:1px solid rgba(255,255,255,0.03);}
-.admin-table button{background:var(--grad);color:#fff;border:none;padding:0.4rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;}
-footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background:rgba(3,3,5,0.9);margin-top:5rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;}
-.footer-brand p{color:var(--muted);font-size:0.85rem;margin-top:0.5rem;max-width:350px;}
-.footer-links h4,.footer-social h4{font-size:0.9rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;}
-.footer-links ul{list-style:none;}
-.footer-links ul li{margin-bottom:0.5rem;}
-.footer-links ul li a{color:var(--muted);font-size:0.85rem;cursor:pointer;}
-.footer-links ul li a:hover{color:#fff;}
-.socials{display:flex;gap:0.8rem;}
-.social{width:38px;height:38px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;}
-.footer-bottom{grid-column:span 3;border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;color:var(--muted);font-size:0.8rem;}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(3,3,5,0.85);backdrop-filter:blur(10px);z-index:2000;display:none;align-items:center;justify-content:center;padding:2rem;}
-.modal.active{display:flex;}
-.modal-body{background:var(--card);border:1px solid var(--border-red);border-radius:14px;width:100%;max-width:650px;padding:2.5rem;position:relative;max-height:90vh;overflow-y:auto;}
-.modal-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--muted);cursor:pointer;font-size:1.2rem;background:none;border:none;}
-.toast{position:fixed;bottom:2rem;right:2rem;background:var(--red);color:#fff;padding:0.9rem 1.8rem;border-radius:8px;font-weight:700;font-size:0.9rem;transform:translateY(150%);transition:transform 0.3s;z-index:3000;}
-.toast.show{transform:translateY(0);}
-.loading-text{color:var(--muted);font-size:0.9rem;}
-@media(max-width:1200px){.apps{grid-template-columns:repeat(3,1fr);}.streamers-grid{grid-template-columns:repeat(2,1fr);}.leads-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:992px){header{padding:1rem 2rem;flex-direction:column;gap:1rem;}nav{width:100%;overflow-x:auto;justify-content:flex-start;}main{padding:12rem 1rem 2rem 1rem;}.status-box{grid-template-columns:1fr;}.leads-grid{grid-template-columns:1fr;}.apps{grid-template-columns:1fr;}.streamers-grid{grid-template-columns:1fr;}.shop-grid{grid-template-columns:1fr;}.tickets{grid-template-columns:1fr;}footer{grid-template-columns:1fr;padding:2rem;}.footer-bottom{grid-column:span 1;flex-direction:column;gap:0.5rem;}}
+:root {
+    --bg: #080808;
+    --card: rgba(15, 15, 18, 0.85);
+    --primary: #ff002b;
+    --text: #ffffff;
+    --text-muted: #a1a1aa;
+    --border: rgba(255, 255, 255, 0.08);
+    --glow: 0 0 20px rgba(255, 0, 43, 0.3);
+    --font-title: 'Bebas Neue', sans-serif;
+    --font-sub: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh;
+    background-image: radial-gradient(circle at 50% 0%, rgba(255, 0, 43, 0.05) 0%, transparent 60%);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+/* Header */
+header {
+    display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem;
+    background: rgba(8, 8, 8, 0.9); backdrop-filter: blur(20px); position: fixed; top: 0; width: 100%; z-index: 1000;
+    border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 1rem; }
+.logo {
+    width: 45px; height: 45px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-title); font-weight: 700; font-size: 1.8rem; color: #fff; box-shadow: var(--glow);
+    transform: skewX(-10deg);
+}
+.logo span { transform: skewX(10deg); }
+.brand h1 { font-family: var(--font-title); font-size: 2rem; line-height: 0.9; letter-spacing: 1px; }
+.brand p { color: var(--primary); font-family: var(--font-sub); font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; }
+
+nav { display: flex; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding: 0.3rem; border-radius: 4px; border: 1px solid var(--border); }
+.nav-btn {
+    color: var(--text-muted); font-family: var(--font-sub); font-size: 1.2rem; font-weight: 600; text-transform: uppercase;
+    padding: 0.4rem 1.2rem; cursor: pointer; transition: 0.3s; background: none; border: none; letter-spacing: 1px;
+}
+.nav-btn:hover, .nav-btn.active { color: #fff; background: var(--primary); border-radius: 3px; box-shadow: var(--glow); }
+
+.btn-login {
+    background: transparent; color: #fff; border: 1px solid var(--primary); padding: 0.6rem 1.8rem; cursor: pointer;
+    font-family: var(--font-sub); font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+    border-radius: 4px;
+}
+.btn-login:hover { background: var(--primary); box-shadow: var(--glow); }
+
+/* Main Layout */
+main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-height: 90vh; }
+.tab { display: none; }
+.tab.active { display: block; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Hero Section */
+.hero { text-align: center; margin-bottom: 5rem; margin-top: 1rem; }
+.hero h1 { font-family: var(--font-title); font-size: 6rem; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; line-height: 0.9; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.hero h1 em { color: var(--primary); font-style: normal; text-shadow: 0 0 30px rgba(255, 0, 43, 0.6); }
+.hero p { font-family: var(--font-sub); font-size: 1.5rem; color: var(--text-muted); letter-spacing: 2px; margin-top: 1rem; text-transform: uppercase; font-weight: 500; }
+
+/* Status Box */
+.status-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 3rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; backdrop-filter: blur(10px);
+    position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.status-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); box-shadow: var(--glow); }
+.status-left h4 { font-family: var(--font-sub); font-size: 1.4rem; font-weight: 700; color: #22c55e; letter-spacing: 2px; display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; text-transform: uppercase; }
+.dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 15px #22c55e; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { transform: scale(0.95); } 50% { transform: scale(1.1); } 100% { transform: scale(0.95); } }
+.stat { display: flex; justify-content: space-between; font-family: var(--font-sub); font-size: 1.4rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.5rem; text-transform: uppercase; }
+.stat span:last-child { color: var(--primary); font-weight: 700; }
+.bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; margin-bottom: 2rem; overflow: hidden; }
+.bar-fill { width: 0%; height: 100%; background: var(--primary); box-shadow: var(--glow); transition: 1s; }
+.status-right h5 { font-family: var(--font-sub); font-size: 1.2rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 1rem; text-transform: uppercase; font-weight: 600; }
+.ip-row { display: flex; background: #000; border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-family: monospace; font-size: 1.2rem; color: var(--primary); }
+.btn-copy { width: 100%; background: var(--primary); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border-radius: 4px; text-transform: uppercase; }
+.btn-copy:hover { background: #fff; color: var(--primary); box-shadow: var(--glow); }
+
+/* Applications (Full Images) */
+.page-head { text-align: center; margin-bottom: 4rem; }
+.page-head h2 { font-family: var(--font-title); font-size: 4rem; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
+.page-head p { font-family: var(--font-sub); font-size: 1.4rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-top: 0.5rem; }
+
+.apps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #000; border: 1px solid #222; overflow: hidden; }
+.app-card {
+    position: relative; height: 550px; cursor: pointer; overflow: hidden;
+    background-size: cover; background-position: center; transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 3rem 1rem;
+}
+.app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 60%, #080808 100%); transition: 0.4s; z-index: 1; }
+.app-card:hover::before { background: linear-gradient(to bottom, rgba(255,0,43,0.1) 0%, rgba(0,0,0,0.7) 50%, #080808 100%); }
+.app-card:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+.app-icon { font-size: 3rem; color: #fff; position: relative; z-index: 2; margin-top: 1rem; opacity: 0.8; transition: 0.4s; }
+.app-card:hover .app-icon { opacity: 1; color: var(--primary); transform: translateY(-5px); text-shadow: var(--glow); }
+.app-title { font-family: var(--font-title); font-size: 2rem; letter-spacing: 2px; color: #fff; text-align: center; position: relative; z-index: 2; margin-top: auto; margin-bottom: 0.5rem; text-transform: uppercase; }
+.app-form-btn { font-family: var(--font-sub); font-size: 1.3rem; font-weight: 700; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; position: relative; z-index: 2; margin-bottom: 2rem; transition: 0.3s; }
+.app-card:hover .app-form-btn { color: var(--primary); text-shadow: var(--glow); }
+
+/* Support & Tickets */
+.support-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.support-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 2.5rem;
+    cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: flex-start; backdrop-filter: blur(10px);
+}
+.support-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,0,43,0.1); }
+.support-card i { font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem; }
+.support-card h3 { font-family: var(--font-title); font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
+.support-card p { color: var(--text-muted); font-size: 1rem; }
+
+/* Shop */
+.shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+.shop-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.4s; }
+.shop-item:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(255,0,43,0.1); }
+.shop-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.shop-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+.shop-item:hover .shop-img img { transform: scale(1.1); }
+.shop-body { padding: 1.5rem; }
+.shop-price { font-family: var(--font-sub); font-size: 1.5rem; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+.shop-title { font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 1px; }
+
+/* Admin */
+.admin-login { max-width: 450px; margin: 5rem auto; background: var(--card); border: 1px solid var(--primary); padding: 3rem; border-radius: 8px; box-shadow: 0 0 50px rgba(255,0,43,0.1); text-align: center; }
+.admin-login h2 { font-family: var(--font-title); font-size: 2.5rem; margin-bottom: 2rem; letter-spacing: 2px; }
+.admin-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 1rem; color: #fff; font-family: var(--font-body); font-size: 1rem; margin-bottom: 1rem; outline: none; transition: 0.3s; border-radius: 4px; }
+.admin-input:focus { border-color: var(--primary); }
+.admin-btn { width: 100%; background: var(--primary); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: 0.3s; text-transform: uppercase; border-radius: 4px; }
+.admin-btn:hover { background: #fff; color: var(--primary); box-shadow: var(--glow); }
+
+.admin-section { background: var(--card); border: 1px solid var(--border); padding: 2.5rem; margin-bottom: 2rem; border-radius: 8px; backdrop-filter: blur(10px); }
+.admin-section h3 { font-family: var(--font-title); font-size: 2rem; margin-bottom: 2rem; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 1rem; display: flex; align-items: center; gap: 1rem; letter-spacing: 1px; }
+.admin-table { width: 100%; border-collapse: collapse; font-family: var(--font-body); }
+.admin-table th { text-align: left; padding: 1rem; font-family: var(--font-sub); font-size: 1.1rem; color: var(--text-muted); letter-spacing: 2px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+.admin-table td { padding: 1rem; border-bottom: 1px solid #111; font-size: 0.95rem; }
+.admin-table button { background: transparent; border: 1px solid #333; color: #fff; padding: 0.5rem 1rem; cursor: pointer; transition: 0.3s; font-family: var(--font-sub); font-size: 1.1rem; letter-spacing: 1px; border-radius: 4px; text-transform: uppercase; font-weight: 600;}
+.admin-table button.accept { border-color: #22c55e; color: #22c55e; }
+.admin-table button.accept:hover { background: #22c55e; color: #000; }
+.admin-table button.reject { border-color: var(--primary); color: var(--primary); }
+.admin-table button.reject:hover { background: var(--primary); color: #fff; }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
+.modal.active { display: flex; }
+.modal-body { background: var(--card); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: 8px; width: 100%; max-width: 600px; padding: 3rem; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+.modal-close { position: absolute; top: 1.5rem; right: 1.5rem; color: var(--text-muted); cursor: pointer; font-size: 1.5rem; background: none; border: none; transition: 0.3s; }
+.modal-close:hover { color: var(--primary); }
+
+/* Responsive */
+@media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(3, 1fr); } .shop-grid { grid-template-columns: repeat(2, 1fr); } .support-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 992px) { 
+    header { padding: 1rem; flex-direction: column; gap: 1rem; } 
+    main { padding: 12rem 1rem 2rem; } 
+    .apps-grid { grid-template-columns: 1fr; } 
+    .app-card { height: 350px; }
+    .hero h1 { font-size: 4rem; } 
+    .status-box { grid-template-columns: 1fr; }
+    .shop-grid { grid-template-columns: 1fr; }
+    .support-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<div class="marquee"><div class="marquee-inner">SOUTHSIDE ROLEPLAY S2 / TOP TIER SERIOUS ROLEPLAY / OPTIMIZED CUSTOM SYSTEMS / ACTIVE STAFF 24/7 / COMPETITIVE ECONOMY / JOIN THE BEST CITY /</div></div>
 <canvas id="bg-canvas"></canvas>
 
-<div class="wrapper">
 <header>
-    <div class="brand"><div class="logo">SS</div><div><h1>SouthSide S2</h1><span>Roleplay</span></div></div>
+    <div class="brand">
+        <div class="logo"><span>SS</span></div>
+        <div><h1>SOUTHSIDE S2</h1><p>Roleplay</p></div>
+    </div>
     <nav id="mainNav">
         <button class="nav-btn active" data-tab="home">Home</button>
-        <button class="nav-btn" data-tab="events">Events</button>
-        <button class="nav-btn" data-tab="rules">Rules</button>
         <button class="nav-btn" data-tab="apps">Applications</button>
         <button class="nav-btn" data-tab="shop">Shop</button>
-        <button class="nav-btn" data-tab="team">Team</button>
-        <button class="nav-btn" data-tab="streamers">Streamers</button>
         <button class="nav-btn" data-tab="support">Support</button>
         <button class="nav-btn" data-tab="admin">Admin</button>
     </nav>
-    <button class="btn-login" id="loginBtn"><i class="fa-brands fa-discord"></i> <span id="loginText">Login</span></button>
+    <button class="btn-login" id="loginBtn">Login</button>
 </header>
 
 <main>
+    <!-- HOME -->
     <div id="tab-home" class="tab active">
-        <div class="hero"><h1>Join The <em>Community</em> Everyone Talks About.</h1><p>Meet dedicated roleplayers, share your clips, and become part of one of the most active FiveM communities.</p></div>
+        <div class="hero">
+            <h1>Rule The <em>Streets.</em></h1>
+            <p>Where loyalty is everything and the streets never sleep.</p>
+        </div>
         <div class="status-box">
             <div class="status-left">
-                <h4 id="statusLabel"><span class="dot"></span> <span id="statusText">Loading...</span></h4>
-                <div class="stat"><span>PLAYER COUNT</span><span id="playerCount">Loading...</span></div>
+                <h4 id="statusLabel"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
+                <div class="stat"><span>ACTIVE PLAYERS</span><span id="playerCount">Loading...</span></div>
                 <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-                <div class="stat"><span>SERVER NAME</span><span id="serverName" style="color:#fff;font-size:0.8rem;">-</span></div>
+                <div class="stat"><span>SERVER NAME</span><span id="serverName">-</span></div>
             </div>
             <div class="status-right">
-                <h5>Server IP</h5>
-                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal" style="color:var(--red);"></i></div>
-                <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy Server IP</button>
-            </div>
-        </div>
-        <div class="leads"><h2>Why SouthSide S2 <em>Leads</em></h2>
-            <div class="leads-grid">
-                <div class="lead"><h4>Elite Roleplay Standard</h4><p>Serious story-driven roleplay with real consequences.</p></div>
-                <div class="lead"><h4>Performance First</h4><p>Hand-crafted scripts and constant optimization.</p></div>
-                <div class="lead"><h4>Balanced Progression</h4><p>A fair economy where effort decides your growth.</p></div>
-                <div class="lead"><h4>Staff That Shows Up</h4><p>Fast support and active moderation 24/7.</p></div>
+                <h5>Direct Connect</h5>
+                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal"></i></div>
+                <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
             </div>
         </div>
     </div>
 
+    <!-- APPLICATIONS -->
+    <div id="tab-apps" class="tab">
+        <div class="page-head">
+            <h2>Join The Faction</h2>
+            <p>Select a department to submit your official application</p>
+        </div>
+        <div class="apps-grid">
+            <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=600&auto=format&fit=crop');">
+                <i class="fa-regular fa-user app-icon"></i>
+                <div class="app-title">Whitelist</div>
+                <div class="app-form-btn">Forms ↓</div>
+            </div>
+            <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://images.unsplash.com/photo-1509305718890-25b20153e8c5?q=80&w=600&auto=format&fit=crop');">
+                <i class="fa-solid fa-crosshairs app-icon"></i>
+                <div class="app-title">Gang & Family</div>
+                <div class="app-form-btn">Forms ↓</div>
+            </div>
+            <div class="app-card" data-app="Police App" style="background-image: url('https://images.unsplash.com/photo-1590493912313-910be545f1da?q=80&w=600&auto=format&fit=crop');">
+                <i class="fa-solid fa-shield-halved app-icon"></i>
+                <div class="app-title">Police Dept</div>
+                <div class="app-form-btn">Forms ↓</div>
+            </div>
+            <div class="app-card" data-app="EMS App" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=600&auto=format&fit=crop');">
+                <i class="fa-solid fa-briefcase-medical app-icon"></i>
+                <div class="app-title">EMS Dept</div>
+                <div class="app-form-btn">Forms ↓</div>
+            </div>
+            <div class="app-card" data-app="Creator App" style="background-image: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=600&auto=format&fit=crop');">
+                <i class="fa-solid fa-video app-icon"></i>
+                <div class="app-title">Creator</div>
+                <div class="app-form-btn">Forms ↓</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUPPORT -->
     <div id="tab-support" class="tab">
-        <div class="page-head"><span style="font-size:0.8rem;font-weight:800;letter-spacing:2px;color:var(--red);text-transform:uppercase;">SouthSide S2 Support</span><h2>How can we <em>help?</em></h2></div>
-        <div class="tickets">
-            <div class="ticket" data-ticket="Donation"><div><h3>Donation</h3><p>Support the server</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Refund"><div><h3>Refund</h3><p>Request a refund</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Bug Report"><div><h3>Bug Report</h3><p>Report a bug</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Gang Application"><div><h3>Gang Application</h3><p>Apply for a gang</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Staff Application"><div><h3>Staff Application</h3><p>Join the staff</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Bad Admin"><div><h3>Bad Admin</h3><p>Report an admin</p></div><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="ticket" data-ticket="Other" style="grid-column:span 2;"><div><h3>Other</h3><p>Other issues</p></div><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="page-head">
+            <h2>Need Help?</h2>
+            <p>Open a ticket and our staff will assist you immediately</p>
+        </div>
+        <div class="support-grid">
+            <div class="support-card" data-ticket="Bug Report">
+                <i class="fa-solid fa-bug"></i>
+                <h3>Bug Report</h3>
+                <p>Found a glitch in the matrix? Report it here.</p>
+            </div>
+            <div class="support-card" data-ticket="Refund">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                <h3>Refund Request</h3>
+                <p>Request a refund for a purchase or donation.</p>
+            </div>
+            <div class="support-card" data-ticket="Player Report">
+                <i class="fa-solid fa-user-slash"></i>
+                <h3>Player Report</h3>
+                <p>Report rule breakers and toxic behavior.</p>
+            </div>
+            <div class="support-card" data-ticket="Donation">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <h3>Donation Support</h3>
+                <p>Need help with your donation perks?</p>
+            </div>
+            <div class="support-card" data-ticket="Bad Admin">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>Report Admin</h3>
+                <p>Report an admin abusing their power.</p>
+            </div>
+            <div class="support-card" data-ticket="Other">
+                <i class="fa-solid fa-circle-info"></i>
+                <h3>Other Issues</h3>
+                <p>Any other inquiries or questions.</p>
+            </div>
         </div>
     </div>
 
+    <!-- SHOP -->
     <div id="tab-shop" class="tab">
-        <div class="page-head"><h2>Shop <em>Catalog</em></h2><p>Cosmetic items and quality-of-life features.</p></div>
-        <div class="shop-cats" id="shopCats">
-            <button class="cat-btn active" data-cat="">All</button>
-            <button class="cat-btn" data-cat="Vehicles">Vehicles</button>
-            <button class="cat-btn" data-cat="Mansions">Mansions</button>
-            <button class="cat-btn" data-cat="Motorcycles">Motorcycles</button>
-            <button class="cat-btn" data-cat="Peds">Peds</button>
-            <button class="cat-btn" data-cat="Other">Other</button>
-        </div>
+        <div class="page-head"><h2>Black Market</h2></div>
         <div class="shop-grid" id="shopGrid"></div>
     </div>
 
-    <div id="tab-apps" class="tab">
-        <div class="page-head"><h2>SouthSide S2 <em>Applications</em></h2><p>Select a department to submit your application</p></div>
-        <div class="apps">
-            <div class="app" data-app="Whitelist App"><i class="fa-solid fa-user"></i><h4>WHITELIST</h4><div class="app-badge">FORMS ↓</div></div>
-            <div class="app" data-app="Gang & Family App"><i class="fa-solid fa-users-rectangle"></i><h4>GANG & FAMILY</h4><div class="app-badge">FORMS ↓</div></div>
-            <div class="app" data-app="Police App"><i class="fa-solid fa-shield-halved"></i><h4>POLICE DEPT</h4><div class="app-badge">FORMS ↓</div></div>
-            <div class="app" data-app="EMS App"><i class="fa-solid fa-briefcase-medical"></i><h4>EMS DEPT</h4><div class="app-badge">FORMS ↓</div></div>
-            <div class="app" data-app="Creator App"><i class="fa-solid fa-video"></i><h4>CREATOR</h4><div class="app-badge">FORMS ↓</div></div>
-        </div>
-    </div>
-
-    <div id="tab-team" class="tab">
-        <div class="generic"><h2>Administration <em>Team</em></h2><p>Meet the dedicated staff members.</p>
-            <div class="generic-grid">
-                <div class="info"><h4>Zigrilou</h4><p>Founder & Lead Developer</p></div>
-                <div class="info"><h4>Admin Team</h4><p>Senior Administrators</p></div>
-                <div class="info"><h4>Support Team</h4><p>Community Helpers</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-streamers" class="tab">
-        <div class="page-head"><h2>SouthSide S2 <em>Streamers</em></h2><p>Official content creators.</p></div>
-        <div class="streamers-grid" id="streamersGrid"><p class="loading-text">Loading...</p></div>
-    </div>
-
-    <div id="tab-rules" class="tab">
-        <div class="generic"><h2>Server <em>Rules</em></h2><p>Read carefully.</p>
-            <div class="generic-grid">
-                <div class="info"><h4>1. FearRP</h4><p>Value your character's life.</p></div>
-                <div class="info"><h4>2. No RDM / VDM</h4><p>Random Deathmatch prohibited.</p></div>
-                <div class="info"><h4>3. Immersion</h4><p>Maintain character integrity.</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-events" class="tab">
-        <div class="generic"><h2>Weekly <em>Events</em></h2><p>Participate in weekend tournaments.</p>
-            <div class="generic-grid">
-                <div class="info"><h4>Saturday Street Meet</h4><p>Weekly car showcase.</p></div>
-                <div class="info"><h4>Gang Turf War</h4><p>Territory control battles.</p></div>
-            </div>
-        </div>
-    </div>
-
+    <!-- ADMIN -->
     <div id="tab-admin" class="tab">
         <div id="adminLoginView">
             <div class="admin-login">
-                <h2>Admin <em>Login</em></h2>
-                <p>Enter your admin password.</p>
-                <input class="admin-input" type="password" id="adminPassword" placeholder="Password">
-                <button class="admin-btn" id="adminLoginBtn">Login</button>
+                <h2>Admin Access</h2>
+                <input class="admin-input" type="password" id="adminPassword" placeholder="ENTER PASSWORD">
+                <button class="admin-btn" id="adminLoginBtn">Authenticate</button>
             </div>
         </div>
         <div id="adminPanelView" style="display:none;">
-            <div style="margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="font-size:2rem;font-weight:800;">Admin <span style="color:var(--red);">Dashboard</span></h2>
-                <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="adminLogoutBtn">Logout</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
+                <h2 style="font-family:var(--font-title); font-size:3rem; color:var(--primary); letter-spacing:2px;">Admin Terminal</h2>
+                <button class="admin-btn" style="width:auto; padding:0.5rem 2rem;" id="adminLogoutBtn">Logout</button>
             </div>
-
+            
             <div class="admin-section">
-                <h3><i class="fa-solid fa-ticket"></i> Applications / Tickets</h3>
+                <h3><i class="fa-solid fa-terminal"></i> Tickets & Applications</h3>
                 <div id="adminTickets"></div>
             </div>
 
             <div class="admin-section">
-                <h3><i class="fa-solid fa-box"></i> Shop Items</h3>
-                <div style="display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr 2fr auto;gap:0.5rem;margin-bottom:1rem;">
-                    <input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item name">
-                    <input class="admin-input" style="margin:0;" type="number" id="newShopPrice" placeholder="Price DT">
+                <h3><i class="fa-solid fa-boxes-stacked"></i> Shop Inventory</h3>
+                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
+                    <input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item Name">
+                    <input class="admin-input" style="margin:0;" type="number" id="newShopPrice" placeholder="Price">
                     <select class="admin-input" style="margin:0;" id="newShopCategory">
                         <option value="Vehicles">Vehicles</option>
                         <option value="Mansions">Mansions</option>
-                        <option value="Motorcycles">Motorcycles</option>
                         <option value="Peds">Peds</option>
-                        <option value="Other">Other</option>
                     </select>
                     <input class="admin-input" style="margin:0;" type="number" id="newShopStock" placeholder="Stock" value="1">
                     <input class="admin-input" style="margin:0;" type="text" id="newShopImage" placeholder="Image URL">
-                    <button class="admin-btn" style="width:auto;padding:0.6rem 1.2rem;margin:0;" id="addShopBtn">Add</button>
+                    <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addShopBtn">Add</button>
                 </div>
                 <div id="adminShop"></div>
             </div>
@@ -293,32 +337,22 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
     </div>
 </main>
 
-<footer>
-    <div class="footer-brand"><div class="brand"><div class="logo" style="width:36px;height:36px;font-size:1rem;">SS</div><div><h1 style="font-size:1.1rem;">SouthSide S2</h1><span>Roleplay</span></div></div><p>A living city where your story becomes reality.</p></div>
-    <div class="footer-links"><h4>Navigation</h4><ul><li><a data-footer="home">Home</a></li><li><a data-footer="shop">Shop</a></li><li><a data-footer="support">Support</a></li></ul></div>
-    <div class="footer-social"><h4>Community</h4><div class="socials"><a href="https://discord.gg" class="social"><i class="fa-brands fa-discord"></i></a><a href="https://instagram.com" class="social"><i class="fa-brands fa-instagram"></i></a><a href="https://youtube.com" class="social"><i class="fa-brands fa-youtube"></i></a></div></div>
-    <div class="footer-bottom"><p>&copy; 2026 SouthSide S2.</p><span>Built with 🔥</span></div>
-</footer>
-</div>
-
+<!-- MODAL -->
 <div id="ticketModal" class="modal">
     <div class="modal-body">
         <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
-        <div style="font-size:0.75rem;color:var(--red);font-weight:800;letter-spacing:1px;margin-bottom:0.3rem;">SOUTHSIDE S2 SUPPORT</div>
-        <h2 id="modalTitle" style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem;">Bug Report</h2>
-        <p id="modalDesc" style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">Fill in details.</p>
+        <div style="font-family:var(--font-sub); color:var(--primary); font-size:1.4rem; letter-spacing:3px; margin-bottom:0.5rem; text-transform:uppercase; font-weight:700;">SOUTHSIDE S2</div>
+        <h2 id="modalTitle" style="font-family:var(--font-title); font-size:2.5rem; margin-bottom:2rem; text-transform:uppercase;">Application</h2>
         <form id="ticketForm">
-            <input type="text" id="ticketSubject" placeholder="Subject" style="width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;margin-bottom:1rem;font-family:inherit;">
-            <textarea id="ticketMessage" placeholder="Message..." rows="4" style="width:100%;background:#030305;border:1px solid var(--border);padding:0.8rem;border-radius:8px;color:#fff;resize:vertical;margin-bottom:1rem;font-family:inherit;"></textarea>
-            <button type="submit" style="width:100%;background:var(--grad);color:#fff;border:none;padding:0.9rem;font-weight:800;border-radius:8px;cursor:pointer;font-family:inherit;">Submit</button>
+            <input type="text" id="ticketSubject" placeholder="Subject / Discord ID" style="width:100%; background:#000; border:1px solid var(--border); padding:1rem; color:#fff; margin-bottom:1rem; font-family:var(--font-body); outline:none; border-radius:4px;">
+            <textarea id="ticketMessage" placeholder="Explain your situation..." rows="5" style="width:100%; background:#000; border:1px solid var(--border); padding:1rem; color:#fff; margin-bottom:2rem; font-family:var(--font-body); outline:none; resize:none; border-radius:4px;"></textarea>
+            <button type="submit" class="admin-btn">Submit</button>
         </form>
     </div>
 </div>
 
-<div id="toast" class="toast">Server IP copied!</div>
-
 <script>
-// ===== PARTICLES =====
+// Particles
 (function(){
     var c = document.getElementById('bg-canvas');
     if (!c) return;
@@ -326,8 +360,8 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
     function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
     window.addEventListener('resize', resize); resize();
     var p = [];
-    for (var i = 0; i < 50; i++) {
-        p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.8+0.5, vy: -Math.random()*0.6-0.2, a: Math.random()*0.4+0.1 });
+    for (var i = 0; i < 60; i++) {
+        p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.5+0.5, vy: -Math.random()*0.5-0.1, a: Math.random()*0.4+0.1 });
     }
     function loop(){
         ctx.clearRect(0,0,c.width,c.height);
@@ -337,7 +371,7 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
             if (q.y < 0) q.y = c.height;
             ctx.beginPath();
             ctx.arc(q.x, q.y, q.r, 0, Math.PI*2);
-            ctx.fillStyle = 'rgba(255,0,60,'+q.a+')';
+            ctx.fillStyle = 'rgba(255,0,43,'+q.a+')';
             ctx.fill();
         }
         requestAnimationFrame(loop);
@@ -345,207 +379,130 @@ footer{border-top:1px solid var(--border);padding:4rem 4rem 2rem 4rem;background
     loop();
 })();
 
-// ===== TABS =====
 function switchTab(name) {
-    var i;
-    var tabs = document.querySelectorAll('.tab');
-    for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-    var btns = document.querySelectorAll('.nav-btn');
-    for (i = 0; i < btns.length; i++) btns[i].classList.remove('active');
-    var target = document.getElementById('tab-' + name);
-    if (target) target.classList.add('active');
-    var btn = document.querySelector('.nav-btn[data-tab="' + name + '"]');
-    if (btn) btn.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (name === 'shop') loadShop();
-    if (name === 'streamers') loadStreamers();
-    if (name === 'admin') loadAdmin();
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelector('.nav-btn[data-tab="' + name + '"]').classList.add('active');
+    if(name === 'shop') loadShop();
+    if(name === 'admin') loadAdmin();
 }
+document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
 
-var navBtns = document.querySelectorAll('.nav-btn');
-for (var i = 0; i < navBtns.length; i++) {
-    navBtns[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
-}
-var footerLinks = document.querySelectorAll('[data-footer]');
-for (var i = 0; i < footerLinks.length; i++) {
-    footerLinks[i].addEventListener('click', function(){ switchTab(this.getAttribute('data-footer')); });
-}
-
-// ===== COPY IP =====
 document.getElementById('copyBtn').addEventListener('click', function(){
     var ip = document.getElementById('serverIP').innerText;
     if (navigator.clipboard) navigator.clipboard.writeText(ip);
-    var t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+    var t = this;
+    var old = t.innerHTML;
+    t.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+    setTimeout(() => t.innerHTML = old, 2000);
 });
 
-// ===== SHOP =====
-async function loadShop(category){
-    var grid = document.getElementById('shopGrid');
-    grid.innerHTML = '<p class="loading-text">Loading...</p>';
-    try {
-        var url = category ? '/api/shop?category=' + encodeURIComponent(category) : '/api/shop';
-        var res = await fetch(url);
-        var items = await res.json();
-        if (!items.length) { grid.innerHTML = '<p class="loading-text">No items.</p>'; return; }
-        grid.innerHTML = items.map(function(item){
-            var imgHtml = item.image ? '<img src="' + item.image + '" alt="' + item.name + '">' : '<i class="fa-solid fa-car"></i>';
-            return '<div class="shop-item"><div class="shop-img">' + imgHtml + '</div><div class="shop-body">' +
-                (item.stock === 0 ? '<span class="shop-badge" style="background:#666;">OUT OF STOCK</span>' : '<span class="shop-badge">STOCK: ' + item.stock + '</span>') +
-                '<div class="shop-price">' + item.price + ' DT</div><div class="shop-title">' + item.name + '</div></div></div>';
-        }).join('');
-    } catch (e) { grid.innerHTML = '<p class="loading-text">Error.</p>'; }
-}
-
-document.getElementById('shopCats').addEventListener('click', function(e){
-    var btn = e.target.closest('.cat-btn');
-    if (!btn) return;
-    document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-    loadShop(btn.getAttribute('data-cat') || null);
-});
-
-// ===== TICKETS =====
-var currentType = '';
-function openModal(title, desc) {
+// Modal System
+let currentType = '';
+function openModal(title) {
     currentType = title;
     document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerText = desc;
     document.getElementById('ticketModal').classList.add('active');
 }
 function closeModal() { document.getElementById('ticketModal').classList.remove('active'); }
 document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
 document.getElementById('ticketModal').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
 
-document.querySelectorAll('[data-ticket]').forEach(function(el){
-    el.addEventListener('click', function(){ openModal(this.getAttribute('data-ticket'), 'Fill in details'); });
+document.querySelectorAll('[data-app]').forEach(el => {
+    el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
-document.querySelectorAll('[data-app]').forEach(function(el){
-    el.addEventListener('click', function(){ openModal(this.getAttribute('data-app'), 'Submit your application'); });
+document.querySelectorAll('[data-ticket]').forEach(el => {
+    el.addEventListener('click', function(){ openModal(this.getAttribute('data-ticket')); });
 });
 
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    var subject = document.getElementById('ticketSubject').value.trim();
-    var msg = document.getElementById('ticketMessage').value.trim();
-    if (!subject || !msg) { alert('Please fill all fields'); return; }
-    try {
-        var res = await fetch('/api/tickets', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: currentType, subject: subject, message: msg })
-        });
-        if (res.ok) { alert('✅ Submitted!'); closeModal(); document.getElementById('ticketForm').reset(); }
-        else { alert('❌ Error'); }
-    } catch (e) { alert('❌ Network error'); }
+    const subject = document.getElementById('ticketSubject').value;
+    const message = document.getElementById('ticketMessage').value;
+    if(!subject || !message) return alert('Fill all fields');
+    
+    await fetch('/api/tickets', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: currentType, subject, message })
+    });
+    alert('✅ Submitted Successfully!');
+    closeModal();
+    this.reset();
 });
 
-// ===== ADMIN =====
+// Admin Logic
 document.getElementById('adminLoginBtn').addEventListener('click', async function(){
-    var password = document.getElementById('adminPassword').value;
-    if (!password) { alert('Enter password'); return; }
-    try {
-        var res = await fetch('/api/admin-login', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: password })
-        });
-        var data = await res.json();
-        if (data.success) {
-            document.getElementById('adminLoginView').style.display = 'none';
-            document.getElementById('adminPanelView').style.display = 'block';
-            loadAdmin();
-        } else { alert('❌ Wrong password'); }
-    } catch (e) { alert('❌ Network error'); }
+    const pass = document.getElementById('adminPassword').value;
+    const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
+    if(res.ok) {
+        document.getElementById('adminLoginView').style.display = 'none';
+        document.getElementById('adminPanelView').style.display = 'block';
+        loadAdmin();
+    } else alert('Wrong Password!');
 });
-
 document.getElementById('adminLogoutBtn').addEventListener('click', function(){
     document.getElementById('adminLoginView').style.display = 'block';
     document.getElementById('adminPanelView').style.display = 'none';
-    document.getElementById('adminPassword').value = '';
 });
 
-document.getElementById('addShopBtn').addEventListener('click', async function(){
-    var name = document.getElementById('newShopName').value.trim();
-    var price = document.getElementById('newShopPrice').value;
-    var category = document.getElementById('newShopCategory').value;
-    var stock = document.getElementById('newShopStock').value || 1;
-    var image = document.getElementById('newShopImage').value.trim();
-    if (!name || !price) return alert('Fill name and price');
-    await fetch('/api/shop', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, price: parseInt(price), category, stock: parseInt(stock), image })
-    });
-    document.getElementById('newShopName').value = '';
-    document.getElementById('newShopPrice').value = '';
-    document.getElementById('newShopStock').value = '1';
-    document.getElementById('newShopImage').value = '';
-    loadAdmin(); loadShop();
-});
+async function loadAdmin() {
+    const tRes = await fetch('/api/tickets'); const tickets = await tRes.json();
+    document.getElementById('adminTickets').innerHTML = tickets.length ? `<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>User</th><th>Status</th><th>Action</th></tr></thead><tbody>${tickets.map(t => 
+        `<tr>
+            <td>${t.type}</td><td>${t.subject}</td><td>${t.user || 'Guest'}</td>
+            <td style="color:${t.status==='accepted'?'#22c55e':t.status==='rejected'?'#ff002b':'#f59e0b'}">${t.status}</td>
+            <td>
+                <button class="accept" onclick="updateTicket('${t.id}', 'accepted')">Accept</button>
+                <button class="reject" onclick="updateTicket('${t.id}', 'rejected')">Reject</button>
+            </td>
+        </tr>`).join('')}</tbody></table>` : '<p style="color:var(--text-muted);">No applications yet.</p>';
+
+    const sRes = await fetch('/api/shop'); const items = await sRes.json();
+    document.getElementById('adminShop').innerHTML = items.length ? `<table class="admin-table"><thead><tr><th>Name</th><th>Price</th><th>Action</th></tr></thead><tbody>${items.map(i => 
+        `<tr><td>${i.name}</td><td>${i.price} DT</td><td><button class="reject" onclick="removeShop('${i.id}')">Delete</button></td></tr>`).join('')}</tbody></table>` : '<p style="color:var(--text-muted);">Empty.</p>';
+}
 
 async function updateTicket(id, status) {
-    var reason = '';
-    if (status === 'rejected') {
-        reason = prompt('Reason for rejection:');
-        if (reason === null) return;
-    }
-    await fetch('/api/tickets/' + id, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, reason })
-    });
+    let reason = '';
+    if(status === 'rejected') { reason = prompt('Reason:'); if(reason === null) return; }
+    await fetch('/api/tickets/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, reason }) });
     loadAdmin();
 }
 
-async function loadAdmin() {
-    try {
-        var tRes = await fetch('/api/tickets');
-        var tickets = await tRes.json();
-        if (tickets.length) {
-            document.getElementById('adminTickets').innerHTML = '<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>User</th><th>Status</th><th>Reason</th><th>Action</th></tr></thead><tbody>' +
-                tickets.map(function(t){
-                    var color = t.status === 'accepted' ? '#22c55e' : t.status === 'rejected' ? '#ff003c' : '#f59e0b';
-                    return '<tr><td>' + t.type + '</td><td>' + t.subject + '</td><td>' + (t.user || 'Guest') + '</td><td style="color:'+color+';font-weight:700;">' + t.status + '</td><td>' + (t.reason || '-') + '</td>' +
-                    '<td><button onclick="updateTicket(\'' + t.id + '\', \'accepted\')" style="background:#22c55e;margin-right:5px;">Accept</button>' +
-                    '<button onclick="updateTicket(\'' + t.id + '\', \'rejected\')" style="background:#ff003c;">Reject</button></td></tr>';
-                }).join('') + '</tbody></table>';
-        } else { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">No tickets yet.</p>'; }
-    } catch (e) { document.getElementById('adminTickets').innerHTML = '<p class="loading-text">Error.</p>'; }
-
-    try {
-        var shRes = await fetch('/api/shop');
-        var items = await shRes.json();
-        if (items.length) {
-            document.getElementById('adminShop').innerHTML = '<table class="admin-table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>' +
-                items.map(function(item){ return '<tr><td>' + item.name + '</td><td>' + item.category + '</td><td>' + item.price + ' DT</td><td>' + item.stock + '</td><td><button onclick="removeShop(\'' + item.id + '\')" style="background:#ff003c;">Delete</button></td></tr>'; }).join('') + '</tbody></table>';
-        } else { document.getElementById('adminShop').innerHTML = '<p class="loading-text">No items.</p>'; }
-    } catch (e) { document.getElementById('adminShop').innerHTML = '<p class="loading-text">Error.</p>'; }
-}
-
-async function removeShop(id) {
-    if (!confirm('Delete this item?')) return;
-    await fetch('/api/shop/' + id, { method: 'DELETE' });
-    loadAdmin(); loadShop();
-}
-window.removeShop = removeShop;
-window.updateTicket = updateTicket;
-
-// ===== DISCORD LOGIN (تم تصليحه) =====
-document.getElementById('loginBtn').addEventListener('click', function(){
-    window.location.href = '/api/auth/discord'; 
+document.getElementById('addShopBtn').addEventListener('click', async function(){
+    const name = document.getElementById('newShopName').value;
+    const price = document.getElementById('newShopPrice').value;
+    const category = document.getElementById('newShopCategory').value;
+    const stock = document.getElementById('newShopStock').value;
+    const image = document.getElementById('newShopImage').value;
+    if(!name || !price) return alert('Fill required fields');
+    await fetch('/api/shop', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price: parseInt(price), category, stock: parseInt(stock), image }) });
+    document.getElementById('newShopName').value = '';
+    document.getElementById('newShopPrice').value = '';
+    document.getElementById('newShopImage').value = '';
+    loadAdmin();
 });
 
-// التحقق من حالة الدخول
-(async function checkLogin(){
-    try {
-        var res = await fetch('/api/auth/me');
-        var data = await res.json();
-        if (data.loggedIn) {
-            document.getElementById('loginText').textContent = data.username;
-            document.getElementById('loginBtn').onclick = function(){
-                window.location.href = '/api/auth/logout';
-            };
-        }
-    } catch (_) {}
-})();
+async function removeShop(id) {
+    if(!confirm('Delete item?')) return;
+    await fetch('/api/shop/' + id, { method: 'DELETE' });
+    loadAdmin();
+}
+
+async function loadShop() {
+    const res = await fetch('/api/shop'); const items = await res.json();
+    document.getElementById('shopGrid').innerHTML = items.length ? items.map(i => `
+        <div class="shop-item">
+            <div class="shop-img">${i.image ? `<img src="${i.image}">` : '<i class="fa-solid fa-car" style="font-size:4rem;color:#333;"></i>'}</div>
+            <div class="shop-body">
+                <div class="shop-price">${i.price} DT</div>
+                <div class="shop-title">${i.name}</div>
+            </div>
+        </div>`).join('') : '<p style="color:var(--text-muted);">Shop is empty.</p>';
+}
+
+document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 </script>
 </body>
 </html>
