@@ -3,7 +3,6 @@ const router = express.Router();
 const { Pool } = require('pg');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
-// إنشاء الجدول أوتوماتيكياً
 pool.query(`CREATE TABLE IF NOT EXISTS shop (id SERIAL PRIMARY KEY, name VARCHAR(255), price INT, category VARCHAR(50), stock INT, image TEXT)`).catch(() => {});
 
 router.get('/shop', async (req, res) => {
