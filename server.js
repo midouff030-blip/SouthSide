@@ -22,7 +22,7 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions =====
+// ===== Sessions & Auth =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,14 +30,13 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 passport.use(new DiscordStrategy({
   clientID: process.env.DISCORD_CLIENT_ID,
   clientSecret: process.env.DISCORD_CLIENT_SECRET,
-  callbackURL: process.env.DISCORD_CALLBACK_URL, // كيتقرا من Render
+  callbackURL: process.env.DISCORD_CALLBACK_URL,
   scope: ['identify']
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
@@ -85,7 +84,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs & Members =====
+// ===== Gangs (Full Control) =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -97,34 +96,27 @@ app.delete('/api/gangs/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-app.post('/api/gangs/:id/members', async (req, res) => {
-  try {
-    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+// إضافة عضو للجانغ
+app.post('/api/gangs/:id/members', (req, res) => {
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+  if (!gang) return res.status(404).json({ error: 'Gang not found' });
+  
+  const { discordId, memberName, avatar } = req.body;
+  gang.members.push({ 
+      discordId: discordId, 
+      name: memberName || 'Member', 
+      avatar: avatar || 'https://cdn.discordapp.com/embed/avatars/0.png' 
+  }); 
+  saveDB(db); res.json(gang);
+});
 
-    const discordId = req.body.discordId;
-    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
-
-    // جلب الصورة بالبوت
-    const botToken = process.env.DISCORD_BOT_TOKEN;
-    if (botToken && discordId) {
-        try {
-            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
-                headers: { Authorization: `Bot ${botToken}` }
-            });
-            if (discordRes.ok) {
-                const userData = await discordRes.json();
-                if (userData.avatar) {
-                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
-                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
-                }
-            }
-        } catch (e) { }
-    }
-
-    gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
-    saveDB(db); res.json(gang);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+// مسح عضو من الجانغ
+app.delete('/api/gangs/:id/members/:discordId', (req, res) => {
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+  if (!gang) return res.status(404).json({ error: 'Gang not found' });
+  
+  gang.members = gang.members.filter(m => m.discordId !== req.params.discordId);
+  saveDB(db); res.json(gang);
 });
 
 // ===== Shop =====
