@@ -102,7 +102,7 @@ app.post('/api/gangs/:id/members', async (req, res) => {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
     if (gang) { 
       const discordId = req.body.discordId;
-      let avatarUrl = `https://cdn.discordapp.com/embed/avatars/${Math.floor(Math.random()*5)}.png`;
+      let avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
       try {
         const lanyardRes = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
         const lanyardData = await lanyardRes.json();
