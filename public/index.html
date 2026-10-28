@@ -8,31 +8,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
-    --bg: #050505;
-    --card: rgba(15, 15, 18, 0.85);
-    --primary: #ff002b;
-    --text: #ffffff;
-    --text-muted: #a1a1aa;
-    --border: rgba(255, 255, 255, 0.08);
-    --glow: 0 0 20px rgba(255, 0, 43, 0.4);
-    --font-title: 'Bebas Neue', sans-serif;
-    --font-sub: 'Rajdhani', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --bg: #050505; --card: rgba(15, 15, 18, 0.85); --primary: #ff002b; --text: #ffffff;
+    --text-muted: #a1a1aa; --border: rgba(255, 255, 255, 0.08); --glow: 0 0 20px rgba(255, 0, 43, 0.4);
+    --font-title: 'Bebas Neue', sans-serif; --font-sub: 'Rajdhani', sans-serif; --font-body: 'Inter', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh;
-    background-image: radial-gradient(circle at 50% 0%, rgba(255, 0, 43, 0.08) 0%, transparent 60%);
-}
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; background-image: radial-gradient(circle at 50% 0%, rgba(255, 0, 43, 0.08) 0%, transparent 60%); }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
-
 canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-/* Header */
 header {
     display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem;
     background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(20px); position: fixed; top: 0; width: 100%; z-index: 1000;
@@ -51,18 +39,11 @@ nav { display: flex; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding
 .nav-btn:hover, .nav-btn.active { color: #fff; background: var(--primary); border-radius: 3px; box-shadow: var(--glow); }
 
 #userArea { display: flex; align-items: center; }
-.user-profile {
-    display: flex; align-items: center; gap: 1rem; background: rgba(255, 255, 255, 0.05); padding: 0.4rem 1rem;
-    border-radius: 50px; border: 1px solid var(--border); cursor: pointer; transition: 0.3s;
-}
+.user-profile { display: flex; align-items: center; gap: 1rem; background: rgba(255, 255, 255, 0.05); padding: 0.4rem 1rem; border-radius: 50px; border: 1px solid var(--border); cursor: pointer; transition: 0.3s; }
 .user-profile:hover { border-color: var(--primary); box-shadow: 0 0 15px rgba(255,0,43,0.2); }
 .user-profile img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
 .user-profile span { font-family: var(--font-sub); font-size: 1.2rem; font-weight: 600; color: #fff; }
-.btn-login {
-    background: transparent; color: #fff; border: 1px solid var(--primary); padding: 0.6rem 1.8rem; cursor: pointer;
-    font-family: var(--font-sub); font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
-    border-radius: 4px; display: flex; align-items: center; gap: 0.5rem;
-}
+.btn-login { background: transparent; color: #fff; border: 1px solid var(--primary); padding: 0.6rem 1.8rem; cursor: pointer; font-family: var(--font-sub); font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; border-radius: 4px; display: flex; align-items: center; gap: 0.5rem; }
 .btn-login:hover { background: var(--primary); box-shadow: var(--glow); }
 
 main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-height: 90vh; }
@@ -71,10 +52,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Hero */
-.hero-section {
-    position: relative; width: 100%; height: 60vh; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;
-    margin-bottom: 4rem; border: 1px solid var(--border); background-image: url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center;
-}
+.hero-section { position: relative; width: 100%; height: 60vh; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 4rem; border: 1px solid var(--border); background-image: url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; }
 .hero-section::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, #050505 10%, rgba(5,5,5,0.7) 50%, rgba(0,0,0,0.3) 100%); }
 .hero-content { position: relative; z-index: 2; text-align: center; }
 .hero-content h1 { font-family: var(--font-title); font-size: 7rem; line-height: 0.9; text-transform: uppercase; margin-bottom: 1rem; }
@@ -91,13 +69,23 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .page-head h2 { font-family: var(--font-title); font-size: 4.5rem; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
 .page-head p { font-family: var(--font-sub); font-size: 1.5rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-top: 0.5rem; }
 
+/* Status Box */
+.status-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; backdrop-filter: blur(10px); position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-left: 4px solid var(--primary); }
+.status-left h4 { font-family: var(--font-sub); font-size: 1.6rem; font-weight: 700; color: #22c55e; letter-spacing: 2px; display: flex; align-items: center; gap: 0.8rem; margin-bottom: 2rem; text-transform: uppercase; }
+.dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 15px #22c55e; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { transform: scale(0.95); } 50% { transform: scale(1.1); } 100% { transform: scale(0.95); } }
+.stat { display: flex; justify-content: space-between; font-family: var(--font-sub); font-size: 1.5rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.5rem; text-transform: uppercase; }
+.stat span:last-child { color: var(--primary); font-weight: 700; }
+.bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; margin-bottom: 2rem; overflow: hidden; }
+.bar-fill { width: 0%; height: 100%; background: var(--primary); box-shadow: var(--glow); transition: 1s; }
+.status-right h5 { font-family: var(--font-sub); font-size: 1.3rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 1rem; text-transform: uppercase; font-weight: 600; }
+.ip-row { display: flex; background: #000; border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-family: monospace; font-size: 1.3rem; color: var(--primary); }
+.btn-copy { width: 100%; background: var(--primary); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border-radius: 4px; text-transform: uppercase; }
+.btn-copy:hover { background: #fff; color: var(--primary); box-shadow: var(--glow); }
+
 /* Applications */
 .apps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #000; border: 1px solid #222; overflow: hidden; }
-.app-card {
-    position: relative; height: 500px; cursor: pointer; overflow: hidden;
-    background-size: cover; background-position: center; transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
-    display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 3rem 1rem;
-}
+.app-card { position: relative; height: 500px; cursor: pointer; overflow: hidden; background-size: cover; background-position: center; transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1); display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 3rem 1rem; }
 .app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 60%, #050505 100%); transition: 0.4s; z-index: 1; }
 .app-card:hover::before { background: linear-gradient(to bottom, rgba(255,0,43,0.15) 0%, rgba(0,0,0,0.7) 50%, #050505 100%); }
 .app-card:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
@@ -107,7 +95,18 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .app-form-btn { font-family: var(--font-sub); font-size: 1.4rem; font-weight: 700; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; position: relative; z-index: 2; margin-bottom: 2rem; transition: 0.3s; }
 .app-card:hover .app-form-btn { color: var(--primary); text-shadow: var(--glow); }
 
-/* Illegal Network */
+/* Streamers */
+.streamers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+.streamer-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.3s; }
+.streamer-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+.streamer-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.streamer-img img { width: 100%; height: 100%; object-fit: cover; }
+.streamer-info { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.streamer-name { font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 1px; }
+.live-dot { width: 12px; height: 12px; background: #333; border-radius: 50%; }
+.live-dot.on { background: #22c55e; box-shadow: 0 0 10px #22c55e; animation: pulse 1.5s infinite; }
+
+/* Gangs */
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; backdrop-filter: blur(10px); }
 .gang-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -119,13 +118,16 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .gang-member img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
 .gang-member:hover img { opacity: 1; transform: scale(1.1); }
 
-/* Support */
-.support-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-.support-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 3rem; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: flex-start; backdrop-filter: blur(10px); }
-.support-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,0,43,0.1); }
-.support-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 1.5rem; }
-.support-card h3 { font-family: var(--font-title); font-size: 2rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
-.support-card p { color: var(--text-muted); font-size: 1.1rem; }
+/* Shop */
+.shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+.shop-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.4s; }
+.shop-item:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(255,0,43,0.1); }
+.shop-img { height: 220px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.shop-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+.shop-item:hover .shop-img img { transform: scale(1.1); }
+.shop-body { padding: 1.5rem; }
+.shop-price { font-family: var(--font-sub); font-size: 1.8rem; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+.shop-title { font-family: var(--font-title); font-size: 1.8rem; letter-spacing: 1px; }
 
 /* Admin */
 .admin-login { max-width: 450px; margin: 5rem auto; background: var(--card); border: 1px solid var(--primary); padding: 3rem; border-radius: 8px; box-shadow: 0 0 50px rgba(255,0,43,0.1); text-align: center; }
@@ -145,7 +147,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .admin-table button.reject { border-color: var(--primary); color: var(--primary); }
 .admin-table button.reject:hover { background: var(--primary); color: #fff; }
 
-/* Modal (Application System) */
+/* Modal */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: 8px; width: 100%; max-width: 700px; padding: 3rem; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; transition: border-color 0.3s ease, box-shadow 0.3s ease;}
@@ -158,15 +160,16 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .form-input:focus { border-color: var(--primary); }
 .form-textarea { resize: vertical; min-height: 100px; }
 
-@media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(3, 1fr); } .support-grid { grid-template-columns: repeat(2, 1fr); } .gangs-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(3, 1fr); } .shop-grid { grid-template-columns: repeat(2, 1fr); } .gangs-grid { grid-template-columns: repeat(2, 1fr); } .streamers-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 992px) { 
     header { padding: 1rem; flex-direction: column; gap: 1rem; } 
     main { padding: 12rem 1rem 2rem; } 
     .apps-grid { grid-template-columns: 1fr; } 
     .app-card { height: 350px; }
     .hero-content h1 { font-size: 4rem; } 
-    .support-grid { grid-template-columns: 1fr; }
+    .shop-grid { grid-template-columns: 1fr; }
     .gangs-grid { grid-template-columns: 1fr; }
+    .streamers-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -183,7 +186,8 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
         <button class="nav-btn active" data-tab="home">Home</button>
         <button class="nav-btn" data-tab="apps">Applications</button>
         <button class="nav-btn" data-tab="illegal">Illegal Network</button>
-        <button class="nav-btn" data-tab="support">Support</button>
+        <button class="nav-btn" data-tab="shop">Shop</button>
+        <button class="nav-btn" data-tab="streamers">Streamers</button>
         <button class="nav-btn" data-tab="admin">Admin</button>
     </nav>
     <div id="userArea">
@@ -206,12 +210,12 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
         </div>
         
         <div class="page-head"><h2>Server Status</h2></div>
-        <div class="status-box" style="margin-bottom: 5rem;">
+        <div class="status-box">
             <div class="status-left">
-                <h4><span class="dot"></span> Server Online</h4>
-                <div class="stat"><span>ACTIVE PLAYERS</span><span>128 / 128</span></div>
-                <div class="bar"><div class="bar-fill" style="width: 100%;"></div></div>
-                <div class="stat"><span>SERVER NAME</span><span>SouthSide S2</span></div>
+                <h4 id="statusLabel"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
+                <div class="stat"><span>ACTIVE PLAYERS</span><span id="playerCount">Loading...</span></div>
+                <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+                <div class="stat"><span>SERVER NAME</span><span id="serverName">-</span></div>
             </div>
             <div class="status-right">
                 <h5>Direct Connect</h5>
@@ -265,29 +269,19 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
         <div class="gangs-grid" id="gangsGrid"></div>
     </div>
 
-    <!-- SUPPORT -->
-    <div id="tab-support" class="tab">
+    <!-- SHOP -->
+    <div id="tab-shop" class="tab">
+        <div class="page-head"><h2>Shop</h2></div>
+        <div class="shop-grid" id="shopGrid"></div>
+    </div>
+
+    <!-- STREAMERS -->
+    <div id="tab-streamers" class="tab">
         <div class="page-head">
-            <h2>Need Help?</h2>
-            <p>Open a ticket and our staff will assist you immediately</p>
+            <h2>Top Streamers</h2>
+            <p>Watch the best roleplayers in the city</p>
         </div>
-        <div class="support-grid">
-            <div class="support-card" data-ticket="Bug Report">
-                <i class="fa-solid fa-bug"></i>
-                <h3>Bug Report</h3>
-                <p>Found a glitch in the matrix? Report it here.</p>
-            </div>
-            <div class="support-card" data-ticket="Refund">
-                <i class="fa-solid fa-money-bill-transfer"></i>
-                <h3>Refund Request</h3>
-                <p>Request a refund for a purchase or donation.</p>
-            </div>
-            <div class="support-card" data-ticket="Player Report">
-                <i class="fa-solid fa-user-slash"></i>
-                <h3>Player Report</h3>
-                <p>Report rule breakers and toxic behavior.</p>
-            </div>
-        </div>
+        <div class="streamers-grid" id="streamersGrid"></div>
     </div>
 
     <!-- ADMIN -->
@@ -319,6 +313,29 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 </div>
                 <div id="adminGangs"></div>
             </div>
+
+            <div class="admin-section">
+                <h3><i class="fa-solid fa-store"></i> Manage Shop</h3>
+                <div style="display:grid; grid-template-columns: 2fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
+                    <input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item Name">
+                    <input class="admin-input" style="margin:0;" type="number" id="newShopPrice" placeholder="Price (DT)">
+                    <input class="admin-input" style="margin:0;" type="text" id="newShopImage" placeholder="Image URL">
+                    <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addShopBtn">Add Item</button>
+                </div>
+                <div id="adminShop"></div>
+            </div>
+
+            <!-- إدارة الستريمرز -->
+            <div class="admin-section">
+                <h3><i class="fa-solid fa-video"></i> Manage Streamers</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
+                    <input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Name">
+                    <input class="admin-input" style="margin:0;" type="text" id="newStreamerUrl" placeholder="Stream Link">
+                    <input class="admin-input" style="margin:0;" type="text" id="newStreamerImage" placeholder="Image URL">
+                    <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addStreamerBtn">Add</button>
+                </div>
+                <div id="adminStreamers"></div>
+            </div>
         </div>
     </div>
 </main>
@@ -333,9 +350,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
         <h2 id="modalTitle" style="font-family:var(--font-title); font-size:2.5rem; margin-bottom:1.5rem; text-transform:uppercase;">Application</h2>
         
         <form id="ticketForm">
-            <!-- Champs dynamiques générés selon la carte cliquée -->
             <div id="dynamicFormFields"></div>
-
             <button type="submit" class="admin-btn" id="submitFormBtn" style="margin-top: 1.5rem;">Submit Application</button>
         </form>
     </div>
@@ -375,7 +390,9 @@ function switchTab(name) {
     document.getElementById('tab-' + name).classList.add('active');
     document.querySelector('.nav-btn[data-tab="' + name + '"]').classList.add('active');
     if(name === 'illegal') loadGangs();
+    if(name === 'shop') loadShop();
     if(name === 'admin') loadAdmin();
+    if(name === 'streamers') loadStreamers();
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
 
@@ -388,93 +405,49 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     setTimeout(() => t.innerHTML = old, 2000);
 });
 
-// Configs dynamiques des applications
+// App Configs
 const appConfigs = {
-    "Whitelist App": {
-        title: "WHITELIST APPLICATION",
-        color: "#ff002b",
-        icon: "fa-regular fa-user",
-        fields: [
-            { label: "CHARACTER NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
-            { label: "AGE *", type: "number", name: "age", placeholder: "Your character age", required: true },
-            { label: "DISCORD ID *", type: "input", name: "discord_id", placeholder: "e.g. 123456789012345678", required: true },
-            { label: "CHARACTER BACKSTORY *", type: "textarea", name: "backstory", placeholder: "Tell us your character backstory...", required: true }
-        ]
-    },
-    "Gang & Family App": {
-        title: "GANG & FAMILY APPLICATION",
-        color: "#ff7a1a",
-        icon: "fa-solid fa-crosshairs",
-        fields: [
-            { label: "GANG NAME *", type: "input", name: "gang_name", placeholder: "Official organization name", required: true },
-            { label: "GANG COLOR (HEX CODE) *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true },
-            { label: "MEMBERS' DISCORD IDS (8+) *", type: "textarea", name: "members_ids", placeholder: "At least 8 Discord IDs required...", required: true },
-            { label: "ORIGIN STORY OF THE GANG *", type: "textarea", name: "origin_story", placeholder: "Origin story of the gang...", required: true },
-            { label: "GANG OBJECTIVE *", type: "textarea", name: "gang_objective", placeholder: "Describe your gang objective and goals...", required: true }
-        ]
-    },
-    "Police App": {
-        title: "POLICE DEPARTMENT APPLICATION",
-        color: "#3b82f6",
-        icon: "fa-solid fa-shield-halved",
-        fields: [
-            { label: "CHARACTER NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
-            { label: "AGE *", type: "number", name: "age", placeholder: "Your character age", required: true },
-            { label: "WHY DO YOU WANT TO JOIN THE POLICE? *", type: "textarea", name: "motivation", placeholder: "Your motivation and character background...", required: true },
-            { label: "LAW ENFORCEMENT / LEO RP EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Previous police RP, servers played...", required: true },
-            { label: "WEEKLY AVAILABILITY *", type: "input", name: "availability", placeholder: "e.g. Mon-Fri 6pm-11pm EST", required: true }
-        ]
-    },
-    "EMS App": {
-        title: "EMS DEPARTMENT APPLICATION",
-        color: "#10b981",
-        icon: "fa-solid fa-briefcase-medical",
-        fields: [
-            { label: "CHARACTER NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
-            { label: "AGE *", type: "number", name: "age", placeholder: "Your character age", required: true },
-            { label: "WHY DO YOU WANT TO JOIN EMS? *", type: "textarea", name: "motivation", placeholder: "Your motivation and character background...", required: true },
-            { label: "MEDICAL / EMS RP EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Previous EMS RP, servers played...", required: true },
-            { label: "WEEKLY AVAILABILITY *", type: "input", name: "availability", placeholder: "e.g. Mon-Fri 6pm-11pm EST", required: true }
-        ]
-    },
-    "Creator App": {
-        title: "CREATOR PROGRAM APPLICATION",
-        color: "#a855f7",
-        icon: "fa-solid fa-video",
-        fields: [
-            { label: "CHANNEL / STREAM NAME *", type: "input", name: "channel_name", placeholder: "Your channel name", required: true },
-            { label: "PLATFORM *", type: "select", name: "platform", options: ["Twitch", "YouTube", "Kick", "TikTok"], required: true },
-            { label: "CHANNEL URL *", type: "input", name: "channel_url", placeholder: "https://twitch.tv/yourname", required: true },
-            { label: "STREAMING EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Platforms used, average viewers...", required: true },
-            { label: "STREAMING SCHEDULE *", type: "input", name: "schedule", placeholder: "e.g. Tue/Thu/Sat 7pm-11pm EST", required: true }
-        ]
-    }
-};
-
-const defaultSupportConfig = {
-    color: "var(--primary)",
-    icon: "fa-solid fa-headset",
-    fields: [
-        { label: "DISCORD ID / SUBJECT *", type: "input", name: "subject", placeholder: "Enter your Discord ID or Subject", required: true },
-        { label: "MESSAGE / DETAILS *", type: "textarea", name: "message", placeholder: "Explain your situation in detail...", required: true }
-    ]
+    "Whitelist App": { title: "WHITELIST", color: "#ff002b", icon: "fa-regular fa-user", fields: [
+        { label: "CHARACTER NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
+        { label: "AGE *", type: "number", name: "age", placeholder: "Your age", required: true },
+        { label: "DISCORD ID *", type: "input", name: "discord_id", placeholder: "e.g. 1234567890", required: true },
+        { label: "BACKSTORY *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true }
+    ]},
+    "Gang & Family App": { title: "GANG & FAMILY", color: "#ff7a1a", icon: "fa-solid fa-crosshairs", fields: [
+        { label: "GANG NAME *", type: "input", name: "gang_name", placeholder: "Name", required: true },
+        { label: "GANG COLOR *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true },
+        { label: "MEMBERS IDS *", type: "textarea", name: "members_ids", placeholder: "8+ IDs...", required: true },
+        { label: "OBJECTIVE *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true }
+    ]},
+    "Police App": { title: "POLICE DEPT", color: "#3b82f6", icon: "fa-solid fa-shield-halved", fields: [
+        { label: "NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
+        { label: "AGE *", type: "number", name: "age", placeholder: "Age", required: true },
+        { label: "WHY PD? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true },
+        { label: "EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Experience...", required: true }
+    ]},
+    "EMS App": { title: "EMS DEPT", color: "#10b981", icon: "fa-solid fa-briefcase-medical", fields: [
+        { label: "NAME *", type: "input", name: "char_name", placeholder: "First Last", required: true },
+        { label: "AGE *", type: "number", name: "age", placeholder: "Age", required: true },
+        { label: "WHY EMS? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true },
+        { label: "EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Experience...", required: true }
+    ]},
+    "Creator App": { title: "CREATOR", color: "#a855f7", icon: "fa-solid fa-video", fields: [
+        { label: "CHANNEL NAME *", type: "input", name: "channel_name", placeholder: "Name", required: true },
+        { label: "PLATFORM *", type: "select", name: "platform", options: ["Twitch", "YouTube", "Kick"], required: true },
+        { label: "CHANNEL URL *", type: "input", name: "channel_url", placeholder: "https://...", required: true },
+        { label: "EXPERIENCE *", type: "textarea", name: "experience", placeholder: "Avg viewers...", required: true }
+    ]}
 };
 
 let currentType = '';
 function openModal(title) {
     currentType = title;
-    const config = appConfigs[title] || defaultSupportConfig;
-    const themeColor = config.color || "var(--primary)";
-
-    document.getElementById('modalTitle').innerText = config.title || title;
-    document.getElementById('modalHeaderIcon').innerHTML = config.icon ? `<i class="${config.icon}" style="color: ${themeColor}"></i>` : '';
+    const config = appConfigs[title] || { title: "SUPPORT", color: "#ff002b", icon: "fa-solid fa-headset", fields: [] };
     
-    const cardBody = document.getElementById('modalCardBody');
-    cardBody.style.borderTop = `4px solid ${themeColor}`;
-    cardBody.style.boxShadow = `0 0 30px ${themeColor}40`;
-
-    const submitBtn = document.getElementById('submitFormBtn');
-    submitBtn.style.background = themeColor;
+    document.getElementById('modalTitle').innerText = config.title;
+    document.getElementById('modalHeaderIcon').innerHTML = config.icon ? `<i class="${config.icon}" style="color: ${config.color}"></i>` : '';
+    document.getElementById('modalCardBody').style.borderTop = `4px solid ${config.color}`;
+    document.getElementById('submitFormBtn').style.background = config.color;
 
     const fieldsContainer = document.getElementById('dynamicFormFields');
     fieldsContainer.innerHTML = '';
@@ -482,7 +455,6 @@ function openModal(title) {
     config.fields.forEach(f => {
         const group = document.createElement('div');
         group.className = 'form-group';
-
         const label = document.createElement('label');
         label.className = 'form-label';
         label.innerText = f.label;
@@ -490,27 +462,15 @@ function openModal(title) {
 
         let input;
         if (f.type === 'textarea') {
-            input = document.createElement('textarea');
-            input.className = 'form-input form-textarea';
+            input = document.createElement('textarea'); input.className = 'form-input form-textarea';
         } else if (f.type === 'select') {
-            input = document.createElement('select');
-            input.className = 'form-input';
-            f.options.forEach(opt => {
-                const o = document.createElement('option');
-                o.value = opt;
-                o.innerText = opt;
-                input.appendChild(o);
-            });
+            input = document.createElement('select'); input.className = 'form-input';
+            f.options.forEach(opt => { const o = document.createElement('option'); o.value = opt; o.innerText = opt; input.appendChild(o); });
         } else {
-            input = document.createElement('input');
-            input.type = f.type || 'text';
-            input.className = 'form-input';
+            input = document.createElement('input'); input.type = f.type || 'text'; input.className = 'form-input';
         }
-
-        input.name = f.name;
-        input.placeholder = f.placeholder || '';
+        input.name = f.name; input.placeholder = f.placeholder || '';
         if (f.required) input.required = true;
-
         group.appendChild(input);
         fieldsContainer.appendChild(group);
     });
@@ -525,168 +485,129 @@ document.getElementById('ticketModal').addEventListener('click', function(e){ if
 document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
-document.querySelectorAll('[data-ticket]').forEach(el => {
-    el.addEventListener('click', function(){ openModal(this.getAttribute('data-ticket')); });
-});
 
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    
-    const formData = new FormData(this);
-    const dataObj = {};
+    const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
-
-    const payload = {
-        type: currentType,
-        subject: dataObj.discord_id || dataObj.subject || dataObj.char_name || 'N/A',
-        message: JSON.stringify(dataObj)
-    };
-
-    try {
-        await fetch('/api/tickets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        alert('✅ Submitted Successfully!');
-        closeModal();
-        this.reset();
-    } catch(err) {
-        alert('❌ Error submitting application');
-    }
+    await fetch('/api/tickets', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: currentType, subject: dataObj.discord_id || dataObj.char_name || 'N/A', message: JSON.stringify(dataObj) })
+    });
+    alert('✅ Submitted!');
+    closeModal(); this.reset();
 });
 
-// Gangs Loading
+// FiveM Stats
+async function loadStats() {
+    try {
+        const res = await fetch('/api/stats'); const data = await res.json();
+        document.getElementById('statusText').textContent = data.online ? 'Server Online' : 'Server Offline';
+        document.getElementById('playerCount').textContent = `${data.players} / ${data.maxPlayers}`;
+        document.getElementById('serverName').textContent = data.name;
+        document.getElementById('serverIP').textContent = data.ip;
+        document.getElementById('barFill').style.width = (data.players / data.maxPlayers * 100) + '%';
+    } catch(e) {}
+}
+loadStats();
+
+// Load Gangs
 async function loadGangs() {
     try {
-        const res = await fetch('/api/gangs');
-        const gangs = await res.json();
-        const grid = document.getElementById('gangsGrid');
-        
-        if(!gangs || gangs.length === 0) {
-            grid.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No gangs registered yet.</p>';
-            return;
-        }
-
-        grid.innerHTML = gangs.map(gang => `
+        const res = await fetch('/api/gangs'); const gangs = await res.json();
+        document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
             <div class="gang-card">
-                <div class="gang-header">
-                    <div class="gang-logo">${gang.logo || 'G'}</div>
-                    <div>
-                        <div class="gang-title">${gang.name}</div>
-                        <div class="gang-members-count">${gang.members ? gang.members.length : 0} MEMBERS</div>
-                    </div>
-                </div>
-                <div class="gang-roster">
-                    ${(gang.members || []).map(m => `
-                        <div class="gang-member" data-name="${m.name}">
-                            <img src="${m.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}">
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-    } catch(err) {
-        console.error(err);
-    }
+                <div class="gang-header"><div class="gang-logo">${g.logo || 'G'}</div><div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members.length} MEMBERS</div></div></div>
+                <div class="gang-roster">${(g.members || []).map(m => `<div class="gang-member"><img src="https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}</div>
+            </div>`).join('') : '<p>No gangs.</p>';
+    } catch(e){}
 }
 
-// Admin Logic
+// Load Streamers
+async function loadStreamers() {
+    try {
+        const res = await fetch('/api/streamers'); const streamers = await res.json();
+        document.getElementById('streamersGrid').innerHTML = streamers.length ? streamers.map(s => `
+            <a href="${s.url}" target="_blank" class="streamer-card" style="text-decoration:none; color:inherit;">
+                <div class="streamer-img"><img src="${s.image}"></div>
+                <div class="streamer-info"><span class="streamer-name">${s.name}</span><div class="live-dot on"></div></div>
+            </a>`).join('') : '<p>No streamers.</p>';
+    } catch(e){}
+}
+
+// Load Shop
+async function loadShop() {
+    try {
+        const res = await fetch('/api/shop'); const items = await res.json();
+        document.getElementById('shopGrid').innerHTML = items.length ? items.map(i => `
+            <div class="shop-item">
+                <div class="shop-img"><img src="${i.image}"></div>
+                <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
+            </div>`).join('') : '<p>Shop empty.</p>';
+    } catch(e){}
+}
+
+// Admin
 document.getElementById('adminLoginBtn').addEventListener('click', async function(){
     const pass = document.getElementById('adminPassword').value;
-    try {
-        const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
-        if(res.ok) {
-            document.getElementById('adminLoginView').style.display = 'none';
-            document.getElementById('adminPanelView').style.display = 'block';
-            loadAdmin();
-        } else alert('Wrong Password!');
-    } catch(err) { alert('Server error'); }
+    const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
+    if(res.ok) {
+        document.getElementById('adminLoginView').style.display = 'none';
+        document.getElementById('adminPanelView').style.display = 'block';
+        loadAdmin();
+    } else alert('Wrong Password');
 });
-document.getElementById('adminLogoutBtn').addEventListener('click', function(){
+document.getElementById('adminLogoutBtn').addEventListener('click', () => {
     document.getElementById('adminLoginView').style.display = 'block';
     document.getElementById('adminPanelView').style.display = 'none';
 });
 
 async function loadAdmin() {
-    try {
-        const tRes = await fetch('/api/tickets'); const tickets = await tRes.json();
-        document.getElementById('adminTickets').innerHTML = tickets.length ? `<table class="admin-table"><thead><tr><th>Type</th><th>Subject</th><th>Details</th><th>Status</th><th>Action</th></tr></thead><tbody>${tickets.map(t => 
-            `<tr>
-                <td>${t.type}</td><td>${t.subject}</td><td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;">${t.message}</td>
-                <td style="color:${t.status==='accepted'?'#22c55e':t.status==='rejected'?'#ff002b':'#f59e0b'}">${t.status}</td>
-                <td>
-                    <button class="accept" onclick="updateTicket('${t.id}', 'accepted')">Accept</button>
-                    <button class="reject" onclick="updateTicket('${t.id}', 'rejected')">Reject</button>
-                </td>
-            </tr>`).join('')}</tbody></table>` : '<p style="color:var(--text-muted);">No applications yet.</p>';
+    // Tickets
+    const t = await (await fetch('/api/tickets')).json();
+    document.getElementById('adminTickets').innerHTML = t.length ? `<table class="admin-table"><tr><th>Type</th><th>Status</th><th>Action</th></tr>${t.map(x=>`<tr><td>${x.type}</td><td>${x.status}</td><td><button onclick="updateTicket('${x.id}', 'accepted')">Accept</button></td></tr>`).join('')}</table>` : 'No tickets.';
 
-        const gRes = await fetch('/api/gangs'); const gangs = await gRes.json();
-        document.getElementById('adminGangs').innerHTML = gangs.length ? `<table class="admin-table"><thead><tr><th>Gang Name</th><th>Members</th><th>Action</th></tr></thead><tbody>${gangs.map(g => 
-            `<tr>
-                <td>${g.name}</td>
-                <td>${g.members ? g.members.length : 0} Members</td>
-                <td>
-                    <button class="accept" onclick="addMember('${g.id}')">+ Add Member</button>
-                    <button class="reject" onclick="removeGang('${g.id}')">Delete Gang</button>
-                </td>
-            </tr>`).join('')}</tbody></table>` : '<p style="color:var(--text-muted);">No gangs.</p>';
-    } catch(err) { console.error(err); }
+    // Gangs
+    const g = await (await fetch('/api/gangs')).json();
+    document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`<tr><td>${x.name}</td><td>${x.members.length} m</td><td><button onclick="addMember('${x.id}')">Add Member</button></td></tr>`).join('')}</table>` : 'No gangs.';
+
+    // Shop
+    const s = await (await fetch('/api/shop')).json();
+    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td></tr>`).join('')}</table>` : 'Empty.';
+
+    // Streamers
+    const st = await (await fetch('/api/streamers')).json();
+    document.getElementById('adminStreamers').innerHTML = st.length ? `<table class="admin-table">${st.map(x=>`<tr><td>${x.name}</td><td>${x.url}</td><td><button onclick="removeStreamer('${x.id}')">Delete</button></td></tr>`).join('')}</table>` : 'Empty.';
 }
 
-async function updateTicket(id, status) {
-    let reason = '';
-    if(status === 'rejected') { reason = prompt('Reason:'); if(reason === null) return; }
-    await fetch('/api/tickets/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, reason }) });
-    loadAdmin();
+async function updateTicket(id, st) { await fetch('/api/tickets/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); loadAdmin(); }
+document.getElementById('addGangBtn').addEventListener('click', async function(){ await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newGangName').value, logo:document.getElementById('newGangLogo').value})}); loadAdmin(); });
+async function addMember(id) { 
+    const discordId = prompt("Discord ID (e.g. 1234567890):"); 
+    if(discordId) { 
+        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:discordId, avatar:'0'})}); 
+        loadAdmin(); 
+    } 
 }
-
-document.getElementById('addGangBtn').addEventListener('click', async function(){
-    const name = document.getElementById('newGangName').value;
-    const logo = document.getElementById('newGangLogo').value;
-    if(!name) return alert('Fill gang name');
-    await fetch('/api/gangs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, logo: logo || name[0], members: [] }) });
-    document.getElementById('newGangName').value = '';
-    document.getElementById('newGangLogo').value = '';
-    loadAdmin();
+document.getElementById('addShopBtn').addEventListener('click', async function(){ await fetch('/api/shop', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})}); loadAdmin(); });
+document.getElementById('addStreamerBtn').addEventListener('click', async function(){ 
+    await fetch('/api/streamers', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newStreamerName').value, url:document.getElementById('newStreamerUrl').value, image:document.getElementById('newStreamerImage').value})}); 
+    loadAdmin(); 
 });
-
-async function removeGang(id) {
-    if(!confirm('Delete this gang?')) return;
-    await fetch('/api/gangs/' + id, { method: 'DELETE' });
-    loadAdmin();
+async function removeStreamer(id) {
+    if(confirm('Delete Streamer?')) {
+        await fetch('/api/streamers/'+id, {method:'DELETE'});
+        loadAdmin();
+    }
 }
 
-async function addMember(gangId) {
-    const name = prompt("Member Name:");
-    if(!name) return;
-    const avatar = prompt("Member Avatar URL (Leave empty for default):") || 'https://cdn.discordapp.com/embed/avatars/0.png';
-    await fetch('/api/gangs/' + gangId + '/members', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, avatar })
-    });
-    loadAdmin();
-}
-
-// Login Discord
+// Auth
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
-
 async function checkLogin() {
-    try {
-        var res = await fetch('/api/auth/me');
-        var data = await res.json();
-        if (data.loggedIn) {
-            var pfpUrl = data.avatar 
-                ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` 
-                : `https://cdn.discordapp.com/embed/avatars/0.png`;
-                
-            document.getElementById('userArea').innerHTML = `
-                <div class="user-profile" onclick="window.location.href='/api/auth/logout'" title="Click to Logout">
-                    <img src="${pfpUrl}" alt="PFP">
-                    <span>${data.username}</span>
-                </div>
-            `;
-        }
-    } catch (e) { console.error("Login Error", e); }
+    const res = await fetch('/api/auth/me'); const data = await res.json();
+    if (data.loggedIn) {
+        document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
+    }
 }
 checkLogin();
 </script>
