@@ -332,12 +332,16 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminShop"></div>
             </div>
 
+            <!-- إدارة الستريمرز (Live Checkbox) -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-video"></i> Manage Streamers</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto auto; gap:0.5rem; margin-bottom:2rem;">
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Kick Username">
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerUrl" placeholder="Stream Link">
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerImage" placeholder="Image URL">
+                    <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; font-family:var(--font-sub); font-weight:600; font-size:1.1rem; cursor:pointer;">
+                        <input type="checkbox" id="newStreamerLive" style="width:20px; height:20px; cursor:pointer;"> LIVE
+                    </label>
                     <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addStreamerBtn">Add</button>
                 </div>
                 <div id="adminStreamers"></div>
@@ -529,7 +533,7 @@ async function loadGangs() {
     } catch(e){}
 }
 
-// Load Streamers (Automatic via DecAPI)
+// Load Streamers (مع فلترة Live / Offline)
 async function loadStreamers() {
     try {
         const res = await fetch('/api/streamers'); const streamers = await res.json();
@@ -632,6 +636,7 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
+        // هنا كنخليو الـ Avatar URL خاوي، و الـ Server غادي يجيب الصورة من Lanyard، و إلا ما لقاهاش كيحط صورة افتراضية.
         await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId})}); 
         loadAdmin(); 
     } 
@@ -641,7 +646,9 @@ document.getElementById('addShopBtn').addEventListener('click', async function()
     loadAdmin(); 
 });
 document.getElementById('addStreamerBtn').addEventListener('click', async function(){ 
-    await fetch('/api/streamers', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newStreamerName').value, url:document.getElementById('newStreamerUrl').value, image:document.getElementById('newStreamerImage').value})}); 
+    // هنا كناخدو الـ isLive من الـ Checkbox
+    const isLive = document.getElementById('newStreamerLive').checked;
+    await fetch('/api/streamers', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newStreamerName').value, url:document.getElementById('newStreamerUrl').value, image:document.getElementById('newStreamerImage').value, isLive: isLive})}); 
     loadAdmin(); 
 });
 async function removeStreamer(id) {
