@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== قاعدة البيانات (JSON) =====
+// ===== 1. قاعدة البيانات (JSON) =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [] }, null, 2));
@@ -21,15 +21,15 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== الجلسات =====
+// ===== 2. الجلسات =====
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'southside-secret',
+  secret: process.env.SESSION_SECRET || 'southside-secret-2026',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== الديسكورد =====
+// ===== 3. الديسكورد =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -44,31 +44,17 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== المسارات (Routes) =====
+// ===== 4. الروابط =====
 app.get('/api/auth/discord', passport.authenticate('discord'));
+app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
 
-app.get('/api/auth/discord/callback', 
-  passport.authenticate('discord', { failureRedirect: '/?login=failed' }), 
-  (req, res) => res.redirect('/?login=success')
-);
-
-// هاد الرابط هو اللي كيصيفط الـ ID و الصورة للـ HTML
+// هاد الرابط كيرجع الـ ID و الصورة
 app.get('/api/auth/me', (req, res) => {
-  if (req.user) {
-    res.json({ 
-      loggedIn: true, 
-      username: req.user.username, 
-      id: req.user.id, 
-      avatar: req.user.avatar 
-    });
-  } else {
-    res.json({ loggedIn: false });
-  }
+  if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
+  else res.json({ loggedIn: false });
 });
 
-app.get('/api/auth/logout', (req, res) => {
-  req.logout(() => res.redirect('/'));
-});
+app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 
 // Shop
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
@@ -101,5 +87,4 @@ app.post('/api/admin-login', (req, res) => {
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-app.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on port ${PORT}`));
