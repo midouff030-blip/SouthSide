@@ -63,7 +63,7 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers =====
+// ===== Streamers (Automatic via DecAPI) =====
 app.get('/api/streamers', async (req, res) => {
     try {
         const db = getDB();
@@ -80,6 +80,7 @@ app.get('/api/streamers', async (req, res) => {
             } catch (e) { }
             return { ...s, isLive: isLive };
         }));
+        
         res.json(streamers);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -94,7 +95,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs & Members =====
+// ===== Gangs & Members (Lanyard API) =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
