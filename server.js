@@ -88,39 +88,36 @@ app.delete('/api/streamers/:id', (req, res) => {
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
-  const db = getDB(); 
-  if (!db.gangs) db.gangs = [];
+  const db = getDB(); if (!db.gangs) db.gangs = [];
   
-  const newGang = { 
+  const gang = { 
       id: Date.now().toString(), 
-      name: req.body.name,
+      name: req.body.name || 'Unknown',
       boss: req.body.boss || '', 
       bossId: req.body.bossId || '',
       underboss: req.body.underboss || '', 
       underbossId: req.body.underbossId || '',
       members: [] 
   };
-  
-  db.gangs.push(newGang); 
-  saveDB(db); 
-  res.json(newGang);
+  db.gangs.push(gang); saveDB(db); res.json(gang);
 });
 
 app.delete('/api/gangs/:id', (req, res) => {
-  const db = getDB(); 
-  db.gangs = db.gangs.filter(g => g.id !== req.params.id);
+  const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
+// إضافة عضو (مع الصورة اللي كتحطها نتا)
 app.post('/api/gangs/:id/members', (req, res) => {
-  const db = getDB(); 
-  const gang = db.gangs.find(g => g.id === req.params.id);
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
   if (!gang) return res.status(404).json({ error: 'Gang not found' });
+  
+  const avatar = req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
   
   gang.members.push({ 
       discordId: req.body.discordId, 
       name: req.body.memberName || 'Member', 
-      avatar: req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png' 
+      avatar: avatar 
   }); 
   saveDB(db); res.json(gang);
 });
