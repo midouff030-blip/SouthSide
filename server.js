@@ -64,40 +64,26 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers (Automatic Live Check) =====
+// ===== Streamers (Automatic Live via DecAPI) =====
 app.get('/api/streamers', async (req, res) => {
     try {
         const db = getDB();
         let streamers = db.streamers || [];
         
-        const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
-        const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
-        
-        if (KICK_CLIENT_ID && KICK_CLIENT_SECRET && streamers.length > 0) {
-            let token = null;
+        streamers = await Promise.all(streamers.map(async (s) => {
+            let isLive = false;
             try {
-                const tokenRes = await fetch('https://id.kick.com/oauth/token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `grant_type=client_credentials&client_id=${KICK_CLIENT_ID}&client_secret=${KICK_CLIENT_SECRET}`
-                });
-                const tokenData = await tokenRes.json();
-                token = tokenData.access_token;
-            } catch (e) { console.log('Kick Token Error'); }
-
-            if (token) {
-                streamers = await Promise.all(streamers.map(async (s) => {
-                    try {
-                        const kickRes = await fetch(`https://api.kick.com/public/v1/channels?slug=${s.name}`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        const kickData = await kickRes.json();
-                        const isLive = kickData.data && kickData.data[0] && kickData.data[0].livestream !== null;
-                        return { ...s, isLive: isLive };
-                    } catch (e) { return { ...s, isLive: false }; }
-                }));
-            }
-        }
+                // DecAPI كيشيك على Kick بشكل أوتوماتيكي
+                const decapiRes = await fetch(`https://decapi.me/kick/uptime/${s.name}`);
+                const text = await decapiRes.text();
+                // إلا كان الرد مافيهش "offline" أو "User not found"، فمعناها راه لايف
+                if (text && !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('not found')) {
+                    isLive = true;
+                }
+            } catch (e) { console.log('DecAPI Error'); }
+            return { ...s, isLive: isLive };
+        }));
+        
         res.json(streamers);
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -123,7 +109,6 @@ app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
-
 app.post('/api/gangs/:id/members', async (req, res) => {
   try {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
@@ -137,7 +122,6 @@ app.post('/api/gangs/:id/members', async (req, res) => {
             avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
         }
       } catch (e) { console.log('Lanyard error'); }
-      
       gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
       saveDB(db); 
       res.json(gang);
