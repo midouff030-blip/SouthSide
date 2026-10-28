@@ -55,7 +55,6 @@ nav { display: flex; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding
 }
 .nav-btn:hover, .nav-btn.active { color: #fff; background: var(--primary); border-radius: 3px; box-shadow: var(--glow); }
 
-/* User Profile */
 #userArea { display: flex; align-items: center; }
 .user-profile {
     display: flex; align-items: center; gap: 1rem; background: rgba(255, 255, 255, 0.05); padding: 0.4rem 1rem;
@@ -77,7 +76,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .tab.active { display: block; animation: fadeIn 0.5s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ==== HOME PAGE ==== */
+/* Home */
 .hero-section {
     position: relative; width: 100%; height: 70vh; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;
     margin-bottom: 4rem; border: 1px solid var(--border);
@@ -95,7 +94,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .btn-hero-secondary { background: transparent; border: 1px solid #fff; color: #fff; padding: 1rem 3rem; border-radius: 4px; font-family: var(--font-sub); font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
 .btn-hero-secondary:hover { background: #fff; color: #000; }
 
-/* إحصائيات */
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 5rem; }
 .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; text-align: center; backdrop-filter: blur(10px); transition: 0.3s; }
 .stat-card:hover { border-color: var(--primary); transform: translateY(-5px); }
@@ -103,7 +101,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .stat-card h3 { font-family: var(--font-title); font-size: 3rem; letter-spacing: 1px; margin-bottom: 0.2rem; }
 .stat-card p { font-family: var(--font-sub); font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-/* Features Section */
 .section-title { font-family: var(--font-title); font-size: 4rem; text-align: center; text-transform: uppercase; margin-bottom: 3rem; letter-spacing: 2px; }
 .section-title em { color: var(--primary); font-style: normal; }
 .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 5rem; }
@@ -113,7 +110,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .feature-box h3 { font-family: var(--font-title); font-size: 2.2rem; letter-spacing: 1px; margin-bottom: 1rem; }
 .feature-box p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; }
 
-/* Server Status Box */
 .status-box {
     background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 3rem;
     display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; backdrop-filter: blur(10px);
@@ -131,7 +127,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .btn-copy { width: 100%; background: var(--primary); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border-radius: 4px; text-transform: uppercase; }
 .btn-copy:hover { background: #fff; color: var(--primary); box-shadow: var(--glow); }
 
-/* Testimonials */
 .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 5rem; }
 .testimonial-card { background: var(--card); border: 1px solid var(--border); padding: 2.5rem; border-radius: 8px; position: relative; backdrop-filter: blur(10px); }
 .testimonial-card::before { content: '\201C'; font-family: var(--font-title); font-size: 6rem; color: var(--primary); position: absolute; top: -10px; left: 20px; opacity: 0.2; }
@@ -141,7 +136,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .testimonial-author h4 { font-family: var(--font-sub); font-size: 1.3rem; font-weight: 700; }
 .testimonial-author span { color: var(--primary); font-size: 0.9rem; }
 
-/* Applications (Full Images) */
+/* Applications */
 .page-head { text-align: center; margin-bottom: 4rem; }
 .page-head h2 { font-family: var(--font-title); font-size: 4.5rem; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
 .page-head p { font-family: var(--font-sub); font-size: 1.5rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-top: 0.5rem; }
@@ -632,7 +627,7 @@ async function loadShop() {
         </div>`).join('') : '<p style="color:var(--text-muted);">Shop is empty.</p>';
 }
 
-// ==== LOGIN & PROFILE SYSTEM (معدل باش يجيب PFP) ====
+// ==== LOGIN & PROFILE SYSTEM ====
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 
 async function checkLogin() {
@@ -640,7 +635,6 @@ async function checkLogin() {
         var res = await fetch('/api/auth/me');
         var data = await res.json();
         if (data.loggedIn) {
-            // كنجيبو الصورة و الاسم من الداتا اللي كيصيفطها السيرفر
             var pfpUrl = data.avatar 
                 ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` 
                 : `https://cdn.discordapp.com/embed/avatars/0.png`;
