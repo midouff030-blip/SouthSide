@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const passport = require('passport');
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,27 +14,26 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== 1. قاعدة البيانات (JSON) =====
+// ===== Database =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [] }, null, 2));
+  fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [], streamers: [] }, null, 2));
 }
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== 2. الجلسات =====
+// ===== Sessions =====
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'southside-secret-2026',
+  secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== 3. الديسكورد =====
+// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
-
 passport.use(new DiscordStrategy({
   clientID: process.env.DISCORD_CLIENT_ID,
   clientSecret: process.env.DISCORD_CLIENT_SECRET,
@@ -44,17 +44,81 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 4. الروابط =====
+// ===== FiveM Stats API =====
+app.get('/api/stats', async (req, res) => {
+    try {
+        const FIVEM_IP = process.env.FIVEM_IP || '127.0.0.1';
+        const FIVEM_PORT = process.env.FIVEM_PORT || '30120';
+        const base = `http://${FIVEM_IP}:${FIVEM_PORT}`;
+        const dynRes = await fetch(`${base}/dynamic.json`, { timeout: 5000 });
+        if (!dynRes.ok) throw new Error('unreachable');
+        const dyn = await dynRes.json();
+        let name = 'SouthSide S2';
+        try {
+            const infoRes = await fetch(`${base}/info.json`, { timeout: 3000 });
+            if (infoRes.ok) { const info = await infoRes.json(); name = info.hostname || name; }
+        } catch (_) {}
+        res.json({ online: true, players: dyn.clients || 0, maxPlayers: dyn.sv_maxclients || 128, name, ip: `connect ${FIVEM_IP}:${FIVEM_PORT}` });
+    } catch (e) {
+        res.json({ online: false, players: 0, maxPlayers: 128, name: 'SouthSide S2', ip: 'connect play.southsiderp.tn' });
+    }
+});
+
+// ===== Routes =====
 app.get('/api/auth/discord', passport.authenticate('discord'));
 app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
-
-// هاد الرابط كيرجع الـ ID و الصورة
 app.get('/api/auth/me', (req, res) => {
   if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
   else res.json({ loggedIn: false });
 });
-
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
+
+// Streamers
+app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
+app.post('/api/streamers', (req, res) => {
+  const db = getDB(); if (!db.streamers) db.streamers = [];
+  const st = { id: Date.now().toString(), ...req.body };
+  db.streamers.push(st); saveDB(db); res.json(st);
+});
+app.delete('/api/streamers/:id', (req, res) => {
+  const db = getDB(); db.streamers = db.streamers.filter(s => s.id !== req.params.id);
+  saveDB(db); res.json({ success: true });
+});
+
+// Gangs & Members (مع Lanyard API للصورة)
+app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
+app.post('/api/gangs', (req, res) => {
+  const db = getDB(); if (!db.gangs) db.gangs = [];
+  const gang = { id: Date.now().toString(), members: [], ...req.body };
+  db.gangs.push(gang); saveDB(db); res.json(gang);
+});
+app.delete('/api/gangs/:id', (req, res) => {
+  const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
+  saveDB(db); res.json({ success: true });
+});
+
+app.post('/api/gangs/:id/members', async (req, res) => {
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (gang) { 
+      const discordId = req.body.discordId;
+      let avatarUrl = `https://cdn.discordapp.com/embed/avatars/${Math.floor(Math.random()*5)}.png`;
+      try {
+        const lanyardRes = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
+        const lanyardData = await lanyardRes.json();
+        if (lanyardData.success && lanyardData.data.discord_user.avatar) {
+            avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
+        }
+      } catch (e) { console.log('Lanyard error:', e); }
+      
+      gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
+      saveDB(db); 
+      res.json(gang);
+    } else {
+      res.status(404).json({ error: 'Gang not found' });
+    }
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 // Shop
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
@@ -87,4 +151,4 @@ app.post('/api/admin-login', (req, res) => {
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
