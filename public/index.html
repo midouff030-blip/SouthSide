@@ -519,7 +519,7 @@ async function loadGangs() {
         document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
             <div class="gang-card">
                 <div class="gang-header"><div class="gang-logo">${g.logo || 'G'}</div><div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members.length} MEMBERS</div></div></div>
-                <div class="gang-roster">${(g.members || []).map(m => `<div class="gang-member"><img src="https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}</div>
+                <div class="gang-roster">${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}</div>
             </div>`).join('') : '<p>No gangs.</p>';
     } catch(e){}
 }
@@ -586,7 +586,7 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
-        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:discordId, avatar:'0'})}); 
+        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId})}); 
         loadAdmin(); 
     } 
 }
