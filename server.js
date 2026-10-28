@@ -75,7 +75,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs & Members (Manual Avatar) =====
+// ===== Gangs & Members (Auto Fetch Avatar via Bot) =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -86,12 +86,35 @@ app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
-app.post('/api/gangs/:id/members', (req, res) => {
-  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-  if (gang) { 
-      gang.members.push({ discordId: req.body.discordId, avatar: req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png' }); 
-      saveDB(db); res.json(gang);
-  } else { res.status(404).json({ error: 'Gang not found' }); }
+
+app.post('/api/gangs/:id/members', async (req, res) => {
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+
+    const discordId = req.body.discordId;
+    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; // Default
+
+    // محاولة جلب الصورة بالبوت
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    if (botToken && discordId) {
+        try {
+            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
+                headers: { Authorization: `Bot ${botToken}` }
+            });
+            if (discordRes.ok) {
+                const userData = await discordRes.json();
+                if (userData.avatar) {
+                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
+                }
+            }
+        } catch (e) { console.log('Discord Bot Error:', e.message); }
+    }
+
+    gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
+    saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ===== Shop =====
