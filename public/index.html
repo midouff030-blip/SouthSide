@@ -332,7 +332,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminShop"></div>
             </div>
 
-            <!-- إدارة الستريمرز -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-video"></i> Manage Streamers</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
@@ -580,9 +579,28 @@ document.getElementById('adminLogoutBtn').addEventListener('click', () => {
 });
 
 async function loadAdmin() {
-    // Tickets
+    // Tickets (مع التفاصيل و Reason)
     const t = await (await fetch('/api/tickets')).json();
-    document.getElementById('adminTickets').innerHTML = t.length ? `<table class="admin-table"><tr><th>Type</th><th>Status</th><th>Action</th></tr>${t.map(x=>`<tr><td>${x.type}</td><td>${x.status}</td><td><button onclick="updateTicket('${x.id}', 'accepted')">Accept</button></td></tr>`).join('')}</table>` : 'No tickets.';
+    let html = '';
+    t.forEach(x => {
+        let details = '';
+        try { let parsed = JSON.parse(x.message); details = Object.entries(parsed).map(([k,v]) => `<b>${k}:</b> ${v}`).join('<br>'); } 
+        catch(e) { details = x.message; }
+        
+        let statusColor = x.status === 'accepted' ? '#22c55e' : x.status === 'rejected' ? '#ff002b' : '#f59e0b';
+        let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${x.id}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${x.id}', 'rejected')">Reject</button>` : '';
+        
+        html += `<div style="background:#111; border:1px solid #333; padding:1rem; margin-bottom:1rem; border-radius:6px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <strong style="color:var(--primary); font-family:var(--font-title); font-size:1.3rem;">${x.type}</strong>
+                <span style="color:${statusColor}; font-weight:bold;">${x.status.toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.9rem; color:#ccc; margin-bottom:0.5rem; line-height:1.4;">${details}</div>
+            ${x.reason ? `<div style="color:#ff5555; font-size:0.9rem; margin-bottom:0.5rem;"><b>Reason:</b> ${x.reason}</div>` : ''}
+            <div>${actionBtns}</div>
+        </div>`;
+    });
+    document.getElementById('adminTickets').innerHTML = t.length ? html : 'No tickets.';
 
     // Gangs
     const g = await (await fetch('/api/gangs')).json();
@@ -597,8 +615,20 @@ async function loadAdmin() {
     document.getElementById('adminStreamers').innerHTML = st.length ? `<table class="admin-table">${st.map(x=>`<tr><td>${x.name}</td><td>${x.url}</td><td><button onclick="removeStreamer('${x.id}')">Delete</button></td></tr>`).join('')}</table>` : 'Empty.';
 }
 
-async function updateTicket(id, st) { await fetch('/api/tickets/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st})}); loadAdmin(); }
-document.getElementById('addGangBtn').addEventListener('click', async function(){ await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newGangName').value, logo:document.getElementById('newGangLogo').value})}); loadAdmin(); });
+async function updateTicket(id, st) { 
+    let reason = '';
+    if (st === 'rejected') {
+        reason = prompt("Reason for rejection:");
+        if (reason === null) return;
+    }
+    await fetch('/api/tickets/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st, reason:reason})}); 
+    loadAdmin(); 
+}
+
+document.getElementById('addGangBtn').addEventListener('click', async function(){ 
+    await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newGangName').value, logo:document.getElementById('newGangLogo').value})}); 
+    loadAdmin(); 
+});
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
@@ -606,7 +636,10 @@ async function addMember(id) {
         loadAdmin(); 
     } 
 }
-document.getElementById('addShopBtn').addEventListener('click', async function(){ await fetch('/api/shop', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})}); loadAdmin(); });
+document.getElementById('addShopBtn').addEventListener('click', async function(){ 
+    await fetch('/api/shop', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})}); 
+    loadAdmin(); 
+});
 document.getElementById('addStreamerBtn').addEventListener('click', async function(){ 
     await fetch('/api/streamers', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newStreamerName').value, url:document.getElementById('newStreamerUrl').value, image:document.getElementById('newStreamerImage').value})}); 
     loadAdmin(); 
