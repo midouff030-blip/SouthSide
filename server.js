@@ -63,31 +63,11 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers (Automatic via DecAPI) =====
-app.get('/api/streamers', async (req, res) => {
-    try {
-        const db = getDB();
-        let streamers = db.streamers || [];
-        
-        streamers = await Promise.all(streamers.map(async (s) => {
-            let isLive = false;
-            try {
-                const decapiRes = await fetch(`https://decapi.me/kick/uptime/${s.name}`);
-                const text = await decapiRes.text();
-                if (text && !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('not found')) {
-                    isLive = true;
-                }
-            } catch (e) { }
-            return { ...s, isLive: isLive };
-        }));
-        
-        res.json(streamers);
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
+// ===== Streamers (Manual Live/Ofline) =====
+app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
 app.post('/api/streamers', (req, res) => {
   const db = getDB(); if (!db.streamers) db.streamers = [];
-  const st = { id: Date.now().toString(), name: req.body.name, url: req.body.url, image: req.body.image };
+  const st = { id: Date.now().toString(), ...req.body };
   db.streamers.push(st); saveDB(db); res.json(st);
 });
 app.delete('/api/streamers/:id', (req, res) => {
@@ -95,7 +75,7 @@ app.delete('/api/streamers/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== Gangs & Members (Lanyard API) =====
+// ===== Gangs & Members (Manual Avatar) =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -106,23 +86,12 @@ app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
-app.post('/api/gangs/:id/members', async (req, res) => {
-  try {
-    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-    if (gang) { 
-      const discordId = req.body.discordId;
-      let avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
-      try {
-        const lanyardRes = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
-        const lanyardData = await lanyardRes.json();
-        if (lanyardData.success && lanyardData.data.discord_user.avatar) {
-            avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
-        }
-      } catch (e) { }
-      gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
+app.post('/api/gangs/:id/members', (req, res) => {
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+  if (gang) { 
+      gang.members.push({ discordId: req.body.discordId, avatar: req.body.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png' }); 
       saveDB(db); res.json(gang);
-    } else { res.status(404).json({ error: 'Gang not found' }); }
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } else { res.status(404).json({ error: 'Gang not found' }); }
 });
 
 // ===== Shop =====
