@@ -113,17 +113,18 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .live-badge { position: absolute; top: 10px; left: 10px; background: #ff002b; color: #fff; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
 .offline-badge { position: absolute; top: 10px; left: 10px; background: #222; color: #888; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
 
-/* Gangs (Illegal Network) */
+/* Gangs */
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; backdrop-filter: blur(10px); }
 .gang-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--border); }
-.gang-logo { width: 50px; height: 50px; background: #000; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 1.8rem; color: #fff; border-radius: 4px; }
+.gang-logo-img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; border: 2px solid var(--primary); }
 .gang-title { font-family: var(--font-title); font-size: 1.8rem; font-weight: 700; text-transform: uppercase; line-height: 1; }
 .gang-members-count { font-family: var(--font-sub); font-size: 0.9rem; color: var(--primary); font-weight: 700; background: rgba(255,0,43,0.1); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.3rem; }
 .gang-roster { padding: 1.5rem; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
-.gang-member { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #222; position: relative; cursor: pointer; transition: 0.3s; }
-.gang-member img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
-.gang-member:hover img { opacity: 1; transform: scale(1.1); }
+.gang-member { width: 100%; text-align: center; }
+.gang-member img { width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: cover; opacity: 0.8; transition: 0.3s; border: 2px solid transparent; }
+.gang-member:hover img { opacity: 1; transform: scale(1.1); border-color: var(--primary); }
+.gang-member-name { font-size: 0.7rem; color: #ccc; margin-top: 0.2rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Shop */
 .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
@@ -311,14 +312,15 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminTickets"></div>
             </div>
 
-            <!-- إدارة الجانغ (Boss, Underboss) -->
+            <!-- إدارة الجانغ -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-skull"></i> Manage Gangs</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:2rem;">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangName" placeholder="Gang Name">
-                    <input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss Discord ID">
-                    <input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss Discord ID">
-                    <input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo Letter (e.g. S)">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss ID">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss ID">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangImage" placeholder="Gang Logo URL">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo Letter">
                     <button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addGangBtn">Add Gang</button>
                 </div>
                 <div id="adminGangs"></div>
@@ -529,11 +531,17 @@ async function loadGangs() {
         const res = await fetch('/api/gangs'); const gangs = await res.json();
         document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
             <div class="gang-card">
-                <div class="gang-header"><div class="gang-logo">${g.logo || 'G'}</div><div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members.length} MEMBERS</div></div></div>
+                <div class="gang-header">
+                    <img src="${g.logoImage || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="gang-logo-img" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    <div>
+                        <div class="gang-title">${g.name}</div>
+                        <div class="gang-members-count">${g.members.length} MEMBERS</div>
+                    </div>
+                </div>
                 <div class="gang-roster">
-                    ${(g.boss ? `<div class="gang-member" title="Boss"><img src="https://cdn.discordapp.com/embed/avatars/0.png"></div>` : '')}
-                    ${(g.underboss ? `<div class="gang-member" title="Underboss"><img src="https://cdn.discordapp.com/embed/avatars/0.png"></div>` : '')}
-                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"></div>`).join('')}
+                    ${(g.boss ? `<div class="gang-member"><img src="https://cdn.discordapp.com/avatars/${g.boss}/${g.bossAvatar || '0'}.png" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">Boss</span></div>` : '')}
+                    ${(g.underboss ? `<div class="gang-member"><img src="https://cdn.discordapp.com/avatars/${g.underboss}/${g.underbossAvatar || '0'}.png" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">Underboss</span></div>` : '')}
+                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
                 </div>
             </div>`).join('') : '<p>No gangs.</p>';
     } catch(e){}
@@ -614,7 +622,15 @@ async function loadAdmin() {
 
     // Gangs
     const g = await (await fetch('/api/gangs')).json();
-    document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`<tr><td>${x.name}</td><td>${x.members.length} m</td><td><button onclick="addMember('${x.id}')">Add Member</button></td></tr>`).join('')}</table>` : 'No gangs.';
+    document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`
+        <tr>
+            <td>${x.name}</td>
+            <td>${x.members.length} m</td>
+            <td>
+                <button onclick="addMember('${x.id}')">Add Member</button>
+                <button class="reject" onclick="removeGang('${x.id}')">Delete Gang</button>
+            </td>
+        </tr>`).join('')}</table>` : 'No gangs.';
 
     // Shop
     const s = await (await fetch('/api/shop')).json();
@@ -635,26 +651,46 @@ async function updateTicket(id, st) {
     loadAdmin(); 
 }
 
-// إضافة جانغ جديد مع الـ Boss و الـ Underboss
+// إضافة جانغ جديد
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
     const name = document.getElementById('newGangName').value;
-    const boss = document.getElementById('newGangBoss').value;
-    const underboss = document.getElementById('newGangUnderboss').value;
+    const bossId = document.getElementById('newGangBoss').value;
+    const underbossId = document.getElementById('newGangUnderboss').value;
+    const logoImage = document.getElementById('newGangImage').value;
     const logo = document.getElementById('newGangLogo').value;
 
     if(!name) return alert('Gang name is required');
 
-    await fetch('/api/gangs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:name, boss:boss, underboss:underboss, logo:logo})}); 
+    // جلب صور البوس و الأندربوس من الديسكورد
+    let bossAvatar = '0';
+    let underbossAvatar = '0';
+    const botToken = process.env.DISCORD_BOT_TOKEN; // ملاحظة: هذا المتغير ما كاينش فـ الفرونت إند، غادي نحلوه فـ السيرفر
+
+    await fetch('/api/gangs', {
+        method:'POST', headers:{'Content-Type':'application/json'}, 
+        body:JSON.stringify({name:name, boss:bossId, underboss:underbossId, logoImage:logoImage, logo:logo})
+    }); 
     loadAdmin(); 
 });
+
+// مسح الجانغ
+async function removeGang(id) {
+    if(confirm('Are you sure you want to delete this gang?')) {
+        await fetch('/api/gangs/'+id, {method:'DELETE'});
+        loadAdmin();
+    }
+}
 
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
-        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId})}); 
+        const memberName = prompt("Member Name (e.g. John):") || 'Member';
+        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId, memberName:memberName})}); 
         loadAdmin(); 
     } 
 }
+
+// باقي الأدمن
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
     await fetch('/api/shop', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})}); 
     loadAdmin(); 
