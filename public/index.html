@@ -339,7 +339,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerName" placeholder="Name">
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerUrl" placeholder="Stream Link">
                     <input class="admin-input" style="margin:0;" type="text" id="newStreamerImage" placeholder="Image URL">
-                    <!-- Checkbox Live -->
                     <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; font-family:var(--font-sub); font-weight:600; font-size:1.1rem; cursor:pointer;">
                         <input type="checkbox" id="newStreamerLive" style="width:20px; height:20px; cursor:pointer;"> LIVE
                     </label>
@@ -637,8 +636,7 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
 async function addMember(id) { 
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(discordId) { 
-        const avatar = prompt("Avatar URL (Optional):") || 'https://cdn.discordapp.com/embed/avatars/0.png';
-        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId, avatar:avatar})}); 
+        await fetch('/api/gangs/'+id+'/members', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({discordId:discordId})}); 
         loadAdmin(); 
     } 
 }
