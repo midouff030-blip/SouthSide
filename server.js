@@ -14,15 +14,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ===== Database =====
+// ===== Database (With Safe Writing) =====
 const dbPath = path.join(__dirname, 'data.json');
+
+// إنشاء الملف إلا ما كانش
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [], streamers: [] }, null, 2));
 }
-const getDB = () => JSON.parse(fs.readFileSync(dbPath));
-const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions =====
+// دالة قراءة آمنة
+const getDB = () => {
+    try {
+        const data = fs.readFileSync(dbPath, 'utf8');
+        return JSON.parse(data);
+    } catch (e) {
+        console.error("Error reading DB:", e);
+        return { shop: [], tickets: [], gangs: [], streamers: [] };
+    }
+};
+
+// دالة كتابة آمنة
+const saveDB = (data) => {
+    try {
+        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+        return true;
+    } catch (e) {
+        console.error("Error writing DB:", e);
+        return false;
+    }
+};
+
+// ===== Sessions & Auth =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,7 +52,6 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
-// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -78,39 +99,45 @@ app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
 app.post('/api/streamers', (req, res) => {
   const db = getDB(); if (!db.streamers) db.streamers = [];
   const st = { id: Date.now().toString(), ...req.body };
-  db.streamers.push(st); saveDB(db); res.json(st);
+  db.streamers.push(st); 
+  if(saveDB(db)) res.json(st);
+  else res.status(500).json({ error: "Failed to save" });
 });
 app.delete('/api/streamers/:id', (req, res) => {
   const db = getDB(); db.streamers = db.streamers.filter(s => s.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
+  if(saveDB(db)) res.json({ success: true });
+  else res.status(500).json({ error: "Failed to delete" });
 });
 
-// ===== Gangs (Boss, Underboss, Members) =====
+// ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', (req, res) => {
   const db = getDB(); 
   if (!db.gangs) db.gangs = [];
   
-  const gang = { 
+  const newGang = { 
       id: Date.now().toString(), 
+      name: req.body.name,
       boss: req.body.boss || '', 
       underboss: req.body.underboss || '', 
       logo: req.body.logo || 'G',
       members: [] 
   };
   
-  if (req.body.name) gang.name = req.body.name;
-  
-  db.gangs.push(gang); 
-  saveDB(db); 
-  res.json(gang);
+  db.gangs.push(newGang); 
+  if (saveDB(db)) {
+      res.json(newGang);
+  } else {
+      res.status(500).json({ error: "Failed to save gang" });
+  }
 });
 
 app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); 
   if (!db.gangs) db.gangs = [];
   db.gangs = db.gangs.filter(g => g.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
+  if (saveDB(db)) res.json({ success: true });
+  else res.status(500).json({ error: "Failed to delete gang" });
 });
 
 // إضافة عضو للجانغ
@@ -125,18 +152,22 @@ app.post('/api/gangs/:id/members', (req, res) => {
       name: memberName || 'Member', 
       avatar: avatar || 'https://cdn.discordapp.com/embed/avatars/0.png' 
   }); 
-  saveDB(db); res.json(gang);
+  if (saveDB(db)) res.json(gang);
+  else res.status(500).json({ error: "Failed to add member" });
 });
 
 // ===== Shop =====
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
 app.post('/api/shop', (req, res) => {
   const db = getDB(); const item = { id: Date.now().toString(), ...req.body };
-  db.shop.push(item); saveDB(db); res.json(item);
+  db.shop.push(item); 
+  if (saveDB(db)) res.json(item);
+  else res.status(500).json({ error: "Failed to save shop item" });
 });
 app.delete('/api/shop/:id', (req, res) => {
   const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
+  if (saveDB(db)) res.json({ success: true });
+  else res.status(500).json({ error: "Failed to delete shop item" });
 });
 
 // ===== Tickets =====
@@ -144,12 +175,20 @@ app.get('/api/tickets', (req, res) => res.json(getDB().tickets));
 app.post('/api/tickets', (req, res) => {
   const db = getDB();
   const ticket = { id: Date.now().toString(), status: 'pending', reason: '', user: req.user ? req.user.username : 'Guest', ...req.body };
-  db.tickets.push(ticket); saveDB(db); res.json(ticket);
+  db.tickets.push(ticket); 
+  if (saveDB(db)) res.json(ticket);
+  else res.status(500).json({ error: "Failed to save ticket" });
 });
 app.put('/api/tickets/:id', (req, res) => {
   const db = getDB(); const t = db.tickets.find(x => x.id === req.params.id);
-  if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); }
-  res.json(t);
+  if (t) { 
+      t.status = req.body.status; 
+      t.reason = req.body.reason || ''; 
+      if (saveDB(db)) res.json(t);
+      else res.status(500).json({ error: "Failed to update ticket" });
+  } else {
+      res.status(404).json({ error: "Ticket not found" });
+  }
 });
 
 // ===== Admin =====
