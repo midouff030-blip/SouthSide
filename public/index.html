@@ -96,16 +96,28 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
 .app-form-btn { font-family: var(--font-sub); font-size: 1.4rem; font-weight: 700; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; position: relative; z-index: 2; margin-bottom: 2rem; transition: 0.3s; }
 .app-card:hover .app-form-btn { color: var(--primary); text-shadow: var(--glow); }
 
-/* Streamers */
+/* Streamers - Live / Offline */
 .streamers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
-.streamer-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.3s; }
-.streamer-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-.streamer-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.streamer-img img { width: 100%; height: 100%; object-fit: cover; }
+.streamer-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.4s; text-decoration: none; color: var(--text); display: block; }
+.streamer-card:hover { transform: translateY(-5px); }
+.streamer-card.live { border-color: var(--primary); box-shadow: 0 10px 30px rgba(255,0,43,0.2); }
+.streamer-card.offline { border-color: #333; opacity: 0.7; }
+
+.streamer-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.streamer-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+/* فلترة الأبيض والأسود للـ Offline */
+.streamer-card.offline .streamer-img img { filter: grayscale(100%); }
+
 .streamer-info { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .streamer-name { font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 1px; }
-.live-dot { width: 12px; height: 12px; background: #333; border-radius: 50%; }
-.live-dot.on { background: #22c55e; box-shadow: 0 0 10px #22c55e; animation: pulse 1.5s infinite; }
+
+/* النقطة ديال Live/Offline */
+.live-dot { width: 12px; height: 12px; border-radius: 50%; }
+.streamer-card.live .live-dot { background: #ff002b; box-shadow: 0 0 10px #ff002b; animation: pulse 1.5s infinite; }
+.streamer-card.offline .live-dot { background: #555; }
+
+.live-badge { position: absolute; top: 10px; left: 10px; background: #ff002b; color: #fff; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
+.offline-badge { position: absolute; top: 10px; left: 10px; background: #222; color: #888; font-family: var(--font-sub); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; z-index: 2;}
 
 /* Gangs */
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
@@ -326,7 +338,6 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1500px; margin: 0 auto; min-heig
                 <div id="adminShop"></div>
             </div>
 
-            <!-- إدارة الستريمرز -->
             <div class="admin-section">
                 <h3><i class="fa-solid fa-video"></i> Manage Streamers</h3>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap:0.5rem; margin-bottom:2rem;">
@@ -524,15 +535,26 @@ async function loadGangs() {
     } catch(e){}
 }
 
-// Load Streamers
+// Load Streamers (مع فلترة Live / Offline)
 async function loadStreamers() {
     try {
         const res = await fetch('/api/streamers'); const streamers = await res.json();
-        document.getElementById('streamersGrid').innerHTML = streamers.length ? streamers.map(s => `
-            <a href="${s.url}" target="_blank" class="streamer-card" style="text-decoration:none; color:inherit;">
-                <div class="streamer-img"><img src="${s.image}"></div>
-                <div class="streamer-info"><span class="streamer-name">${s.name}</span><div class="live-dot on"></div></div>
-            </a>`).join('') : '<p>No streamers.</p>';
+        document.getElementById('streamersGrid').innerHTML = streamers.length ? streamers.map(s => {
+            // هنا كنحددو واش لايف ولا أوفلاين (مؤقتاً كنخلوهوم لايف، ولكن إلا حطيتي isLive فـ داتابيز غادي يخدم)
+            const isLive = s.isLive !== false; // افتراضياً لايف
+            return `
+            <a href="${s.url}" target="_blank" class="streamer-card ${isLive ? 'live' : 'offline'}">
+                <div class="streamer-img">
+                    <span class="${isLive ? 'live-badge' : 'offline-badge'}">${isLive ? 'LIVE' : 'OFFLINE'}</span>
+                    <img src="${s.image}">
+                </div>
+                <div class="streamer-info">
+                    <span class="streamer-name">${s.name}</span>
+                    <div class="live-dot"></div>
+                </div>
+            </a>
+            `;
+        }).join('') : '<p>No streamers.</p>';
     } catch(e){}
 }
 
