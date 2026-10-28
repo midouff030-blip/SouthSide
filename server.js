@@ -22,7 +22,7 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions & Auth =====
+// ===== Sessions =====
 app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
@@ -30,6 +30,7 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none' }
 }));
 
+// ===== Discord Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -63,18 +64,16 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== Streamers (مع Automatic Live Check) =====
+// ===== Streamers (Automatic Live Check) =====
 app.get('/api/streamers', async (req, res) => {
     try {
         const db = getDB();
         let streamers = db.streamers || [];
         
-        // هاد الجزء كيشيك أوتوماتيكياً على Kick
         const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID;
         const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET;
         
-        if (KICK_CLIENT_ID && KICK_CLIENT_SECRET) {
-            // 1. جيب التوكن ديال Kick
+        if (KICK_CLIENT_ID && KICK_CLIENT_SECRET && streamers.length > 0) {
             let token = null;
             try {
                 const tokenRes = await fetch('https://id.kick.com/oauth/token', {
@@ -84,9 +83,8 @@ app.get('/api/streamers', async (req, res) => {
                 });
                 const tokenData = await tokenRes.json();
                 token = tokenData.access_token;
-            } catch (e) { console.log('Kick Token Error', e); }
+            } catch (e) { console.log('Kick Token Error'); }
 
-            // 2. شيك على كل ستريمر
             if (token) {
                 streamers = await Promise.all(streamers.map(async (s) => {
                     try {
@@ -94,22 +92,16 @@ app.get('/api/streamers', async (req, res) => {
                             headers: { Authorization: `Bearer ${token}` }
                         });
                         const kickData = await kickRes.json();
-                        // واش كاين لايف فـ الداتا
                         const isLive = kickData.data && kickData.data[0] && kickData.data[0].livestream !== null;
                         return { ...s, isLive: isLive };
-                    } catch (e) {
-                        return { ...s, isLive: false };
-                    }
+                    } catch (e) { return { ...s, isLive: false }; }
                 }));
             }
         }
         res.json(streamers);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// إضافة ستريمر (بلا isLive، حيت غادي يتحسب أوتوماتيك)
 app.post('/api/streamers', (req, res) => {
   const db = getDB(); if (!db.streamers) db.streamers = [];
   const st = { id: Date.now().toString(), name: req.body.name, url: req.body.url, image: req.body.image };
@@ -131,6 +123,7 @@ app.delete('/api/gangs/:id', (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
+
 app.post('/api/gangs/:id/members', async (req, res) => {
   try {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
@@ -143,13 +136,12 @@ app.post('/api/gangs/:id/members', async (req, res) => {
         if (lanyardData.success && lanyardData.data.discord_user.avatar) {
             avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${lanyardData.data.discord_user.avatar}.png`;
         }
-      } catch (e) { console.log('Lanyard error:', e); }
+      } catch (e) { console.log('Lanyard error'); }
+      
       gang.members.push({ discordId: discordId, avatar: avatarUrl }); 
       saveDB(db); 
       res.json(gang);
-    } else {
-      res.status(404).json({ error: 'Gang not found' });
-    }
+    } else { res.status(404).json({ error: 'Gang not found' }); }
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
