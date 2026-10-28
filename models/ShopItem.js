@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
-
-const ShopItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-  category: { type: String, default: 'Other' },
+const ShopSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  category: String,
   stock: { type: Number, default: 1 },
-  image: { type: String, default: '' },
-  createdAt: { type: Date, default: Date.now }
+  image: String
 });
-
-module.exports = mongoose.model('ShopItem', ShopItemSchema);
+module.exports = mongoose.model('ShopItem', ShopSchema);

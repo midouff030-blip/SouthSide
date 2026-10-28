@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
-
 const UserSchema = new mongoose.Schema({
-  discordId: { type: String, unique: true, required: true },
+  discordId: { type: String, required: true, unique: true },
   username: String,
-  discriminator: String,
   avatar: String,
-  isAdmin: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+  isAdmin: { type: Boolean, default: false }
 });
-
 module.exports = mongoose.model('User', UserSchema);
