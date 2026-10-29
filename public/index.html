@@ -506,6 +506,7 @@ function switchAdminTab(name, btn) {
     document.getElementById('adminTab-' + name).classList.add('active');
     if (btn) btn.classList.add('active');
     document.getElementById('adminPageTitle').innerText = name.charAt(0).toUpperCase() + name.slice(1);
+    if (name === 'multi') { startFetchingPlayers(); } // 🔴 نبداو نجيبو اللاعبين كي ندخلو للـ Multi Stream
 }
 
 document.getElementById('copyBtn').addEventListener('click', function(){
@@ -545,7 +546,6 @@ async function checkLogin() {
                     document.getElementById('adminLoginView').style.display = 'none';
                     document.getElementById('adminPanelView').style.display = 'grid';
                     loadAdmin(); 
-                    connectWS();
                 }
             } catch (e) { console.log("Not admin"); }
         } else {
@@ -693,7 +693,6 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         loadAdmin();
         loadFivemLogs();
         loadSiteLogs();
-        connectWS();
     } else alert('Wrong Password');
 });
 
@@ -784,7 +783,6 @@ async function loadFivemLogs() {
     try {
         const res = await fetch('/api/fivem-logs', { headers: getAdminHeaders() });
         const data = await res.json();
-        if (data.error) { container.innerHTML = `<p style="color:#ef4444;">${data.error}</p>`; return; }
         if (data.logs && data.logs.length > 0) {
             container.innerHTML = data.logs.map(log => {
                 const time = new Date(log.time).toLocaleTimeString();
@@ -848,29 +846,20 @@ async function removeShopItem(id) {
     }
 }
 
-// 🔴 WebSocket للـ Multi Stream (يجيب الصور)
-let wsClient = null;
+// 🔴 الجزء الجديد: Multi Stream واللاعبين (بلا WebSocket)
 let currentPlayers = [];
 let activeStreams = {};
 let streamIntervals = {};
+let playersInterval = null;
 
-function connectWS() {
-    wsClient = new WebSocket(`wss://${window.location.host}/ws`);
-
-    wsClient.onopen = () => console.log('✅ Connected to WebSocket for streams');
-    wsClient.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            if (data.type === 'players_updated') {
-                currentPlayers = data.players;
-                renderPlayersList();
-            }
-        } catch(e) {}
-    };
-    wsClient.onclose = () => {
-        console.log('❌ WebSocket closed. Reconnecting...');
-        setTimeout(connectWS, 3000);
-    };
+function fetchPlayers() {
+    fetch('/api/players', { headers: getAdminHeaders() })
+        .then(res => res.json())
+        .then(players => {
+            currentPlayers = players;
+            renderPlayersList();
+        })
+        .catch(err => console.log("Error fetching players:", err));
 }
 
 function renderPlayersList() {
@@ -895,11 +884,6 @@ function selectPlayerForStream(playerId) {
     activeStreams[playerId] = true;
     renderStreamGrid();
     
-    if (wsClient && wsClient.readyState === WebSocket.OPEN) {
-        wsClient.send(JSON.stringify({ type: 'request_stream', playerId: playerId }));
-    }
-
-    // 🔴 نجيبو الصورة كل 300ms (3 صور في الثانية)
     streamIntervals[playerId] = setInterval(async () => {
         try {
             const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
@@ -944,6 +928,12 @@ function resetStreams() {
     streamIntervals = {};
     activeStreams = {};
     renderStreamGrid();
+}
+
+function startFetchingPlayers() {
+    if (playersInterval) clearInterval(playersInterval);
+    fetchPlayers(); // نجيبو أول مرة
+    playersInterval = setInterval(fetchPlayers, 3000); // من بعد كل 3 ثواني
 }
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
