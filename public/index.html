@@ -25,6 +25,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-main);
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
+/* Header */
 header {
     display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 4rem;
     background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(20px); position: fixed; top: 0; width: 100%; z-index: 1000;
@@ -48,28 +49,57 @@ nav { display: flex; gap: 0.5rem; background: #111; padding: 0.3rem; border-radi
 .btn-login { background: var(--primary); color: #000; border: none; padding: 0.6rem 1.5rem; font-weight: 700; font-size: 0.85rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
 .btn-login:hover { opacity: 0.9; }
 
-main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-height: 90vh; }
+main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-height: 90vh; }
 .tab { display: none; }
 .tab.active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.hero { text-align: center; margin-bottom: 5rem; margin-top: 2rem; }
-.hero h1 { font-size: 4rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 1rem; }
-.hero h1 em { color: var(--text-muted); font-style: normal; }
-.hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.6; }
+/* HOME PAGE STYLES (Kima Documentation) */
+.hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
+.hero-doc h1 { font-size: 5rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 1.5rem; }
+.hero-doc h1 em { color: var(--text-muted); font-style: normal; }
+.hero-doc p { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 3rem; line-height: 1.6; }
 
-.status-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 4rem; }
-.status-left h4 { font-size: 0.85rem; color: #22c55e; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
-.dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
-.stat { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.8rem; font-size: 1rem; }
-.stat span:last-child { color: var(--accent); }
-.bar { width: 100%; height: 6px; background: #222; border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden; }
-.bar-fill { width: 0%; height: 100%; background: var(--primary); transition: 1s; }
-.status-right h5 { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; }
-.ip-row { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 1rem; color: var(--text-muted); margin-bottom: 1rem; }
-.btn-copy { width: 100%; background: #222; color: var(--text); border: none; padding: 0.8rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-.btn-copy:hover { background: #333; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 6rem; }
+.stat-block { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; text-align: center; }
+.stat-block h3 { font-size: 3rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; }
+.stat-block p { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
+.section-title { text-align: center; margin-bottom: 4rem; }
+.section-title h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
+.section-title p { color: var(--text-muted); font-size: 1.1rem; }
+
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 6rem; }
+.feature-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; transition: 0.3s; }
+.feature-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+.feature-card i { font-size: 2rem; color: var(--accent); margin-bottom: 1.5rem; }
+.feature-card h4 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; }
+.feature-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
+
+.how-to-join { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 4rem; margin-bottom: 6rem; }
+.how-to-join h2 { text-align: center; font-size: 2.5rem; font-weight: 800; margin-bottom: 4rem; }
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+.step { text-align: center; position: relative; }
+.step-num { width: 50px; height: 50px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; margin: 0 auto 1.5rem; }
+.step h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; }
+.step p { color: var(--text-muted); font-size: 0.9rem; }
+
+.updates-list { margin-bottom: 6rem; }
+.update-item { display: flex; gap: 2rem; padding: 1.5rem; border-bottom: 1px solid var(--border); }
+.update-date { color: var(--accent); font-weight: 700; font-size: 0.9rem; min-width: 100px; }
+.update-text h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.update-text p { color: var(--text-muted); font-size: 0.9rem; }
+
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 6rem; }
+.faq-item { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; }
+.faq-item h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.faq-item p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+.cta-section { text-align: center; background: linear-gradient(135deg, rgba(255,42,75,0.1), rgba(0,0,0,0)); border: 1px solid var(--border); border-radius: 24px; padding: 5rem 2rem; margin-bottom: 4rem; }
+.cta-section h2 { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; }
+.cta-section p { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
+
+/* OTHER PAGES (Apps, Illegal, Shop, Admin) */
 .page-head { text-align: center; margin-bottom: 3rem; }
 .page-head h2 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.5rem; }
 .page-head p { color: var(--text-muted); font-size: 1rem; }
@@ -104,6 +134,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .shop-price { font-size: 1rem; color: var(--accent); font-weight: 700; margin-bottom: 0.3rem; }
 .shop-title { font-size: 1rem; font-weight: 700; }
 
+/* Admin */
 .admin-login { max-width: 400px; margin: 5rem auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 3rem; text-align: center; }
 .admin-login h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; }
 .admin-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 1rem; border-radius: 8px; color: #fff; margin-bottom: 1rem; outline: none; font-family: inherit; }
@@ -122,6 +153,7 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .admin-table button.reject { background: var(--accent); color: #fff; }
 .admin-table button.reject:hover { opacity: 0.9; }
 
+/* Modal */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -134,17 +166,19 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .form-input:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 100px; }
 
-@media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(2, 1fr); } .shop-grid { grid-template-columns: repeat(2, 1fr); } .gangs-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(2, 1fr); } .shop-grid { grid-template-columns: repeat(2, 1fr); } .gangs-grid { grid-template-columns: repeat(2, 1fr); } .features-grid { grid-template-columns: repeat(2, 1fr); } .steps-grid { grid-template-columns: 1fr; gap: 2rem; } }
 @media (max-width: 992px) { 
     header { padding: 1rem 2rem; flex-direction: column; gap: 1rem; } 
     nav { width: 100%; overflow-x: auto; justify-content: flex-start; } 
     main { padding: 10rem 1.5rem 2rem; } 
-    .status-box { grid-template-columns: 1fr; } 
+    .stats-row { grid-template-columns: 1fr; } 
     .apps-grid { grid-template-columns: 1fr; } 
     .app-card { height: 250px; }
-    .hero h1 { font-size: 2.5rem; } 
+    .hero-doc h1 { font-size: 3rem; } 
     .shop-grid { grid-template-columns: 1fr; }
     .gangs-grid { grid-template-columns: 1fr; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .cta-section h2 { font-size: 2rem; }
 }
 </style>
 </head>
@@ -170,30 +204,149 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 </header>
 
 <main>
-    <!-- HOME -->
+    <!-- HOME (DOCUMENTATION STYLE) -->
     <div id="tab-home" class="tab active">
-        <div class="hero">
+        <div class="hero-doc">
             <h1>Join The <em>Elite.</em></h1>
             <p>A serious roleplay experience where your story matters. No pay-to-win, just pure immersion.</p>
-            <div class="hero-btns" style="display:flex; gap:1rem; justify-content:center;">
+            <div style="display:flex; gap:1rem; justify-content:center;">
                 <button class="btn-login" style="padding: 1rem 2rem; font-size: 1rem;" onclick="document.getElementById('loginBtn').click()">Connect Discord</button>
                 <button class="btn-copy" style="width:auto; padding: 1rem 2rem; font-size: 1rem;" onclick="document.querySelector('[data-tab=apps]').click()">Apply Whitelist</button>
             </div>
         </div>
-        
-        <div class="page-head"><h2>Server Status</h2></div>
-        <div class="status-box">
-            <div class="status-left">
-                <h4 id="statusLabel"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
-                <div class="stat"><span>ACTIVE PLAYERS</span><span id="playerCount">Loading...</span></div>
-                <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-                <div class="stat"><span>SERVER NAME</span><span id="serverName">-</span></div>
+
+        <!-- LIVE STATS -->
+        <div class="stats-row">
+            <div class="stat-block">
+                <h3 id="playerCount">0 / 128</h3>
+                <p>Active Players</p>
             </div>
-            <div class="status-right">
-                <h5>Direct Connect</h5>
-                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal"></i></div>
-                <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
+            <div class="stat-block">
+                <h3>50+</h3>
+                <p>Custom Scripts</p>
             </div>
+            <div class="stat-block">
+                <h3>24/7</h3>
+                <p>Staff Support</p>
+            </div>
+        </div>
+
+        <!-- SERVER STATUS -->
+        <div class="status-box" style="margin-bottom: 6rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+            <div>
+                <h4 id="statusLabel" style="font-size: 0.85rem; color: #22c55e; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 1px;"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
+                <div class="stat" style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.8rem; font-size: 1rem;"><span>SERVER NAME</span><span id="serverName" style="color:var(--accent);">-</span></div>
+                <div class="bar" style="width: 100%; height: 6px; background: #222; border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden;"><div class="bar-fill" id="barFill" style="width: 0%; height: 100%; background: var(--primary); transition: 1s;"></div></div>
+            </div>
+            <div>
+                <h5 style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem;">Direct Connect</h5>
+                <div class="ip-row" style="display: flex; justify-content: space-between; align-items: center; background: #000; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 1rem; color: var(--text-muted); margin-bottom: 1rem;"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal"></i></div>
+                <button class="btn-copy" id="copyBtn" style="width: 100%; background: #222; color: var(--text); border: none; padding: 0.8rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
+            </div>
+        </div>
+
+        <!-- FEATURES -->
+        <div class="section-title">
+            <h2>Why Choose Us</h2>
+            <p>Experience the difference with our custom systems.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h4>Hardcore Roleplay</h4>
+                <p>Real consequences, real stories. You play your character, or you don't play at all.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-bolt"></i>
+                <h4>Zero Lag</h4>
+                <p>Custom-built scripts and high-end hardware. Smooth gameplay even in full-scale gang wars.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <h4>Street Economy</h4>
+                <p>Grind from the bottom to the top. A fair market where hustlers thrive and kings are made.</p>
+            </div>
+        </div>
+
+        <!-- HOW TO JOIN -->
+        <div class="how-to-join">
+            <h2>How To Join</h2>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h4>Join Discord</h4>
+                    <p>Connect your Discord account to get verified and access the community.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h4>Apply Whitelist</h4>
+                    <p>Submit your application to join the city. Be detailed and honest.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h4>Start Playing</h4>
+                    <p>Once accepted, connect to the server and start your story.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LATEST UPDATES -->
+        <div class="section-title">
+            <h2>Latest Updates</h2>
+            <p>Stay up to date with the newest features and changes.</p>
+        </div>
+        <div class="updates-list">
+            <div class="update-item">
+                <div class="update-date">Today</div>
+                <div class="update-text">
+                    <h4>New Gang System</h4>
+                    <p>Added the new Illegal Network feature with custom gang rosters.</p>
+                </div>
+            </div>
+            <div class="update-item">
+                <div class="update-date">Yesterday</div>
+                <div class="update-text">
+                    <h4>Economy Rebalance</h4>
+                    <p>Adjusted job payouts to create a more competitive market.</p>
+                </div>
+            </div>
+            <div class="update-item">
+                <div class="update-date">2 Days Ago</div>
+                <div class="update-text">
+                    <h4>New Vehicles</h4>
+                    <p>Added over 20 new custom vehicles to the shop.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="section-title">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h4>How do I get whitelisted?</h4>
+                <p>You need to submit an application via our Discord and wait for staff review.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Is this server pay-to-win?</h4>
+                <p>No. Our shop only contains cosmetics and quality-of-life items.</p>
+            </div>
+            <div class="faq-item">
+                <h4>What are the system requirements?</h4>
+                <p>You need a legit copy of GTA V and a stable internet connection.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Can I play as a criminal?</h4>
+                <p>Yes, we offer full criminal roleplay including gangs, heists, and more.</p>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Ready to start your story?</h2>
+            <p>Join hundreds of players in the most immersive city.</p>
+            <button class="btn-login" style="padding: 1rem 3rem; font-size: 1.1rem;" onclick="document.getElementById('loginBtn').click()">Join Now</button>
         </div>
     </div>
 
@@ -576,7 +729,7 @@ async function removeGang(id) {
     }
 }
 
-// Edit Gang (تعديل الداتا)
+// Edit Gang
 async function editGang(id) {
     const res = await fetch('/api/gangs'); const gangs = await res.json();
     const g = gangs.find(x => x.id === id);
