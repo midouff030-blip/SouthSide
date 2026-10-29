@@ -276,6 +276,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         if (botToken && guildId) {
             // 1. نعطيوه رتبة Accepted أولاً
             console.log(`[DISCORD API] Attempting to ADD Accepted Role (${CONFIG.ROLE_ACCEPTED_ID}) to User: ${t.discordId}`);
+            let acceptedSuccess = false;
             try {
                 const resAdd = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_ACCEPTED_ID}`, {
                     method: 'PUT',
@@ -283,6 +284,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 });
                 if (resAdd.ok) {
                     console.log(`✅ [SUCCESS] Accepted Role ADDED to ${t.discordId}`);
+                    acceptedSuccess = true;
                 } else {
                     const errData = await resAdd.text();
                     console.error(`❌ [FAILED] Could not add Accepted Role. Discord API Response: ${resAdd.status} - ${errData}`);
@@ -291,8 +293,8 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 console.error("❌ [ERROR] Exception while adding accepted role:", err);
             }
 
-            // 2. نحّيو رتبة Waiting
-            if (CONFIG.ROLE_WAITING_ID) {
+            // 2. نحّيو رتبة Waiting (كان كان الـ Accepted تزادت بنجاح برك)
+            if (acceptedSuccess && CONFIG.ROLE_WAITING_ID) {
                 console.log(`[DISCORD API] Attempting to REMOVE Waiting Role (${CONFIG.ROLE_WAITING_ID}) from User: ${t.discordId}`);
                 try {
                     const resDel = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
@@ -308,6 +310,8 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 } catch (err) {
                     console.error("❌ [ERROR] Exception while removing waiting role:", err);
                 }
+            } else if (!acceptedSuccess) {
+                console.log(`⚠️ [SKIPPED] Waiting Role not removed because Accepted Role failed to add.`);
             }
         }
     }
