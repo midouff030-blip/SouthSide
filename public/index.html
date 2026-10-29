@@ -128,25 +128,29 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .form-input:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 100px; }
 
-/* ========== 🔵 ADMIN PANEL (HeRo Shield Style Only) ========== */
+/* ========== 🔵 ADMIN PANEL (Full Screen Fix) ========== */
 
-/* كي نكونو في الأدمن، نخليو الصفحة كلها هي اللوحة */
-body.admin-mode header, body.admin-mode main { display: none; }
-body.admin-mode { background: #0b0f19; overflow: hidden; }
+body.admin-mode header, body.admin-mode main { display: none !important; }
+body.admin-mode { background: #0b0f19; overflow: hidden !important; }
 
 #tab-admin {
     display: none;
-    height: 100vh;
-    width: 100vw;
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     z-index: 9999;
     background: #0b0f19;
     grid-template-columns: 260px 1fr;
 }
-#tab-admin.active {
+#tab-admin.active { display: grid; }
+
+/* Panel View Fix */
+#adminPanelView {
     display: grid;
+    grid-template-columns: 260px 1fr;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0; left: 0;
 }
 
 /* Sidebar */
@@ -156,7 +160,7 @@ body.admin-mode { background: #0b0f19; overflow: hidden; }
     padding: 1.5rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    height: 100vh;
     overflow-y: auto;
 }
 .admin-brand { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #1c2538; padding-bottom: 1.5rem; }
@@ -183,7 +187,7 @@ body.admin-mode { background: #0b0f19; overflow: hidden; }
     padding: 2.5rem 3rem;
     overflow-y: auto;
     background: #0b0f19;
-    position: relative;
+    height: 100vh;
     background-image: 
         linear-gradient(rgba(28, 37, 56, 0.3) 1px, transparent 1px),
         linear-gradient(90deg, rgba(28, 37, 56, 0.3) 1px, transparent 1px);
@@ -191,7 +195,7 @@ body.admin-mode { background: #0b0f19; overflow: hidden; }
 }
 .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
 .admin-header h2 { font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-.admin-header .logout-btn { background: #0f1524; color: #fff; border: 1px solid #1c2538; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.admin-header .logout-btn { background: #0f1524; color: #fff; border: 1px solid #1c2538; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
 .admin-header .logout-btn:hover { background: #151e31; border-color: #3b82f6; }
 
 .admin-tab { display: none; }
@@ -240,9 +244,10 @@ body.admin-mode { background: #0b0f19; overflow: hidden; }
 /* Responsive */
 @media (max-width: 992px) { 
     #tab-admin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    #adminPanelView { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .admin-sidebar { flex-direction: row; overflow-x: auto; height: auto; padding: 1rem; border-right: none; border-bottom: 1px solid #1c2538; }
     .admin-sidebar h3, .admin-brand { display: none; }
-    .admin-content { padding: 1.5rem; }
+    .admin-content { padding: 1.5rem; height: auto; }
 }
 </style>
 </head>
@@ -376,7 +381,7 @@ body.admin-mode { background: #0b0f19; overflow: hidden; }
     </div>
 
     <!-- Panel View -->
-    <div id="adminPanelView" style="display: none; height: 100%; width: 100%;">
+    <div id="adminPanelView" style="display: none;">
         
         <!-- Sidebar -->
         <div class="admin-sidebar">
