@@ -156,6 +156,12 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .admin-table button.accept { background: #22c55e; color: #000; }
 .admin-table button.reject { background: var(--accent); color: #fff; }
 
+/* Logs Container */
+.logs-container { background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #ccc; line-height: 1.6; }
+.log-line { border-bottom: 1px solid #111; padding: 0.3rem 0; }
+.log-line:last-child { border-bottom: none; }
+.log-time { color: var(--accent); font-weight: bold; margin-right: 10px; }
+
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -302,7 +308,19 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
                 <h2 style="font-family:var(--font-title); font-size:2.5rem; color:#fff; text-transform:uppercase; letter-spacing:1px;">Dashboard</h2>
                 <button class="admin-btn" style="width:auto; padding:0.6rem 1.8rem; background:var(--accent); color:#fff;" id="adminLogoutBtn">Logout</button>
             </div>
+            
             <div class="admin-section"><h3>Applications</h3><div id="adminTickets"></div></div>
+            
+            <div class="admin-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
+                    <h3 style="border:none; padding:0; margin:0;">Server Logs (FiveM)</h3>
+                    <button class="admin-btn" style="width:auto; padding:0.4rem 1rem; font-size:0.8rem;" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                </div>
+                <div class="logs-container" id="fivemLogsContainer">
+                    <p style="color:#888;">Click "Refresh" to load logs.</p>
+                </div>
+            </div>
+
             <div class="admin-section"><h3>Manage Gangs</h3><div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:1.5rem;"><input class="admin-input" style="margin:0;" type="text" id="newGangName" placeholder="Gang Name"><input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo URL"><input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss Name"><input class="admin-input" style="margin:0;" type="text" id="newGangBossId" placeholder="Boss ID"><input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss Name"><input class="admin-input" style="margin:0;" type="text" id="newGangUnderbossId" placeholder="Underboss ID"><button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addGangBtn">Add</button></div><div id="adminGangs"></div></div>
             <div class="admin-section"><h3>Manage Shop</h3><div style="display:grid; grid-template-columns: 2fr 1fr 2fr auto; gap:0.5rem; margin-bottom:1.5rem;"><input class="admin-input" style="margin:0;" type="text" id="newShopName" placeholder="Item Name"><input class="admin-input" style="margin:0;" type="number" id="newShopPrice" placeholder="Price (DT)"><input class="admin-input" style="margin:0;" type="text" id="newShopImage" placeholder="Image URL"><button class="admin-btn" style="width:auto; padding:0 1.5rem; margin:0;" id="addShopBtn">Add</button></div><div id="adminShop"></div></div>
         </div>
@@ -355,7 +373,10 @@ function switchTab(name) {
     document.querySelector('.nav-btn[data-tab="' + name + '"]').classList.add('active');
     if(name === 'illegal') loadGangs();
     if(name === 'shop') loadShop();
-    if(name === 'admin') loadAdmin();
+    if(name === 'admin') {
+        loadAdmin();
+        loadFivemLogs(); // 🔴 كي تدخل للتاب يجيب اللوقز
+    }
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
 
@@ -502,6 +523,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         document.getElementById('adminLoginView').style.display = 'none';
         document.getElementById('adminPanelView').style.display = 'block';
         loadAdmin();
+        loadFivemLogs();
     } else alert('Wrong Password');
 });
 document.getElementById('adminLogoutBtn').addEventListener('click', () => {
@@ -553,6 +575,40 @@ async function updateTicket(id, st) {
     }
     await fetch('/api/tickets/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st, reason:reason})}); 
     loadAdmin(); 
+}
+
+// 🚔 FiveM Logs Function
+async function loadFivemLogs() {
+    const container = document.getElementById('fivemLogsContainer');
+    if (!container) return; 
+    container.innerHTML = '<p style="color:#888;">Loading logs...</p>';
+
+    try {
+        const res = await fetch('/api/fivem-logs');
+        const data = await res.json();
+
+        if (data.error) {
+            container.innerHTML = `<p style="color:#ff0000;">${data.error}</p>`;
+            return;
+        }
+
+        if (data.logs && data.logs.length > 0) {
+            container.innerHTML = data.logs.map(line => {
+                const timeMatch = line.match(/\[(.*?)\]/);
+                const time = timeMatch ? timeMatch[1] : '';
+                const text = line.replace(/\[(.*?)\]/, '').trim();
+                
+                return `<div class="log-line">
+                    ${time ? `<span class="log-time">[${time}]</span>` : ''}
+                    ${text}
+                </div>`;
+            }).join('');
+        } else {
+            container.innerHTML = '<p style="color:#888;">No logs found.</p>';
+        }
+    } catch (e) {
+        container.innerHTML = '<p style="color:#ff0000;">Error connecting to server.</p>';
+    }
 }
 
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
@@ -631,6 +687,7 @@ async function checkLogin() {
                 document.getElementById('adminLoginView').style.display = 'none';
                 document.getElementById('adminPanelView').style.display = 'block';
                 loadAdmin();
+                loadFivemLogs();
             }
         }
     } catch (e) { console.log("Not logged in"); }
