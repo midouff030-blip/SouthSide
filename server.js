@@ -10,7 +10,7 @@ const fetch = require('node-fetch');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server, path: '/ws' }); // نخليو WebSocket للـ Logs القديمة (اختياري)
+const wss = new WebSocket.Server({ server, path: '/ws' }); // نخليوه احتياطي
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
@@ -106,7 +106,7 @@ async function isAdmin(req, res, next) {
   res.status(403).json({ error: 'Access Denied.' });
 }
 
-// ===== WebSocket (احتياطي للوقز القديمة، ما نستعملوهش توا) =====
+// ===== WebSocket (احتياطي للوقز القديمة) =====
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         try {
@@ -202,22 +202,197 @@ app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true
 
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
-app.post('/api/gangs', isAdmin, async (req, res) => { /* كود قديم */ });
-app.put('/api/gangs/:id', isAdmin, async (req, res) => { /* كود قديم */ });
-app.delete('/api/gangs/:id', isAdmin, (req, res) => { /* كود قديم */ });
-app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { /* كود قديم */ });
+app.post('/api/gangs', isAdmin, async (req, res) => { 
+  try {
+    const db = getDB(); 
+    let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
+    if (botToken && req.body.bossId) {
+        try { const r1 = await fetch(`https://discord.com/api/v10/users/${req.body.bossId}`, { headers: { Authorization: `Bot ${botToken}` } }); if (r1.ok) { const d1 = await r1.json(); if (d1.avatar) bossAvatar = `https://cdn.discordapp.com/avatars/${req.body.bossId}/${d1.avatar}.${d1.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; } } catch (e) {}
+    }
+    if (botToken && req.body.underbossId) {
+        try { const r2 = await fetch(`https://discord.com/api/v10/users/${req.body.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } }); if (r2.ok) { const d2 = await r2.json(); if (d2.avatar) underbossAvatar = `https://cdn.discordapp.com/avatars/${req.body.underbossId}/${d2.avatar}.${d2.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; } } catch (e) {}
+    }
+    const gang = { id: Date.now().toString(), name: req.body.name || 'Unknown', logo: req.body.logo || '', boss: req.body.boss || '', bossId: req.body.bossId || '', bossAvatar, underboss: req.body.underboss || '', underbossId: req.body.underbossId || '', underbossAvatar, members: [] };
+    db.gangs.push(gang); saveDB(db); addSiteLog('GANG_ADD', req.user ? req.user.username : 'Admin', `Added gang: ${gang.name}`); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.put('/api/gangs/:id', isAdmin, async (req, res) => { 
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+    gang.name = req.body.name || gang.name; gang.logo = req.body.logo || gang.logo; gang.boss = req.body.boss || gang.boss; gang.bossId = req.body.bossId || gang.bossId; gang.underboss = req.body.underboss || gang.underboss; gang.underbossId = req.body.underbossId || gang.underbossId;
+    saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.delete('/api/gangs/:id', isAdmin, (req, res) => { const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id); saveDB(db); res.json({ success: true }); });
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { 
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+    const discordId = req.body.discordId; const memberName = req.body.memberName || 'Member'; let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
+    if (botToken && discordId) { try { const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, { headers: { Authorization: `Bot ${botToken}` } }); if (discordRes.ok) { const userData = await discordRes.json(); if (userData.avatar) avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${userData.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; } } catch (e) {} }
+    gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 // ===== Shop =====
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
-app.post('/api/shop', isAdmin, (req, res) => { /* كود قديم */ });
-app.delete('/api/shop/:id', isAdmin, (req, res) => { /* كود قديم */ });
+app.post('/api/shop', isAdmin, (req, res) => { const db = getDB(); const item = { id: Date.now().toString(), ...req.body }; db.shop.push(item); saveDB(db); addSiteLog('SHOP_ADD', req.user ? req.user.username : 'Admin', `Added item: ${item.name}`); res.json(item); });
+app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id); saveDB(db); res.json({ success: true }); });
 
-// ===== Tickets =====
+// ===== Tickets & Webhooks =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
-app.post('/api/tickets', async (req, res) => { /* كود قديم */ });
-app.put('/api/tickets/:id', isAdmin, async (req, res) => { /* كود قديم */ });
 
-// ===== Admin =====
+app.get('/api/check-cooldown', async (req, res) => {
+    const { discordId, type } = req.query;
+    if (!discordId || discordId === 'Guest') return res.json({ blocked: false });
+    
+    const db = getDB();
+    const lastRejected = db.tickets
+        .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+
+    if (lastRejected && lastRejected.createdAt) {
+        const timePassed = Date.now() - lastRejected.createdAt;
+        const hoursPassed = timePassed / (1000 * 60 * 60);
+        if (hoursPassed < 24) {
+            const hoursLeft = Math.ceil(24 - hoursPassed);
+            return res.json({ blocked: true, hoursLeft: hoursLeft });
+        }
+    }
+    res.json({ blocked: false });
+});
+
+app.post('/api/tickets', async (req, res) => { 
+    try {
+        const db = getDB(); 
+        const discordId = req.body.discordId || 'Guest';
+        const type = req.body.type;
+        
+        if (discordId !== 'Guest') {
+            const lastRejected = db.tickets
+                .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+                .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+
+            if (lastRejected && lastRejected.createdAt) {
+                const timePassed = Date.now() - lastRejected.createdAt;
+                const hoursPassed = timePassed / (1000 * 60 * 60);
+                if (hoursPassed < 24) {
+                    const hoursLeft = Math.ceil(24 - hoursPassed);
+                    return res.status(403).json({ error: `You must wait ${hoursLeft} hours before applying for ${type} again.` });
+                }
+            }
+        }
+
+        const ticket = { 
+            id: Date.now().toString(), status: 'pending', reason: '', 
+            user: req.user ? req.user.username : 'Guest', 
+            discordId: discordId, 
+            createdAt: Date.now(),
+            ...req.body 
+        }; 
+        db.tickets.push(ticket); saveDB(db); 
+        addSiteLog('TICKET_NEW', ticket.user, `Submitted ${ticket.type}`);
+
+        if (ticket.discordId && ticket.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
+            try {
+                const botToken = CONFIG.DISCORD_BOT_TOKEN;
+                const guildId = CONFIG.GUILD_ID;
+                if (botToken && guildId) {
+                    await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${ticket.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                        method: 'PUT', headers: { Authorization: `Bot ${botToken}` }
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+        res.json(ticket); 
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/tickets/:id', isAdmin, async (req, res) => {
+  const db = getDB(); 
+  const t = db.tickets.find(x => x.id === req.params.id);
+  
+  if (t) { 
+    t.status = req.body.status; 
+    t.reason = req.body.reason || ''; 
+    saveDB(db); 
+    addSiteLog('TICKET_UPDATE', req.user ? req.user.username : 'Admin', `Ticket ${t.type} ${t.status.toUpperCase()}`);
+
+    const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
+    let webhookURL = CONFIG.WEBHOOK_WHITELIST;
+    let embed = {};
+    let gangName = "";
+
+    if (t.type.includes("Gang")) {
+        webhookURL = CONFIG.WEBHOOK_GANG;
+        try { let parsed = JSON.parse(t.message); gangName = parsed.gang_name || "Unknown Gang"; } catch(e) {}
+    } else if (t.type.includes("Police")) {
+        webhookURL = CONFIG.WEBHOOK_POLICE;
+    } else if (t.type.includes("EMS")) {
+        webhookURL = CONFIG.WEBHOOK_EMS;
+    }
+
+    if (t.status === 'accepted') {
+        if (t.type.includes("Gang")) {
+            embed = { title: "🔔 Gang Application Accepted", description: `Congratulations ${userMention}!\nYour gang application has been ACCEPTED ✅\n\n**${gangName}**\n\nPlease contact the <@&${CONFIG.ADMIN_ROLE_ID}> to receive your roles and complete the final setup.\n\nGood luck and represent your gang with pride.`, color: 0x2ecc71, footer: { text: "SouthSide S2 | Roleplay" } };
+        } else if (t.type.includes("Police")) {
+            embed = { title: "👮‍♂️ Police Application Accepted", description: `Congratulations ${userMention}!\nYour application for the **Police Department** has been ACCEPTED ✅\n\nWelcome to the force, Officer!\nPlease contact the PD High Command for your interview and training.`, color: 0x3498db, footer: { text: "SouthSide S2 | Police Dept" } };
+        } else if (t.type.includes("EMS")) {
+            embed = { title: "🚑 EMS Application Accepted", description: `Congratulations ${userMention}!\nYour application for **EMS** has been ACCEPTED ✅\n\nWelcome to the medical team!\nPlease contact the EMS Chief for your uniform and duty protocols.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | EMS Dept" } };
+        } else {
+            embed = { title: "✅ Whitelist Accepted", description: `Congratulations ${userMention}!\nYour Whitelist application has been ACCEPTED ✅\n\nWelcome to SouthSide S2! You can now connect to the server using the IP provided on the website.`, color: 0x2ecc71, footer: { text: "SouthSide S2 | Roleplay" } };
+        }
+    } else if (t.status === 'rejected') {
+        if (t.type.includes("Gang")) {
+            embed = { title: "❌ Gang Application Rejected", description: `${userMention}\n\n${gangName}\n\nYour application has been rejected because:\n**${t.reason}**\n\nBetter luck next time!`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Roleplay" } };
+        } else if (t.type.includes("Police")) {
+            embed = { title: "❌ Police Application Rejected", description: `Sorry ${userMention}, your application for the **Police Department** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Police Dept" } };
+        } else if (t.type.includes("EMS")) {
+            embed = { title: "❌ EMS Application Rejected", description: `Sorry ${userMention}, your application for **EMS** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | EMS Dept" } };
+        } else {
+            embed = { title: "❌ Whitelist Rejected", description: `Sorry ${userMention}, your Whitelist application has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Roleplay" } };
+        }
+    }
+
+    // 🔴 بعثان الويب هوك
+    if (webhookURL && embed.title) {
+        try {
+            await fetch(webhookURL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: userMention, embeds: [embed] }) });
+        } catch (error) { console.error("Webhook Error:", error); }
+    }
+
+    // 🔴 تحديث الرتب
+    if (t.discordId && t.discordId !== 'Guest') {
+        const botToken = CONFIG.DISCORD_BOT_TOKEN;
+        const guildId = CONFIG.GUILD_ID;
+        if (botToken && guildId) {
+            try {
+                const memberRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}`, { headers: { Authorization: `Bot ${botToken}` } });
+                if (memberRes.ok) {
+                    const memberData = await memberRes.json();
+                    let currentRoles = memberData.roles || []; 
+                    if (t.status === 'accepted' && CONFIG.ROLE_ACCEPTED_ID) {
+                        if (!currentRoles.includes(CONFIG.ROLE_ACCEPTED_ID)) currentRoles.push(CONFIG.ROLE_ACCEPTED_ID);
+                        if (CONFIG.ROLE_WAITING_ID) currentRoles = currentRoles.filter(r => r !== CONFIG.ROLE_WAITING_ID);
+                    } else if (t.status === 'rejected' && CONFIG.ROLE_WAITING_ID) {
+                        currentRoles = currentRoles.filter(r => r !== CONFIG.ROLE_WAITING_ID);
+                    }
+                    await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}`, {
+                        method: 'PATCH', headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roles: currentRoles })
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+    }
+  }
+  res.json(t);
+});
+
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
   else { res.status(401).json({ success: false }); }
