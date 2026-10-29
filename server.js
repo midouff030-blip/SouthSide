@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ===== Database =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [], streamers: [] }, null, 2));
+  fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [] }, null, 2));
 }
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
@@ -27,7 +27,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'southside-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true, sameSite: 'none' }
+  cookie: { secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
 // ===== Discord Auth =====
@@ -43,6 +43,15 @@ passport.use(new DiscordStrategy({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ===== Admin Protection Middleware =====
+function isAdmin(req, res, next) {
+  const adminId = process.env.ADMIN_DISCORD_ID; // نحطو ID متاعك في .env
+  if (req.user && req.user.id === adminId) {
+    return next();
+  }
+  res.status(403).json({ error: 'Access Denied. Admins only.' });
+}
 
 // ===== FiveM Stats =====
 app.get('/api/stats', async (req, res) => {
@@ -73,25 +82,12 @@ app.get('/api/auth/me', (req, res) => {
 });
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 
-// ===== Streamers =====
-app.get('/api/streamers', (req, res) => res.json(getDB().streamers || []));
-app.post('/api/streamers', (req, res) => {
-  const db = getDB(); if (!db.streamers) db.streamers = [];
-  const st = { id: Date.now().toString(), ...req.body };
-  db.streamers.push(st); saveDB(db); res.json(st);
-});
-app.delete('/api/streamers/:id', (req, res) => {
-  const db = getDB(); db.streamers = db.streamers.filter(s => s.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
-});
-
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 
-app.post('/api/gangs', async (req, res) => {
+app.post('/api/gangs', isAdmin, async (req, res) => { // 🔒 محمية
   try {
     const db = getDB(); if (!db.gangs) db.gangs = [];
-    
     let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
     let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
     const botToken = process.env.DISCORD_BOT_TOKEN;
@@ -99,26 +95,14 @@ app.post('/api/gangs', async (req, res) => {
     if (botToken && req.body.bossId) {
         try {
             const res1 = await fetch(`https://discord.com/api/v10/users/${req.body.bossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-            if (res1.ok) {
-                const data1 = await res1.json();
-                if (data1.avatar) {
-                    const ext = data1.avatar.startsWith('a_') ? 'gif' : 'png';
-                    bossAvatar = `https://cdn.discordapp.com/avatars/${req.body.bossId}/${data1.avatar}.${ext}?size=256`;
-                }
-            }
+            if (res1.ok) { const data1 = await res1.json(); if (data1.avatar) { const ext = data1.avatar.startsWith('a_') ? 'gif' : 'png'; bossAvatar = `https://cdn.discordapp.com/avatars/${req.body.bossId}/${data1.avatar}.${ext}?size=256`; } }
         } catch (e) {}
     }
 
     if (botToken && req.body.underbossId) {
         try {
             const res2 = await fetch(`https://discord.com/api/v10/users/${req.body.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-            if (res2.ok) {
-                const data2 = await res2.json();
-                if (data2.avatar) {
-                    const ext = data2.avatar.startsWith('a_') ? 'gif' : 'png';
-                    underbossAvatar = `https://cdn.discordapp.com/avatars/${req.body.underbossId}/${data2.avatar}.${ext}?size=256`;
-                }
-            }
+            if (res2.ok) { const data2 = await res2.json(); if (data2.avatar) { const ext = data2.avatar.startsWith('a_') ? 'gif' : 'png'; underbossAvatar = `https://cdn.discordapp.com/avatars/${req.body.underbossId}/${data2.avatar}.${ext}?size=256`; } }
         } catch (e) {}
     }
 
@@ -138,7 +122,7 @@ app.post('/api/gangs', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/gangs/:id', async (req, res) => {
+app.put('/api/gangs/:id', isAdmin, async (req, res) => { // 🔒 محمية
   try {
     const db = getDB(); 
     const gang = db.gangs.find(g => g.id === req.params.id);
@@ -151,7 +135,6 @@ app.put('/api/gangs/:id', async (req, res) => {
     gang.underboss = req.body.underboss || gang.underboss;
     gang.underbossId = req.body.underbossId || gang.underbossId;
 
-    // تحديث الصور إلا تبدل الـ ID
     const botToken = process.env.DISCORD_BOT_TOKEN;
     if (botToken) {
         if (gang.bossId) {
@@ -172,12 +155,12 @@ app.put('/api/gangs/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/gangs/:id', (req, res) => {
+app.delete('/api/gangs/:id', isAdmin, (req, res) => { // 🔒 محمية
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
-app.post('/api/gangs/:id/members', async (req, res) => {
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { // 🔒 محمية
   try {
     const db = getDB(); 
     const gang = db.gangs.find(g => g.id === req.params.id);
@@ -206,31 +189,29 @@ app.post('/api/gangs/:id/members', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/gangs/:id/members/:discordId', (req, res) => {
-  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
-  if (gang) { gang.members = gang.members.filter(m => m.discordId !== req.params.discordId); saveDB(db); }
-  res.json(gang);
-});
-
 // ===== Shop =====
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
-app.post('/api/shop', (req, res) => {
+
+app.post('/api/shop', isAdmin, (req, res) => { // 🔒 محمية
   const db = getDB(); const item = { id: Date.now().toString(), ...req.body };
   db.shop.push(item); saveDB(db); res.json(item);
 });
-app.delete('/api/shop/:id', (req, res) => {
+
+app.delete('/api/shop/:id', isAdmin, (req, res) => { // 🔒 محمية
   const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
 // ===== Tickets =====
-app.get('/api/tickets', (req, res) => res.json(getDB().tickets));
-app.post('/api/tickets', (req, res) => {
+app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets)); // 🔒 محمية
+
+app.post('/api/tickets', (req, res) => { // مفتوحة للجميع باش يقدموا
   const db = getDB();
   const ticket = { id: Date.now().toString(), status: 'pending', reason: '', user: req.user ? req.user.username : 'Guest', ...req.body };
   db.tickets.push(ticket); saveDB(db); res.json(ticket);
 });
-app.put('/api/tickets/:id', (req, res) => {
+
+app.put('/api/tickets/:id', isAdmin, (req, res) => { // 🔒 محمية
   const db = getDB(); const t = db.tickets.find(x => x.id === req.params.id);
   if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); }
   res.json(t);
@@ -238,8 +219,12 @@ app.put('/api/tickets/:id', (req, res) => {
 
 // ===== Admin =====
 app.post('/api/admin-login', (req, res) => {
-  if (req.body.password === process.env.ADMIN_PASSWORD) res.json({ success: true });
-  else res.status(401).json({ success: false });
+  if (req.body.password === process.env.ADMIN_PASSWORD) {
+    req.session.isAdmin = true; // ✅ نحطو الجلسة
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ success: false });
+  }
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
