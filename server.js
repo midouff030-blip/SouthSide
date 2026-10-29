@@ -26,6 +26,7 @@ const CONFIG = {
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
+  DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL, // 🔴 ويبهوك الديسكورد
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
   FIVEM_PORT: process.env.FIVEM_PORT || '30120'
 };
@@ -55,27 +56,23 @@ passport.use(new DiscordStrategy({
   clientID: CONFIG.DISCORD_CLIENT_ID,
   clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
   callbackURL: CONFIG.DISCORD_CALLBACK_URL,
-  scope: ['identify'] // ما نحتاجوش guilds توة، البوت هو اللي باش يقرا الرتبة
+  scope: ['identify', 'guilds']
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية الجديدة: نستعملو البوت باش نتشيكو على الرتبة =====
+// ===== 🔴 الحماية بالرتبة (Role) =====
 async function isAdmin(req, res, next) {
-  // 1. إلا دخل بالباسوورد
   if (req.session && req.session.isAdmin) return next(); 
 
-  // 2. إلا دخل بالديسكورد، نطلبو من البوت يشوف الرتبة
   if (req.user && req.user.id) {
     try {
       const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
         headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
       });
-      
       if (response.ok) {
         const memberData = await response.json();
-        // نتشيكو هل اللاعب عنده الرتبة
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
           return next(); 
         }
@@ -163,8 +160,76 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop
 
 // ===== Tickets =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
-app.post('/api/tickets', (req, res) => { const db = getDB(); const ticket = { id: Date.now().toString(), status: 'pending', reason: '', user: req.user ? req.user.username : 'Guest', ...req.body }; db.tickets.push(ticket); saveDB(db); res.json(ticket); });
-app.put('/api/tickets/:id', isAdmin, (req, res) => { const db = getDB(); const t = db.tickets.find(x => x.id === req.params.id); if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); } res.json(t); });
+app.post('/api/tickets', (req, res) => { 
+    const db = getDB(); 
+    const ticket = { 
+        id: Date.now().toString(), 
+        status: 'pending', 
+        reason: '', 
+        user: req.user ? req.user.username : 'Guest', 
+        discordId: req.body.discordId || 'Guest',
+        ...req.body 
+    }; 
+    db.tickets.push(ticket); 
+    saveDB(db); 
+    res.json(ticket); 
+});
+
+app.put('/api/tickets/:id', isAdmin, async (req, res) => {
+  const db = getDB(); 
+  const t = db.tickets.find(x => x.id === req.params.id);
+  
+  if (t) { 
+    t.status = req.body.status; 
+    t.reason = req.body.reason || ''; 
+    saveDB(db); 
+
+    const webhookUrl = CONFIG.DISCORD_WEBHOOK_URL; 
+    
+    if (webhookUrl) {
+        let embed = {};
+        const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
+
+        if (t.status === 'accepted') {
+            embed = {
+                title: "✅ Whitelist (Citizen) Accepted",
+                description: `Congratulations ${userMention}! Your application for **${t.type}** has been **ACCEPTED**.\n\nWelcome aboard!`,
+                color: 0x2ecc71,
+                fields: [
+                    { name: "🛡️ Reviewed By", value: "Staff Team", inline: true },
+                    { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
+                ],
+                footer: { text: "SouthSide S2 | Roleplay" }
+            };
+        } else if (t.status === 'rejected') {
+            embed = {
+                title: "❌ Whitelist (Citizen) Rejected",
+                description: `Sorry ${userMention}, your application for **${t.type}** has been **REJECTED**.\n\n**Reason:** ${t.reason}`,
+                color: 0xe74c3c,
+                fields: [
+                    { name: "🛡️ Reviewed By", value: "Staff Team", inline: true },
+                    { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
+                ],
+                footer: { text: "SouthSide S2 | Roleplay" }
+            };
+        }
+
+        try {
+            await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: userMention,
+                    embeds: [embed]
+                })
+            });
+        } catch (error) {
+            console.error("Error sending to Discord:", error);
+        }
+    }
+  }
+  res.json(t);
+});
 
 // ===== Admin =====
 app.post('/api/admin-login', (req, res) => {
