@@ -81,15 +81,11 @@ app.use(passport.session());
 
 // ===== 🔴 الحماية بالرتبة أو بالباسورد =====
 async function isAdmin(req, res, next) {
-  // 1. إذا دخل بالباسورد في الـ Header (من الـ Admin Panel)
   if (req.headers['x-admin-password'] && req.headers['x-admin-password'] === CONFIG.ADMIN_PASSWORD) {
       return next();
   }
-
-  // 2. إذا عندو Session Admin (من الـ Login)
   if (req.session && req.session.isAdmin) return next(); 
   
-  // 3. إذا عندو Discord Role
   if (req.user && req.user.id) {
     try {
       const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
@@ -225,13 +221,13 @@ app.post('/api/tickets', async (req, res) => {
             status: 'pending', 
             reason: '', 
             user: req.user ? req.user.username : 'Guest', 
-            discordId: req.body.discordId || 'Guest',
+            discordId: req.body.discordId || 'Guest', // 👈 هنا ياخو الـ ID من الفورم
             ...req.body 
         }; 
         db.tickets.push(ticket); 
         saveDB(db); 
 
-        // 🔴 إضافة رتبة "Waiting for Interview"
+        // 🔴 إضافة رتبة "Waiting for Interview" إذا كان الـ ID صحيح
         if (ticket.discordId && ticket.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
             try {
                 const botToken = CONFIG.DISCORD_BOT_TOKEN;
@@ -265,6 +261,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
 
     const webhookResults = CONFIG.DISCORD_WEBHOOK_RESULTS;
     const webhookLogs = CONFIG.DISCORD_WEBHOOK_LOGS;
+    // 🔴 هنا يخدم الـ Mention باهي، نستعملو <@ID>
     const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
 
     // ✅ إضافة رتبة "Accepted" كي يتقبل
@@ -273,13 +270,11 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
             const botToken = CONFIG.DISCORD_BOT_TOKEN;
             const guildId = CONFIG.GUILD_ID;
             if (botToken && guildId) {
-                // نعطيو الرتبة الجديدة
                 await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_ACCEPTED_ID}`, {
                     method: 'PUT',
                     headers: { Authorization: `Bot ${botToken}` }
                 });
 
-                // نحّيو الرتبة القديمة (Waiting) إذا موجودة
                 if (CONFIG.ROLE_WAITING_ID) {
                     await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
                         method: 'DELETE',
