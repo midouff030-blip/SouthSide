@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ==========================================
 const CONFIG = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'default_secret',
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'admin123', // 👈 زيدنا default باش تخدم
   GUILD_ID: process.env.GUILD_ID,
   ADMIN_ROLE_ID: process.env.ADMIN_ROLE_ID,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -39,18 +39,24 @@ const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [] }, null, 2));
 }
-const getDB = () => JSON.parse(fs.readFileSync(dbPath));
+const getDB = () => {
+    const db = JSON.parse(fs.readFileSync(dbPath));
+    if (!db.gangs) db.gangs = [];
+    if (!db.shop) db.shop = [];
+    if (!db.tickets) db.tickets = [];
+    return db;
+};
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions (🔴 الإصلاح الجذري) =====
+// ===== Sessions =====
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   proxy: true, 
   cookie: { 
-    secure: true, // 🔴 لازم true خاطر Render HTTPS
-    sameSite: 'none', // 🔴 none باش تخدم مع الـ Proxy
+    secure: true, 
+    sameSite: 'none', 
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
@@ -69,9 +75,17 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية بالرتبة =====
+// ===== 🔴 الحماية بالرتبة أو بالباسورد =====
 async function isAdmin(req, res, next) {
+  // 1. إذا دخل بالباسورد في الـ Header (من الـ Admin Panel)
+  if (req.headers['x-admin-password'] && req.headers['x-admin-password'] === CONFIG.ADMIN_PASSWORD) {
+      return next();
+  }
+
+  // 2. إذا عندو Session Admin (من الـ Login)
   if (req.session && req.session.isAdmin) return next(); 
+  
+  // 3. إذا عندو Discord Role
   if (req.user && req.user.id) {
     try {
       const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
@@ -151,7 +165,7 @@ app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', isAdmin, async (req, res) => { 
   try {
-    const db = getDB(); if (!db.gangs) db.gangs = [];
+    const db = getDB(); 
     let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
     let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
     const botToken = CONFIG.DISCORD_BOT_TOKEN;
