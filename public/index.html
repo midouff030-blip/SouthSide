@@ -756,13 +756,29 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
     } else alert('Wrong Password');
 });
 
+// ✅ دالة مساعدة باش تجيب الـ Headers مع الباسورد
+function getAdminHeaders() {
+    const pass = document.getElementById('adminPassword').value;
+    return {
+        'Content-Type': 'application/json',
+        'x-admin-password': pass
+    };
+}
+
 async function loadAdmin() {
-    const t = await (await fetch('/api/tickets')).json();
-    let html = '';
+    const headers = getAdminHeaders();
     
-    // إذا ماكانش داتا، نعرضو رسالة
+    // جيب الـ Tickets
+    const tRes = await fetch('/api/tickets', { headers });
+    if (!tRes.ok) {
+        document.getElementById('adminTickets').innerHTML = '<p style="color:#ef4444;">Error loading tickets. Session expired? Please login again.</p>';
+        return;
+    }
+    const t = await tRes.json();
+    
+    let html = '';
     if (!Array.isArray(t) || t.length === 0) {
-        document.getElementById('adminTickets').innerHTML = '<p style="color:#555;">No tickets.</p>';
+        document.getElementById('adminTickets').innerHTML = '<p style="color:#555;">No tickets found.</p>';
         document.getElementById('ovTickets').innerText = 0;
     } else {
         t.forEach(x => {
@@ -770,11 +786,11 @@ async function loadAdmin() {
             try { let parsed = JSON.parse(x.message); details = Object.entries(parsed).map(([k,v]) => `<b>${k}:</b> ${v}`).join('<br>'); } 
             catch(e) { details = x.message; }
             let statusColor = x.status === 'accepted' ? '#22c55e' : x.status === 'rejected' ? '#ef4444' : '#f59e0b';
-            let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${x.id}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${x.id}', 'rejected')">Reject</button>` : '';
+            let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${x.id || x._id}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${x.id || x._id}', 'rejected')">Reject</button>` : '';
             html += `<div style="background:#0b0f19; border:1px solid #1c2538; padding:1rem; margin-bottom:1rem; border-radius: 8px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                     <strong style="font-size:0.95rem; color:#fff;">${x.type}</strong>
-                    <span style="color:${statusColor}; font-weight:bold; font-size:0.8rem;">${x.status.toUpperCase()}</span>
+                    <span style="color:${statusColor}; font-weight:bold; font-size:0.8rem;">${x.status ? x.status.toUpperCase() : 'UNKNOWN'}</span>
                 </div>
                 <div style="font-size:0.85rem; color:#8892a8; margin-bottom:0.8rem; line-height:1.4;">${details}</div>
                 ${x.reason ? `<div style="color:#ef4444; font-size:0.85rem; margin-bottom:0.8rem;"><b>Reason:</b> ${x.reason}</div>` : ''}
@@ -785,20 +801,22 @@ async function loadAdmin() {
         document.getElementById('ovTickets').innerText = t.filter(x => x.status === 'pending').length;
     }
 
+    // جيب الـ Gangs
     const g = await (await fetch('/api/gangs')).json();
     document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`
         <tr>
             <td>${x.name}</td>
-            <td>${x.members.length} m</td>
+            <td>${x.members ? x.members.length : 0} m</td>
             <td>
-                <button onclick="addMember('${x.id}')">Add</button>
-                <button onclick="editGang('${x.id}')">Edit</button>
-                <button class="reject" onclick="removeGang('${x.id}')">Delete</button>
+                <button onclick="addMember('${x.id || x._id}')">Add</button>
+                <button onclick="editGang('${x.id || x._id}')">Edit</button>
+                <button class="reject" onclick="removeGang('${x.id || x._id}')">Delete</button>
             </td>
         </tr>`).join('')}</table>` : '<p style="color:#555;">No gangs.</p>';
 
+    // جيب الـ Shop
     const s = await (await fetch('/api/shop')).json();
-    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
+    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
 }
 
 async function updateTicket(id, st) { 
@@ -807,7 +825,11 @@ async function updateTicket(id, st) {
         reason = prompt("Reason for rejection:");
         if (reason === null) return;
     }
-    await fetch('/api/tickets/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:st, reason:reason})}); 
+    await fetch('/api/tickets/'+id, {
+        method:'PUT', 
+        headers: getAdminHeaders(), 
+        body:JSON.stringify({status:st, reason:reason})
+    }); 
     loadAdmin(); 
 }
 
@@ -816,7 +838,7 @@ async function loadFivemLogs() {
     if (!container) return; 
     container.innerHTML = '<p style="color:#555;">Loading logs...</p>';
     try {
-        const res = await fetch('/api/fivem-logs');
+        const res = await fetch('/api/fivem-logs', { headers: getAdminHeaders() });
         const data = await res.json();
         if (data.error) { container.innerHTML = `<p style="color:#ef4444;">${data.error}</p>`; return; }
         if (data.logs && data.logs.length > 0) {
@@ -839,7 +861,7 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
     const underbossId = document.getElementById('newGangUnderbossId').value;
     if(!name) return alert('Gang name is required');
     await fetch('/api/gangs', {
-        method:'POST', headers:{'Content-Type':'application/json'}, 
+        method:'POST', headers: getAdminHeaders(), 
         body:JSON.stringify({ name: name, logo: logo, boss: boss, bossId: bossId, underboss: underboss, underbossId: underbossId })
     }); 
     loadAdmin(); 
@@ -847,14 +869,14 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
 
 async function removeGang(id) {
     if(confirm('Are you sure you want to delete this gang?')) {
-        await fetch('/api/gangs/'+id, {method:'DELETE'});
+        await fetch('/api/gangs/'+id, { method:'DELETE', headers: getAdminHeaders() });
         loadAdmin();
     }
 }
 
 async function editGang(id) {
     const res = await fetch('/api/gangs'); const gangs = await res.json();
-    const g = gangs.find(x => x.id === id);
+    const g = gangs.find(x => (x.id === id || x._id === id));
     if(!g) return;
     const newName = prompt("Gang Name:", g.name);
     const newLogo = prompt("Logo URL:", g.logo);
@@ -864,7 +886,7 @@ async function editGang(id) {
     const newUnderbossId = prompt("Underboss ID:", g.underbossId);
     if(newName === null) return;
     await fetch('/api/gangs/'+id, {
-        method:'PUT', headers:{'Content-Type':'application/json'}, 
+        method:'PUT', headers: getAdminHeaders(), 
         body:JSON.stringify({ name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId })
     });
     loadAdmin();
@@ -875,16 +897,27 @@ async function addMember(id) {
     if(!discordId) return;
     const memberName = prompt("Member Name (e.g. John):") || 'Member';
     await fetch('/api/gangs/'+id+'/members', {
-        method:'POST', headers:{'Content-Type':'application/json'}, 
+        method:'POST', headers: getAdminHeaders(), 
         body:JSON.stringify({ discordId: discordId, memberName: memberName })
     }); 
     loadAdmin(); 
 }
 
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
-    await fetch('/api/shop', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})}); 
+    await fetch('/api/shop', {
+        method:'POST', 
+        headers: getAdminHeaders(), 
+        body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})
+    }); 
     loadAdmin(); 
 });
+
+async function removeShopItem(id) {
+    if(confirm('Are you sure you want to delete this item?')) {
+        await fetch('/api/shop/'+id, { method:'DELETE', headers: getAdminHeaders() });
+        loadAdmin();
+    }
+}
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 </script>
