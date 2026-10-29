@@ -292,6 +292,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
     loop();
 })();
 
+// 🔴 تبديل التابات (في try/catch باش ما تبلوكيش الصفحة)
 function switchTab(name) {
     try {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -306,12 +307,16 @@ function switchTab(name) {
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
 
+// 🟢 الإصلاح الكبير: الـ Login ما يبلوكيش الصفحة
 async function checkLogin() {
     try {
         const res = await fetch('/api/auth/me'); 
         const data = await res.json();
         if (data.loggedIn) {
+            // 1. نبدلو صورة البروفايل
             document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
+
+            // 2. نتأكدو هل هو أدمين (بلا ما نبلوكيو الصفحة)
             try {
                 const adminCheck = await fetch('/api/auth/check-admin');
                 if (adminCheck.ok) { 
