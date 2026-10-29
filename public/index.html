@@ -38,8 +38,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .tab { display: none; }
 .tab.active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* HOME */
 .hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
 .hero-doc h1 { font-size: 5rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 1.5rem; }
 .hero-doc h1 em { color: var(--text-muted); font-style: normal; }
@@ -79,27 +77,13 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .page-head { text-align: center; margin-bottom: 3rem; }
 .page-head h2 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.5rem; }
 .page-head p { color: var(--text-muted); font-size: 1rem; }
-
-/* APPS GRID */
 .apps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.app-card { 
-    position: relative; height: 400px; border-radius: 12px; overflow: hidden; cursor: pointer; 
-    background-size: cover; background-position: center; transition: 0.3s; border: 1px solid var(--border);
-    display: flex; flex-direction: column; justify-content: space-between; padding: 2rem 1.5rem;
-}
-.app-card::before { 
-    content: ''; position: absolute; inset: 0; 
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.85)); transition: 0.3s; z-index: 1;
-}
+.app-card { position: relative; height: 400px; border-radius: 12px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; transition: 0.3s; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 2rem 1.5rem; }
+.app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.85)); transition: 0.3s; z-index: 1; }
 .app-card:hover::before { background: linear-gradient(to bottom, rgba(255,42,75,0.3), rgba(0,0,0,0.9)); }
 .app-card:hover { border-color: var(--accent); transform: translateY(-5px); }
 .app-card .app-icon { position: relative; z-index: 2; font-size: 1.6rem; color: #fff; text-align: center; width: 100%; }
-.app-card .app-title { 
-    position: relative; z-index: 2; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; 
-    color: #fff; text-align: center; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-}
-
-/* باقي الصفحات */
+.app-card .app-title { position: relative; z-index: 2; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; text-align: center; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
 .gang-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
@@ -132,8 +116,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .rule-card li strong { color: #fff; font-weight: 700; }
 .rule-card .punish { display: inline-block; margin-top: 0.6rem; font-size: 0.78rem; font-weight: 700; color: #fff; background: rgba(255,42,75,0.15); border: 1px solid rgba(255,42,75,0.4); padding: 0.25rem 0.7rem; border-radius: 6px; letter-spacing: 0.4px; }
 .rule-card .punish.perma { background: rgba(255,42,75,0.3); border-color: var(--accent); }
-
-/* Admin */
 .admin-login { max-width: 400px; margin: 5rem auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 3rem; text-align: center; }
 .admin-login h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; }
 .admin-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 1rem; border-radius: 8px; color: #fff; margin-bottom: 1rem; outline: none; font-family: inherit; }
@@ -149,8 +131,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .admin-table button:hover { background: #333; }
 .admin-table button.accept { background: #22c55e; color: #000; }
 .admin-table button.reject { background: var(--accent); color: #fff; }
-
-/* Modal */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -160,28 +140,12 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .form-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 1rem; border-radius: 8px; color: #fff; outline: none; transition: 0.2s; font-family: inherit; }
 .form-input:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 100px; }
-
 @media (max-width: 1200px) { .apps-grid { grid-template-columns: repeat(2, 1fr); } .shop-grid { grid-template-columns: repeat(2, 1fr); } .gangs-grid { grid-template-columns: repeat(2, 1fr); } .features-grid { grid-template-columns: repeat(2, 1fr); } .steps-grid { grid-template-columns: 1fr; gap: 2rem; } .rules-grid { grid-template-columns: 1fr; } }
-@media (max-width: 992px) { 
-    header { padding: 1rem 2rem; flex-direction: column; gap: 1rem; } 
-    nav { width: 100%; overflow-x: auto; justify-content: flex-start; flex-wrap: wrap; } 
-    main { padding: 12rem 1.5rem 2rem; } 
-    .stats-row { grid-template-columns: 1fr; } 
-    .apps-grid { grid-template-columns: 1fr; } 
-    .app-card { height: 300px; }
-    .hero-doc h1 { font-size: 3rem; } 
-    .shop-grid { grid-template-columns: 1fr; }
-    .gangs-grid { grid-template-columns: 1fr; }
-    .faq-grid { grid-template-columns: 1fr; }
-    .cta-section h2 { font-size: 2rem; }
-    .rules-grid { grid-template-columns: 1fr; }
-}
+@media (max-width: 992px) { header { padding: 1rem 2rem; flex-direction: column; gap: 1rem; } nav { width: 100%; overflow-x: auto; justify-content: flex-start; flex-wrap: wrap; } main { padding: 12rem 1.5rem 2rem; } .stats-row { grid-template-columns: 1fr; } .apps-grid { grid-template-columns: 1fr; } .app-card { height: 300px; } .hero-doc h1 { font-size: 3rem; } .shop-grid { grid-template-columns: 1fr; } .gangs-grid { grid-template-columns: 1fr; } .faq-grid { grid-template-columns: 1fr; } .cta-section h2 { font-size: 2rem; } .rules-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-
 <canvas id="bg-canvas"></canvas>
-
 <header>
     <div class="brand">
         <img src="/logo.png" alt="SS Logo" class="logo-img">
@@ -200,7 +164,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 </header>
 
 <main>
-    <!-- HOME -->
     <div id="tab-home" class="tab active">
         <div class="hero-doc">
             <h1>Join The <em>Elite.</em></h1>
@@ -210,13 +173,11 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
                 <button class="btn-copy" style="width:auto; padding: 1rem 2rem; font-size: 1rem;" onclick="document.querySelector('[data-tab=apps]').click()">Apply Whitelist</button>
             </div>
         </div>
-
         <div class="stats-row">
             <div class="stat-block"><h3 id="playerCount">0 / 128</h3><p>Active Players</p></div>
             <div class="stat-block"><h3>50+</h3><p>Custom Scripts</p></div>
             <div class="stat-block"><h3>24/7</h3><p>Staff Support</p></div>
         </div>
-
         <div class="status-box" style="margin-bottom: 6rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
             <div>
                 <h4 id="statusLabel" style="font-size: 0.85rem; color: #22c55e; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 1px;"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
@@ -229,14 +190,12 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
                 <button class="btn-copy" id="copyBtn" style="width: 100%; background: #222; color: var(--text); border: none; padding: 0.8rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
             </div>
         </div>
-
         <div class="section-title"><h2>Why Choose Us</h2><p>Experience the difference with our custom systems.</p></div>
         <div class="features-grid">
             <div class="feature-card"><i class="fa-solid fa-shield-halved"></i><h4>Hardcore Roleplay</h4><p>Real consequences, real stories. You play your character, or you don't play at all.</p></div>
             <div class="feature-card"><i class="fa-solid fa-bolt"></i><h4>Zero Lag</h4><p>Custom-built scripts and high-end hardware. Smooth gameplay even in full-scale gang wars.</p></div>
             <div class="feature-card"><i class="fa-solid fa-sack-dollar"></i><h4>Street Economy</h4><p>Grind from the bottom to the top. A fair market where hustlers thrive and kings are made.</p></div>
         </div>
-
         <div class="how-to-join">
             <h2>How To Join</h2>
             <div class="steps-grid">
@@ -245,13 +204,11 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
                 <div class="step"><div class="step-num">3</div><h4>Start Playing</h4><p>Once accepted, connect to the server and start your story.</p></div>
             </div>
         </div>
-
         <div class="section-title"><h2>Latest Updates</h2><p>Stay up to date with the newest features and changes.</p></div>
         <div class="updates-list">
             <div class="update-item"><div class="update-date">Today</div><div class="update-text"><h4>Rules Page Added</h4><p>All server rules are now available in one dedicated page.</p></div></div>
             <div class="update-item"><div class="update-date">Yesterday</div><div class="update-text"><h4>Economy Rebalance</h4><p>Adjusted job payouts to create a more competitive market.</p></div></div>
         </div>
-
         <div class="section-title"><h2>Frequently Asked Questions</h2></div>
         <div class="faq-grid">
             <div class="faq-item"><h4>How do I get whitelisted?</h4><p>You need to submit an application via our Discord and wait for staff review.</p></div>
@@ -259,7 +216,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
             <div class="faq-item"><h4>What are the system requirements?</h4><p>You need a legit copy of GTA V and a stable internet connection.</p></div>
             <div class="faq-item"><h4>Can I play as a criminal?</h4><p>Yes, we offer full criminal roleplay including gangs, heists, and more.</p></div>
         </div>
-
         <div class="cta-section">
             <h2>Ready to start your story?</h2>
             <p>Join hundreds of players in the most immersive city.</p>
@@ -267,39 +223,21 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
         </div>
     </div>
 
-    <!-- APPLICATIONS -->
     <div id="tab-apps" class="tab">
-        <div class="page-head">
-            <h2>Applications</h2>
-            <p>Select a department to submit your official application</p>
-        </div>
+        <div class="page-head"><h2>Applications</h2><p>Select a department to submit your official application</p></div>
         <div class="apps-grid">
-            <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');">
-                <i class="fa-regular fa-user app-icon"></i>
-                <div class="app-title">Whitelist</div>
-            </div>
-            <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://images.unsplash.com/photo-1579762593064-1a5e5812eb95?q=80&w=800&auto=format&fit=crop');">
-                <i class="fa-solid fa-crosshairs app-icon"></i>
-                <div class="app-title">Gang & Family</div>
-            </div>
-            <div class="app-card" data-app="Police App" style="background-image: url('https://images.unsplash.com/photo-1555626906-fcf10d6851b4?q=80&w=800&auto=format&fit=crop');">
-                <i class="fa-solid fa-shield-halved app-icon"></i>
-                <div class="app-title">Police Dept</div>
-            </div>
-            <div class="app-card" data-app="EMS App" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');">
-                <i class="fa-solid fa-briefcase-medical app-icon"></i>
-                <div class="app-title">EMS Dept</div>
-            </div>
+            <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
+            <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://images.unsplash.com/photo-1579762593064-1a5e5812eb95?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
+            <div class="app-card" data-app="Police App" style="background-image: url('https://images.unsplash.com/photo-1555626906-fcf10d6851b4?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
+            <div class="app-card" data-app="EMS App" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-briefcase-medical app-icon"></i><div class="app-title">EMS Dept</div></div>
         </div>
     </div>
 
-    <!-- ILLEGAL NETWORK -->
     <div id="tab-illegal" class="tab">
         <div class="page-head"><h2>Illegal Network</h2><p>Gangs, heists, and rankings synced from Discord and the server!</p></div>
         <div class="gangs-grid" id="gangsGrid"></div>
     </div>
 
-    <!-- RULES -->
     <div id="tab-rules" class="tab">
         <div class="page-head"><h2>Server Rules</h2><p>Read carefully — breaking these rules leads to punishment.</p></div>
         <div class="rules-grid">
@@ -324,20 +262,20 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
         </div>
     </div>
 
-    <!-- SHOP -->
     <div id="tab-shop" class="tab">
         <div class="page-head"><h2>Shop</h2></div>
         <div class="shop-grid" id="shopGrid"></div>
     </div>
 
-    <!-- ADMIN (محمية) -->
     <div id="tab-admin" class="tab">
         <div id="adminLoginView">
             <div class="admin-login">
-                <h2>Admin Login</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Enter Admin Password</p>
-                <input class="admin-input" type="password" id="adminPassword" placeholder="Password">
-                <button class="admin-btn" id="adminLoginBtn">Login</button>
+                <h2>Admin Access</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">You must have the Admin role in Discord to access this panel.</p>
+                <button class="admin-btn" onclick="window.location.href='/api/auth/discord'" style="background: #5865F2; color: #fff; margin-bottom: 1rem;"><i class="fa-brands fa-discord"></i> Login with Discord</button>
+                <div style="margin: 1rem 0; color: var(--text-muted); font-size: 0.8rem;">- OR -</div>
+                <input class="admin-input" type="password" id="adminPassword" placeholder="Admin Password">
+                <button class="admin-btn" id="adminLoginBtn">Login with Password</button>
             </div>
         </div>
         <div id="adminPanelView" style="display:none;">
@@ -535,8 +473,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
     } else alert('Wrong Password');
 });
 document.getElementById('adminLogoutBtn').addEventListener('click', () => {
-    document.getElementById('adminLoginView').style.display = 'block';
-    document.getElementById('adminPanelView').style.display = 'none';
+    window.location.href = '/api/auth/logout';
 });
 
 async function loadAdmin() {
@@ -644,18 +581,25 @@ document.getElementById('addShopBtn').addEventListener('click', async function()
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 
-// --- الأمان: يظهر Admin كان للأدمين ---
+// --- 🔴 الأمان: يظهر Admin كان للأدمنة اللي عندهم الرتبة ---
 async function checkLogin() {
     const res = await fetch('/api/auth/me'); 
     const data = await res.json();
     
     if (data.loggedIn) {
-        // 🔴 بدل هذا الرقم بالـ Discord ID متاعك (نفس اللي حطيتو في server.js)
-        if (data.id === '123456789012345678') { 
-            document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin">Admin</button>`;
-            document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
-        }
+        // نتأكدو هل اللاعب عنده رتبة الأدمن في السيرفر
+        const adminCheck = await fetch('/api/auth/check-admin');
         
+        if (adminCheck.ok) { // إذا رجع 200 يعني عنده الرتبة
+            document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin" style="color: var(--accent); border: 1px solid var(--accent);">Admin</button>`;
+            document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
+            
+            // نخليو لوحة التحكم تبان دغيا بلا باسوورد
+            document.getElementById('adminLoginView').style.display = 'none';
+            document.getElementById('adminPanelView').style.display = 'block';
+            loadAdmin();
+        }
+
         document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
     }
 }
