@@ -21,7 +21,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
 body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); z-index: -1; pointer-events: none; }
 
-/* Header (العادي) */
+/* Header */
 header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border); }
 .brand { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
 .brand img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #333; }
@@ -42,7 +42,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .tab { display: none; }
 .tab.active { display: block; }
 
-/* ========== باقي الصفحات ========== */
+/* باقي الصفحات */
 .hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
 .hero-doc h1 { font-family: var(--font-title); font-size: 7rem; letter-spacing: 2px; line-height: 1; margin-bottom: 1.5rem; color: #fff; text-transform: uppercase; }
 .hero-doc h1 em { color: transparent; -webkit-text-stroke: 2px var(--accent); font-style: normal; }
@@ -128,92 +128,42 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .form-input:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 100px; }
 
-/* ========== 🔴 ADMIN PANEL (Red Style Full Screen) ========== */
-
+/* ========== 🔴 ADMIN PANEL ========== */
 body.admin-mode header, body.admin-mode main { display: none !important; }
 body.admin-mode { background: #050505; overflow: hidden !important; }
-
-#tab-admin {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 9999;
-    background: #050505;
-    grid-template-columns: 260px 1fr;
-}
+#tab-admin { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #050505; grid-template-columns: 260px 1fr; }
 #tab-admin.active { display: grid; }
-
-/* Panel View Fix */
-#adminPanelView {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0; left: 0;
-}
-
-/* Sidebar */
-.admin-sidebar {
-    background: #0a0a0a;
-    border-right: 1px solid #1f1f1f;
-    padding: 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow-y: auto;
-}
+#adminPanelView { display: grid; grid-template-columns: 260px 1fr; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+.admin-sidebar { background: #0a0a0a; border-right: 1px solid #1f1f1f; padding: 1.5rem 1rem; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
 .admin-brand { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #1f1f1f; padding-bottom: 1.5rem; }
 .admin-brand i { font-size: 1.5rem; color: #ff0000; background: rgba(255, 0, 0, 0.1); padding: 0.5rem; border-radius: 8px; }
 .admin-brand h2 { font-size: 1.2rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
-
 .admin-sidebar h3 { color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin: 1.5rem 0 0.5rem 0.5rem; }
-.admin-nav-btn {
-    display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 8px;
-    color: #888; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; font-family: inherit;
-}
+.admin-nav-btn { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 8px; color: #888; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
 .admin-nav-btn:hover { background: #111; color: #fff; }
 .admin-nav-btn.active { background: rgba(255, 0, 0, 0.1); color: #ff0000; border: 1px solid rgba(255, 0, 0, 0.3); box-shadow: 0 0 15px rgba(255, 0, 0, 0.1); }
 .admin-nav-btn i { width: 18px; text-align: center; font-size: 0.95rem; }
-
 .admin-user { margin-top: auto; padding-top: 1rem; border-top: 1px solid #1f1f1f; display: flex; align-items: center; gap: 0.8rem; padding: 1rem 0.5rem; color: #ccc; font-size: 0.85rem; }
 .admin-user img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #1f1f1f; }
 .admin-user div { display: flex; flex-direction: column; }
 .admin-user div span:last-child { font-size: 0.7rem; color: #555; cursor: pointer; transition: 0.2s; }
 .admin-user div span:last-child:hover { color: #ff0000; }
-
-/* Content Area */
-.admin-content {
-    padding: 2.5rem 3rem;
-    overflow-y: auto;
-    background: #050505;
-    height: 100vh;
-    background-image: 
-        linear-gradient(rgba(31, 31, 31, 0.3) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(31, 31, 31, 0.3) 1px, transparent 1px);
-    background-size: 40px 40px;
-}
+.admin-content { padding: 2.5rem 3rem; overflow-y: auto; background: #050505; height: 100vh; background-image: linear-gradient(rgba(31, 31, 31, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(31, 31, 31, 0.3) 1px, transparent 1px); background-size: 40px 40px; }
 .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
 .admin-header h2 { font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
 .admin-header .logout-btn { background: #0a0a0a; color: #fff; border: 1px solid #1f1f1f; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
 .admin-header .logout-btn:hover { background: #111; border-color: #ff0000; }
-
 .admin-tab { display: none; }
 .admin-tab.active { display: block; }
-
-/* Cards & Layout */
 .admin-card { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
 .admin-card h3 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
-
 .admin-input { width: 100%; background: #000; border: 1px solid #1f1f1f; padding: 0.8rem 1rem; border-radius: 8px; color: #fff; margin-bottom: 0.5rem; outline: none; font-family: inherit; font-size: 0.85rem; transition: 0.2s; }
 .admin-input:focus { border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1); }
 .admin-input::placeholder { color: #555; }
-
 .admin-btn { background: #1f1f1f; color: #fff; border: 1px solid transparent; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; }
 .admin-btn:hover { background: #333; }
 .admin-btn.primary { background: #ff0000; }
 .admin-btn.primary:hover { background: #cc0000; }
-
 .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .admin-table th { text-align: left; padding: 0.8rem; color: #555; border-bottom: 1px solid #1f1f1f; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 .admin-table td { padding: 0.8rem; border-bottom: 1px solid #111; color: #ccc; }
@@ -223,25 +173,15 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 .admin-table button.accept:hover { background: rgba(34, 197, 94, 0.25); }
 .admin-table button.reject { background: rgba(255, 0, 0, 0.15); color: #ff0000; border: 1px solid rgba(255, 0, 0, 0.3); }
 .admin-table button.reject:hover { background: rgba(255, 0, 0, 0.25); }
-
 .logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
 .log-line { border-bottom: 1px solid #0a0a0a; padding: 0.4rem 0; }
 .log-time { color: #ff0000; font-weight: bold; margin-right: 10px; }
-
-/* Multi Stream Grid */
 .stream-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1rem; height: calc(100vh - 250px); min-height: 500px; }
 .stream-slot { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #555; transition: 0.2s; cursor: pointer; position: relative; overflow: hidden; }
 .stream-slot:hover { border-color: #ff0000; background: #111; }
 .stream-slot i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
 .stream-slot span { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-/* Login View */
-#adminLoginView {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; z-index: 100;
-    background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%);
-}
-
-/* Responsive */
+#adminLoginView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; z-index: 100; background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); }
 @media (max-width: 992px) { 
     #tab-admin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     #adminPanelView { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
@@ -311,7 +251,17 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     <!-- APPS -->
     <div id="tab-apps" class="tab">
         <div class="section-title"><h2>Applications</h2><p>Select a department to submit your official application</p></div>
-        <div class="apps-grid">
+        
+        <!-- 🔴 هنا حطينا رسالة تظهر كان ما عملش Login -->
+        <div id="loginRequiredMsg" style="display: none; text-align: center; padding: 4rem; background: var(--card); border: 1px dashed var(--border);">
+            <i class="fa-brands fa-discord" style="font-size: 4rem; color: #5865F2; margin-bottom: 1rem;"></i>
+            <h3 style="font-family: var(--font-title); font-size: 2rem; color: #fff; margin-bottom: 1rem;">Login Required</h3>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">You must be logged in with Discord to submit an application.</p>
+            <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
+        </div>
+
+        <!-- 🔴 هنا الفورمات، تظهر كان عمل Login -->
+        <div class="apps-grid" id="appsGrid" style="display: none;">
             <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
             <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
             <div class="app-card" data-app="Police App" style="background-image: url('https://i.ibb.co/3Wq0zR5/police.jpg');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
@@ -357,50 +307,37 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     </div>
 </main>
 
-<!-- 🔴 ADMIN PANEL (Red Style Full Screen) -->
+<!-- 🔴 ADMIN PANEL -->
 <div id="tab-admin" class="tab">
-    
-    <!-- Login View -->
     <div id="adminLoginView">
         <div class="admin-card" style="max-width: 400px; width: 100%; text-align: center; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
             <i class="fa-solid fa-shield" style="font-size: 3rem; color: #ff0000; margin-bottom: 1.5rem;"></i>
             <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; letter-spacing: -0.5px;">Admin Access</h2>
             <p style="color: #555; font-size: 0.85rem; margin-bottom: 2rem;">SouthSide S2 Staff Panel</p>
-            
             <button onclick="window.location.href='/api/auth/discord'" style="width: 100%; background: #5865F2; color: #fff; margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 0.8rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s;">
                 <i class="fa-brands fa-discord"></i> Login with Discord
             </button>
-            
             <div style="color: #555; margin-bottom: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 1rem;">
                 <div style="flex: 1; height: 1px; background: #1f1f1f;"></div> OR <div style="flex: 1; height: 1px; background: #1f1f1f;"></div>
             </div>
-            
             <input class="admin-input" type="password" id="adminPassword" placeholder="Enter password" style="padding: 0.8rem; text-align: center;">
             <button class="admin-btn primary" id="adminLoginBtn" style="width: 100%; padding: 0.8rem;">Login</button>
         </div>
     </div>
-
-    <!-- Panel View -->
     <div id="adminPanelView" style="display: none;">
-        
-        <!-- Sidebar -->
         <div class="admin-sidebar">
             <div class="admin-brand">
                 <i class="fa-solid fa-shield"></i>
                 <h2>Admin Panel</h2>
             </div>
-            
             <h3>SERVER</h3>
             <button class="admin-nav-btn active" onclick="switchAdminTab('overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('applications', this)"><i class="fa-solid fa-file-lines"></i> Applications</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('logs', this)"><i class="fa-solid fa-terminal"></i> Logs</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('gangs', this)"><i class="fa-solid fa-users"></i> Gangs</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('shop', this)"><i class="fa-solid fa-store"></i> Shop</button>
-            
             <h3>SCREENSHARE</h3>
             <button class="admin-nav-btn" onclick="switchAdminTab('multi', this)"><i class="fa-solid fa-desktop"></i> Multi Stream</button>
-            
-            <!-- User Info -->
             <div class="admin-user" id="adminUserInfo">
                 <img src="/logo.png" alt="Avatar" id="adminAvatar">
                 <div>
@@ -409,8 +346,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                 </div>
             </div>
         </div>
-
-        <!-- Content -->
         <div class="admin-content">
             <div class="admin-header">
                 <h2 id="adminPageTitle">Overview</h2>
@@ -418,8 +353,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <button class="logout-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back to Site</button>
                 </div>
             </div>
-
-            <!-- Overview Tab -->
             <div id="adminTab-overview" class="admin-tab active">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
                     <div class="admin-card" style="margin: 0;">
@@ -444,13 +377,9 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     </div>
                 </div>
             </div>
-
-            <!-- Applications Tab -->
             <div id="adminTab-applications" class="admin-tab">
                 <div id="adminTickets"></div>
             </div>
-
-            <!-- Logs Tab -->
             <div id="adminTab-logs" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -460,8 +389,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
                 </div>
             </div>
-
-            <!-- Gangs Tab -->
             <div id="adminTab-gangs" class="admin-tab">
                 <div class="admin-card">
                     <h3>Add New Gang</h3>
@@ -480,8 +407,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="adminGangs"></div>
                 </div>
             </div>
-
-            <!-- Shop Tab -->
             <div id="adminTab-shop" class="admin-tab">
                 <div class="admin-card">
                     <h3>Add New Item</h3>
@@ -497,16 +422,12 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="adminShop"></div>
                 </div>
             </div>
-
-            <!-- Multi Stream Tab -->
             <div id="adminTab-multi" class="admin-tab">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <span style="color: #555; font-size: 0.8rem;">0/16 streams active</span>
                     <button class="admin-btn"><i class="fa-solid fa-xmark"></i> Reset</button>
                 </div>
-                
                 <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; height: calc(100vh - 250px);">
-                    <!-- Left: Grid -->
                     <div class="stream-grid-container">
                         <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
                         <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
@@ -517,8 +438,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
                         <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
                     </div>
-
-                    <!-- Right: Players Sidebar -->
                     <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <h3 style="margin: 0;">Players Online</h3>
@@ -548,7 +467,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 </div>
 
 <script>
-// 🌟 Effects Background (Particles)
+// 🌟 Background
 (function(){
     var c = document.getElementById('bg-canvas');
     if (!c) return;
@@ -565,19 +484,14 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     loop();
 })();
 
-// 🔴 تبديل التابات (العادية)
 function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    
     document.getElementById('tab-' + name).classList.add('active');
     const btn = document.querySelector('.nav-btn[data-tab="' + name + '"]');
     if(btn) btn.classList.add('active');
-    
-    // Full screen for admin
-    if(name === 'admin') {
-        document.body.classList.add('admin-mode');
-    } else {
+    if(name === 'admin') { document.body.classList.add('admin-mode'); } 
+    else {
         document.body.classList.remove('admin-mode');
         if(name === 'illegal') loadGangs();
         if(name === 'shop') loadShop();
@@ -585,7 +499,6 @@ function switchTab(name) {
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
 
-// Admin Internal Tabs
 function switchAdminTab(name, btn) {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
@@ -594,24 +507,32 @@ function switchAdminTab(name, btn) {
     document.getElementById('adminPageTitle').innerText = name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-// Login & Setup
 document.getElementById('copyBtn').addEventListener('click', function(){
     var ip = document.getElementById('serverIP').innerText;
     if (navigator.clipboard) navigator.clipboard.writeText(ip);
-    var t = this;
-    var old = t.innerHTML;
+    var t = this; var old = t.innerHTML;
     t.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
     setTimeout(() => t.innerHTML = old, 2000);
 });
+
+// 🔴 هنا التعديلات المهمة
+let loggedInUser = null; // متغير باش نخزنو فيه اليوزر
 
 async function checkLogin() {
     try {
         const res = await fetch('/api/auth/me'); 
         const data = await res.json();
         if (data.loggedIn) {
+            loggedInUser = data; // نخزنو الـ ID والـ Username
+            
+            // نبدلو الـ Header
             document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
             
-            // Setup Admin User Info
+            // نخبو رسالة "Login Required" ونظهرو الـ Apps
+            document.getElementById('loginRequiredMsg').style.display = 'none';
+            document.getElementById('appsGrid').style.display = 'grid';
+            
+            // نجهزو الـ Admin
             document.getElementById('adminUsername').innerText = data.username;
             if(data.avatar) document.getElementById('adminAvatar').src = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
             
@@ -628,22 +549,23 @@ async function checkLogin() {
                         nav.appendChild(adminBtn);
                         adminBtn.addEventListener('click', function(){ switchTab('admin'); });
                     }
-                    
                     document.getElementById('adminLoginView').style.display = 'none';
-                    // 🔴 هنا التعديل المهم (grid)
                     document.getElementById('adminPanelView').style.display = 'grid';
-                    
                     loadAdmin(); 
                 }
             } catch (e) { console.log("Not admin"); }
+        } else {
+            // 🔴 إذا ما كانش مسجل دخول، نظهرو رسالة Login ونخبو الـ Apps
+            document.getElementById('loginRequiredMsg').style.display = 'block';
+            document.getElementById('appsGrid').style.display = 'none';
         }
     } catch (e) { console.log("Not logged in"); }
 }
 checkLogin();
 
-// Load Data
+// Forms Config
 const appConfigs = {
-    "Whitelist App": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Discord ID *", type: "input", name: "discord_id", placeholder: "e.g. 1234567890", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
+    "Whitelist App": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
     "Gang & Family App": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true }, { label: "Members IDs *", type: "textarea", name: "members_ids", placeholder: "8+ IDs...", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
     "Police App": { title: "Police Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why PD? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]},
     "EMS App": { title: "EMS Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why EMS? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]}
@@ -681,31 +603,29 @@ document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
 
-// 🔴 هنا صلحنا المشكلة متاع الـ Submit
+// 🔴 Submit Ticket (يخدم كان كي المسخدم مسجل دخول)
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
+    
+    // 🔴 إذا ما كانش مسجل دخول، نرفضوه
+    if (!loggedInUser) {
+        alert('You must be logged in to submit an application.');
+        return;
+    }
+
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
     
-    // 🔴 ناخذو الـ Discord ID من الـ Form مباشرة (من غير ما نطلب Login)
-    let finalDiscordId = dataObj.discord_id || 'Guest';
-
-    // (اختياري) إذا اليوزر مسجل دخول، ناخذو الـ ID الحقيقي ونخليوه يغلب اللي كتبو
-    try {
-        const meRes = await fetch('/api/auth/me');
-        const meData = await meRes.json();
-        if (meData.loggedIn && meData.id) {
-            finalDiscordId = meData.id;
-        }
-    } catch(e) {}
+    // 🔴 ناخذو الـ ID من اليوزر المسجل دخول مباشرة
+    let finalDiscordId = loggedInUser.id; 
 
     await fetch('/api/tickets', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             type: currentType, 
-            subject: dataObj.discord_id || dataObj.char_name || 'N/A', 
+            subject: dataObj.char_name || 'N/A', 
             message: JSON.stringify(dataObj), 
-            discordId: finalDiscordId // 👈 نبعثو الـ ID الحقيقي
+            discordId: finalDiscordId // 👈 الـ ID الحقيقي متاع الديسكورد
         })
     });
     alert('✅ Application Submitted!');
@@ -763,31 +683,21 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
     const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
     if(res.ok) {
         document.getElementById('adminLoginView').style.display = 'none';
-        // 🔴 هنا التعديل المهم (grid)
         document.getElementById('adminPanelView').style.display = 'grid';
         loadAdmin();
         loadFivemLogs();
     } else alert('Wrong Password');
 });
 
-// ✅ دالة مساعدة باش تجيب الـ Headers مع الباسورد
 function getAdminHeaders() {
     const pass = document.getElementById('adminPassword').value;
-    return {
-        'Content-Type': 'application/json',
-        'x-admin-password': pass
-    };
+    return { 'Content-Type': 'application/json', 'x-admin-password': pass };
 }
 
 async function loadAdmin() {
     const headers = getAdminHeaders();
-    
-    // جيب الـ Tickets
     const tRes = await fetch('/api/tickets', { headers });
-    if (!tRes.ok) {
-        document.getElementById('adminTickets').innerHTML = '<p style="color:#ef4444;">Error loading tickets. Session expired? Please login again.</p>';
-        return;
-    }
+    if (!tRes.ok) { document.getElementById('adminTickets').innerHTML = '<p style="color:#ef4444;">Error loading tickets.</p>'; return; }
     const t = await tRes.json();
     
     let html = '';
@@ -815,7 +725,6 @@ async function loadAdmin() {
         document.getElementById('ovTickets').innerText = t.filter(x => x.status === 'pending').length;
     }
 
-    // جيب الـ Gangs
     const g = await (await fetch('/api/gangs')).json();
     document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`
         <tr>
@@ -828,7 +737,6 @@ async function loadAdmin() {
             </td>
         </tr>`).join('')}</table>` : '<p style="color:#555;">No gangs.</p>';
 
-    // جيب الـ Shop
     const s = await (await fetch('/api/shop')).json();
     document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
 }
@@ -839,11 +747,7 @@ async function updateTicket(id, st) {
         reason = prompt("Reason for rejection:");
         if (reason === null) return;
     }
-    await fetch('/api/tickets/'+id, {
-        method:'PUT', 
-        headers: getAdminHeaders(), 
-        body:JSON.stringify({status:st, reason:reason})
-    }); 
+    await fetch('/api/tickets/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({status:st, reason:reason}) }); 
     loadAdmin(); 
 }
 
@@ -874,10 +778,7 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
     const underboss = document.getElementById('newGangUnderboss').value;
     const underbossId = document.getElementById('newGangUnderbossId').value;
     if(!name) return alert('Gang name is required');
-    await fetch('/api/gangs', {
-        method:'POST', headers: getAdminHeaders(), 
-        body:JSON.stringify({ name: name, logo: logo, boss: boss, bossId: bossId, underboss: underboss, underbossId: underbossId })
-    }); 
+    await fetch('/api/gangs', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ name: name, logo: logo, boss: boss, bossId: bossId, underboss: underboss, underbossId: underbossId }) }); 
     loadAdmin(); 
 });
 
@@ -899,10 +800,7 @@ async function editGang(id) {
     const newUnderboss = prompt("Underboss Name:", g.underboss);
     const newUnderbossId = prompt("Underboss ID:", g.underbossId);
     if(newName === null) return;
-    await fetch('/api/gangs/'+id, {
-        method:'PUT', headers: getAdminHeaders(), 
-        body:JSON.stringify({ name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId })
-    });
+    await fetch('/api/gangs/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({ name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId }) });
     loadAdmin();
 }
 
@@ -910,19 +808,12 @@ async function addMember(id) {
     const discordId = prompt("Discord ID (e.g. 1234567890):"); 
     if(!discordId) return;
     const memberName = prompt("Member Name (e.g. John):") || 'Member';
-    await fetch('/api/gangs/'+id+'/members', {
-        method:'POST', headers: getAdminHeaders(), 
-        body:JSON.stringify({ discordId: discordId, memberName: memberName })
-    }); 
+    await fetch('/api/gangs/'+id+'/members', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ discordId: discordId, memberName: memberName }) }); 
     loadAdmin(); 
 }
 
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
-    await fetch('/api/shop', {
-        method:'POST', 
-        headers: getAdminHeaders(), 
-        body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value})
-    }); 
+    await fetch('/api/shop', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value}) }); 
     loadAdmin(); 
 });
 
