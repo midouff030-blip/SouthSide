@@ -193,7 +193,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
         <button class="nav-btn" data-tab="illegal">Illegal Network</button>
         <button class="nav-btn" data-tab="rules">Rules</button>
         <button class="nav-btn" data-tab="shop">Shop</button>
-        <!-- Admin يظهر هنا بالكود كانك أدمين -->
     </nav>
     <div id="userArea">
         <button class="btn-login" id="loginBtn"><i class="fa-brands fa-discord"></i> Login</button>
@@ -651,8 +650,8 @@ async function checkLogin() {
     const data = await res.json();
     
     if (data.loggedIn) {
-        // بدل هاد الرقم بـ Discord ID متاعك
-        if (data.id === 'YOUR_DISCORD_ID') { 
+        // 🔴 بدل هذا الرقم بالـ Discord ID متاعك (نفس اللي حطيتو في server.js)
+        if (data.id === '123456789012345678') { 
             document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin">Admin</button>`;
             document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
         }
