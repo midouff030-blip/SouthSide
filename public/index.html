@@ -303,7 +303,18 @@ function switchTab(name) {
     if(name === 'shop') loadShop();
     if(name === 'admin') { loadAdmin(); loadFivemLogs(); }
 }
-document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
+
+// نربطو الأزرار الكل (بما فيهم زر الأدمن اللي باش نزيدوه)
+function bindNavButtons() {
+    document.querySelectorAll('.nav-btn').forEach(b => {
+        // نمسحو أي listener قديم باش ما يتعاودش
+        b.replaceWith(b.cloneNode(true));
+    });
+    document.querySelectorAll('.nav-btn').forEach(b => {
+        b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+    });
+}
+bindNavButtons();
 
 // 🟢 الإصلاح الكبير: الـ Login ما يبلوكيش الصفحة
 async function checkLogin() {
@@ -315,9 +326,18 @@ async function checkLogin() {
             try {
                 const adminCheck = await fetch('/api/auth/check-admin');
                 if (adminCheck.ok) { 
+                    // نزيدو زر الأدمن كان ما كانش
                     if (!document.querySelector('.nav-btn[data-tab="admin"]')) {
-                        document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin" style="color: var(--accent);">Admin</button>`;
-                        document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
+                        const nav = document.getElementById('mainNav');
+                        const adminBtn = document.createElement('button');
+                        adminBtn.className = 'nav-btn';
+                        adminBtn.setAttribute('data-tab', 'admin');
+                        adminBtn.style.color = 'var(--accent)';
+                        adminBtn.innerText = 'Admin';
+                        nav.appendChild(adminBtn);
+                        
+                        // نعاودو نربطو الأزرار الكل (باش ما يتلخبطش)
+                        bindNavButtons();
                     }
                     document.getElementById('adminLoginView').style.display = 'none';
                     document.getElementById('adminPanelView').style.display = 'block';
