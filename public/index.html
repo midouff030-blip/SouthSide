@@ -156,7 +156,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .admin-table button.accept { background: #22c55e; color: #000; }
 .admin-table button.reject { background: var(--accent); color: #fff; }
 
-/* Logs Container */
 .logs-container { background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #ccc; line-height: 1.6; }
 .log-line { border-bottom: 1px solid #111; padding: 0.3rem 0; }
 .log-line:last-child { border-bottom: none; }
@@ -366,6 +365,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
     loop();
 })();
 
+// 🔴 الحل السحري: الخدمة كاملة للاعبين، و الـ Admin كان للأدمين
 function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -375,7 +375,7 @@ function switchTab(name) {
     if(name === 'shop') loadShop();
     if(name === 'admin') {
         loadAdmin();
-        loadFivemLogs(); // 🔴 كي تدخل للتاب يجيب اللوقز
+        loadFivemLogs(); 
     }
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
@@ -577,7 +577,6 @@ async function updateTicket(id, st) {
     loadAdmin(); 
 }
 
-// 🚔 FiveM Logs Function
 async function loadFivemLogs() {
     const container = document.getElementById('fivemLogsContainer');
     if (!container) return; 
@@ -669,28 +668,37 @@ document.getElementById('addShopBtn').addEventListener('click', async function()
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 
+// 🟢 الإصلاح الكبير متاع الـ Login
 async function checkLogin() {
     try {
         const res = await fetch('/api/auth/me'); 
         const data = await res.json();
         
         if (data.loggedIn) {
+            // 1. نبدلو صورة البروفايل
             document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
 
-            const adminCheck = await fetch('/api/auth/check-admin');
-            
-            if (adminCheck.ok) { 
-                if (!document.querySelector('.nav-btn[data-tab="admin"]')) {
-                    document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin" style="color: var(--accent);">Admin</button>`;
-                    document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
+            // 2. نتأكدو هل هو أدمين (فقط كان أدمين باش يظهرلو تاب Admin)
+            try {
+                const adminCheck = await fetch('/api/auth/check-admin');
+                
+                if (adminCheck.ok) { 
+                    if (!document.querySelector('.nav-btn[data-tab="admin"]')) {
+                        document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin" style="color: var(--accent);">Admin</button>`;
+                        document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
+                    }
+                    document.getElementById('adminLoginView').style.display = 'none';
+                    document.getElementById('adminPanelView').style.display = 'block';
+                    loadAdmin();
+                    loadFivemLogs();
                 }
-                document.getElementById('adminLoginView').style.display = 'none';
-                document.getElementById('adminPanelView').style.display = 'block';
-                loadAdmin();
-                loadFivemLogs();
+            } catch (e) {
+                // إلا ما كانش أدمين، الموقع يكمل يخدم عادي و ما يطيحش
             }
         }
-    } catch (e) { console.log("Not logged in"); }
+    } catch (e) { 
+        // كي يكون مازال ما دخلش، ما يصير شي
+    }
 }
 checkLogin();
 </script>
