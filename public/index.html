@@ -625,7 +625,8 @@ async function checkLogin() {
                     }
                     
                     document.getElementById('adminLoginView').style.display = 'none';
-                    document.getElementById('adminPanelView').style.display = 'flex';
+                    // 🔴 هنا التعديل المهم (grid)
+                    document.getElementById('adminPanelView').style.display = 'grid';
                     
                     loadAdmin(); 
                 }
@@ -743,7 +744,8 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
     const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
     if(res.ok) {
         document.getElementById('adminLoginView').style.display = 'none';
-        document.getElementById('adminPanelView').style.display = 'flex';
+        // 🔴 هنا التعديل المهم (grid)
+        document.getElementById('adminPanelView').style.display = 'grid';
         loadAdmin();
         loadFivemLogs();
     } else alert('Wrong Password');
