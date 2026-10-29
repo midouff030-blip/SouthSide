@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
-// ✅ قراءة المفاتيح من Render Environment Variables
+// ✅ قراءة المفاتيح من Render
 // ==========================================
 const CONFIG = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'default_secret',
@@ -55,38 +55,33 @@ passport.use(new DiscordStrategy({
   clientID: CONFIG.DISCORD_CLIENT_ID,
   clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
   callbackURL: CONFIG.DISCORD_CALLBACK_URL,
-  scope: ['identify', 'guilds'] 
-}, (accessToken, refreshToken, profile, done) => {
-  profile.accessToken = accessToken; 
-  done(null, profile);
-}));
+  scope: ['identify'] // ما نحتاجوش guilds توة خاطر باش نستعملو البوت
+}, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية بالرتبة (Role) فقط =====
+// ===== 🔴 الحماية الجديدة: نستعملو البوت باش نتشيكو على الرتبة =====
 async function isAdmin(req, res, next) {
-  // 1. إلا دخل بالباسوورد الاحتياطية (Session)
   if (req.session && req.session.isAdmin) return next(); 
 
-  // 2. إلا دخل بالديسكورد، نتشيكو على الرتبة
-  if (req.user && req.user.accessToken) {
+  if (req.user && req.user.id) {
     try {
-      const response = await fetch(`https://discord.com/api/v10/users/@me/guilds/${CONFIG.GUILD_ID}/member`, {
-        headers: { Authorization: `Bearer ${req.user.accessToken}` }
+      // نطلبو من الديسكورد معلومات العضو بالسيرفر باستعمال البوت
+      const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
+        headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
       });
+      
       if (response.ok) {
         const memberData = await response.json();
-        // إلا كان عنده الرتبة، نعديوه
+        // نتشيكو هل عنده الرتبة
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
           return next(); 
         }
       }
     } catch (e) { console.error("Role check error:", e); }
   }
-  
-  // إلا ما عندوش رتبة ولا ما دخلش
-  res.status(403).json({ error: 'Access Denied. Admins only.' });
+  res.status(403).json({ error: 'Access Denied.' });
 }
 
 // ===== FiveM Stats =====
