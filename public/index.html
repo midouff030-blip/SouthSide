@@ -680,21 +680,35 @@ document.getElementById('ticketModal').addEventListener('click', function(e){ if
 document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
+
+// 🔴 هنا صلحنا المشكلة متاع الـ Submit
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
-    let discordId = dataObj.discord_id || 'Guest';
+    
+    // 🔴 ناخذو الـ Discord ID من الـ Form مباشرة (من غير ما نطلب Login)
+    let finalDiscordId = dataObj.discord_id || 'Guest';
+
+    // (اختياري) إذا اليوزر مسجل دخول، ناخذو الـ ID الحقيقي ونخليوه يغلب اللي كتبو
     try {
         const meRes = await fetch('/api/auth/me');
         const meData = await meRes.json();
-        if (meData.loggedIn) discordId = meData.id;
+        if (meData.loggedIn && meData.id) {
+            finalDiscordId = meData.id;
+        }
     } catch(e) {}
+
     await fetch('/api/tickets', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: currentType, subject: dataObj.discord_id || dataObj.char_name || 'N/A', message: JSON.stringify(dataObj), discordId: discordId })
+        body: JSON.stringify({ 
+            type: currentType, 
+            subject: dataObj.discord_id || dataObj.char_name || 'N/A', 
+            message: JSON.stringify(dataObj), 
+            discordId: finalDiscordId // 👈 نبعثو الـ ID الحقيقي
+        })
     });
-    alert('✅ Submitted!');
+    alert('✅ Application Submitted!');
     closeModal(); this.reset();
 });
 
