@@ -20,7 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 const CONFIG = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'default_secret',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
-  ADMIN_DISCORD_ID: process.env.ADMIN_DISCORD_ID,
   GUILD_ID: process.env.GUILD_ID,
   ADMIN_ROLE_ID: process.env.ADMIN_ROLE_ID,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -56,7 +55,7 @@ passport.use(new DiscordStrategy({
   clientID: CONFIG.DISCORD_CLIENT_ID,
   clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
   callbackURL: CONFIG.DISCORD_CALLBACK_URL,
-  scope: ['identify', 'guilds'] // 🔴 ضروري 'guilds' باش نقراو الرتب
+  scope: ['identify', 'guilds'] 
 }, (accessToken, refreshToken, profile, done) => {
   profile.accessToken = accessToken; 
   done(null, profile);
@@ -65,25 +64,28 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية بالرتبة (Role) =====
+// ===== 🔴 الحماية بالرتبة (Role) فقط =====
 async function isAdmin(req, res, next) {
+  // 1. إلا دخل بالباسوورد الاحتياطية (Session)
   if (req.session && req.session.isAdmin) return next(); 
 
+  // 2. إلا دخل بالديسكورد، نتشيكو على الرتبة
   if (req.user && req.user.accessToken) {
-    if (req.user.id === CONFIG.ADMIN_DISCORD_ID) return next(); 
-
     try {
       const response = await fetch(`https://discord.com/api/v10/users/@me/guilds/${CONFIG.GUILD_ID}/member`, {
         headers: { Authorization: `Bearer ${req.user.accessToken}` }
       });
       if (response.ok) {
         const memberData = await response.json();
+        // إلا كان عنده الرتبة، نعديوه
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
           return next(); 
         }
       }
     } catch (e) { console.error("Role check error:", e); }
   }
+  
+  // إلا ما عندوش رتبة ولا ما دخلش
   res.status(403).json({ error: 'Access Denied. Admins only.' });
 }
 
