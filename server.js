@@ -15,27 +15,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
-// ⚠️ حط بياناتك هنا (بدل اللي بين '...')
+// ✅ قراءة المفاتيح من Render Environment Variables
 // ==========================================
 const CONFIG = {
-  // --- إعدادات الأمان ---
-  SESSION_SECRET: 'southside_tn_2026_secret', 
-  ADMIN_PASSWORD: 'admin123456', // باسوورد احتياطية (إلا حبيت تدخل بلا ديسكورد)
-  ADMIN_DISCORD_ID: '123456789012345678', // 🔴 ID متاعك أنت (أرقام فقط)
-  
-  // --- إعدادات الرتب (Role) الجديدة ---
-  GUILD_ID: '123456789012345678', // 🔴 ID متاع سيرفر الديسكورد متاعك
-  ADMIN_ROLE_ID: '987654321098765432', // 🔴 ID متاع رتبة الأدمن في السيرفر
-  
-  // --- إعدادات Discord OAuth ---
-  DISCORD_CLIENT_ID: '1234567890', // 🔴 الـ Client ID
-  DISCORD_CLIENT_SECRET: 'abcdefg123456', // 🔴 الـ Client Secret
-  DISCORD_BOT_TOKEN: 'MTIzNDU2Nzg5...', // 🔴 توكن البوت (لصور اللاعبين)
-  DISCORD_CALLBACK_URL: 'https://your-app.onrender.com/api/auth/discord/callback', // 🔴 بدل بالرابط متاع Render
-  
-  // --- إعدادات FiveM ---
-  FIVEM_IP: '127.0.0.1', 
-  FIVEM_PORT: '30120'
+  SESSION_SECRET: process.env.SESSION_SECRET || 'default_secret',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  ADMIN_DISCORD_ID: process.env.ADMIN_DISCORD_ID,
+  GUILD_ID: process.env.GUILD_ID,
+  ADMIN_ROLE_ID: process.env.ADMIN_ROLE_ID,
+  DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
+  DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+  DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
+  DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
+  FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
+  FIVEM_PORT: process.env.FIVEM_PORT || '30120'
 };
 
 // ===== Database =====
@@ -74,10 +67,10 @@ app.use(passport.session());
 
 // ===== 🔴 الحماية بالرتبة (Role) =====
 async function isAdmin(req, res, next) {
-  if (req.session && req.session.isAdmin) return next(); // احتياطي إلا دخل بالباسوورد
+  if (req.session && req.session.isAdmin) return next(); 
 
   if (req.user && req.user.accessToken) {
-    if (req.user.id === CONFIG.ADMIN_DISCORD_ID) return next(); // أنت دايماً أدمين
+    if (req.user.id === CONFIG.ADMIN_DISCORD_ID) return next(); 
 
     try {
       const response = await fetch(`https://discord.com/api/v10/users/@me/guilds/${CONFIG.GUILD_ID}/member`, {
@@ -86,7 +79,7 @@ async function isAdmin(req, res, next) {
       if (response.ok) {
         const memberData = await response.json();
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
-          return next(); // عنده الرتبة
+          return next(); 
         }
       }
     } catch (e) { console.error("Role check error:", e); }
@@ -120,11 +113,11 @@ app.get('/api/auth/me', (req, res) => {
   else res.json({ loggedIn: false });
 });
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
-app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true })); // 🔴 Route جديدة باش نتأكدو
+app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true })); 
 
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
-app.post('/api/gangs', isAdmin, async (req, res) => { /* كودك هنا */ 
+app.post('/api/gangs', isAdmin, async (req, res) => { 
   try {
     const db = getDB(); if (!db.gangs) db.gangs = [];
     let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -140,7 +133,7 @@ app.post('/api/gangs', isAdmin, async (req, res) => { /* كودك هنا */
     db.gangs.push(gang); saveDB(db); res.json(gang);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
-app.put('/api/gangs/:id', isAdmin, async (req, res) => { /* كودك هنا */ 
+app.put('/api/gangs/:id', isAdmin, async (req, res) => { 
   try {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
     if (!gang) return res.status(404).json({ error: 'Gang not found' });
@@ -154,7 +147,7 @@ app.put('/api/gangs/:id', isAdmin, async (req, res) => { /* كودك هنا */
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.delete('/api/gangs/:id', isAdmin, (req, res) => { const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id); saveDB(db); res.json({ success: true }); });
-app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { /* كودك هنا */ 
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { 
   try {
     const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
     if (!gang) return res.status(404).json({ error: 'Gang not found' });
