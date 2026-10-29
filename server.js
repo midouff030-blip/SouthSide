@@ -28,10 +28,10 @@ const CONFIG = {
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
   
   // 🔴 Webhooks لكل قسم
-  WEBHOOK_WHITELIST: process.env.WEBHOOK_WHITELIST, 
-  WEBHOOK_GANG: process.env.WEBHOOK_GANG,
-  WEBHOOK_POLICE: process.env.WEBHOOK_POLICE,
-  WEBHOOK_EMS: process.env.WEBHOOK_EMS,
+  WEBHOOK_WHITELIST: process.env.WEBHOOK_WHITELIST || process.env.DISCORD_WEBHOOK_RESULTS,
+  WEBHOOK_GANG: process.env.WEBHOOK_GANG || process.env.DISCORD_WEBHOOK_RESULTS,
+  WEBHOOK_POLICE: process.env.WEBHOOK_POLICE || process.env.DISCORD_WEBHOOK_RESULTS,
+  WEBHOOK_EMS: process.env.WEBHOOK_EMS || process.env.DISCORD_WEBHOOK_RESULTS,
   
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
   FIVEM_PORT: process.env.FIVEM_PORT || '30120',
@@ -57,7 +57,6 @@ const getDB = () => {
 };
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// دالة تسجيل اللوقز في السيت
 const addSiteLog = (action, user, details) => {
     const db = getDB();
     db.siteLogs.push({ time: new Date().toISOString(), action, user, details });
@@ -154,7 +153,7 @@ app.get('/api/auth/me', (req, res) => {
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true })); 
 
-// ===== Gangs & Shop (كود قديم) =====
+// ===== Gangs & Shop =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', isAdmin, async (req, res) => { 
   try {
@@ -172,9 +171,25 @@ app.post('/api/gangs', isAdmin, async (req, res) => {
     db.gangs.push(gang); saveDB(db); addSiteLog('GANG_ADD', req.user ? req.user.username : 'Admin', `Added gang: ${gang.name}`); res.json(gang);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
-app.put('/api/gangs/:id', isAdmin, async (req, res) => { /* ... كود قديم ... */ });
+app.put('/api/gangs/:id', isAdmin, async (req, res) => { 
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+    gang.name = req.body.name || gang.name; gang.logo = req.body.logo || gang.logo; gang.boss = req.body.boss || gang.boss; gang.bossId = req.body.bossId || gang.bossId; gang.underboss = req.body.underboss || gang.underboss; gang.underbossId = req.body.underbossId || gang.underbossId;
+    saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 app.delete('/api/gangs/:id', isAdmin, (req, res) => { const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id); saveDB(db); res.json({ success: true }); });
-app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { /* ... كود قديم ... */ });
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { 
+  try {
+    const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+    const discordId = req.body.discordId; const memberName = req.body.memberName || 'Member'; let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
+    if (botToken && discordId) { try { const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, { headers: { Authorization: `Bot ${botToken}` } }); if (discordRes.ok) { const userData = await discordRes.json(); if (userData.avatar) avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${userData.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; } } catch (e) {} }
+    gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
 app.post('/api/shop', isAdmin, (req, res) => { const db = getDB(); const item = { id: Date.now().toString(), ...req.body }; db.shop.push(item); saveDB(db); addSiteLog('SHOP_ADD', req.user ? req.user.username : 'Admin', `Added item: ${item.name}`); res.json(item); });
@@ -256,13 +271,25 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         }
     }
 
+    // 🔴 بعثان الويب هوك مع اللوغز
     if (webhookURL && embed.title) {
+        console.log(`[WEBHOOK] Attempting to send to: ${webhookURL}`);
         try {
-            await fetch(webhookURL, {
+            const webhookRes = await fetch(webhookURL, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: userMention, embeds: [embed] })
             });
-        } catch (error) { console.error("Webhook Error:", error); }
+            if (webhookRes.ok) {
+                console.log(`✅ [WEBHOOK SUCCESS] Message sent to Discord.`);
+            } else {
+                const errData = await webhookRes.text();
+                console.error(`❌ [WEBHOOK FAILED] Discord API Response: ${webhookRes.status} - ${errData}`);
+            }
+        } catch (error) { 
+            console.error("❌ [WEBHOOK ERROR] Exception:", error); 
+        }
+    } else {
+        console.log(`⚠️ [WEBHOOK SKIPPED] URL is missing or Embed is empty.`);
     }
 
     // 🔴 تحديث الرتب
