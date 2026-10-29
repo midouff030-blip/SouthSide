@@ -198,13 +198,37 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop
 // ===== Tickets & Webhooks =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
 
+// ✅ إنشاء Ticket مع إضافة الرتبة الأوتوماتيكية + فحص الـ Cooldown
 app.post('/api/tickets', async (req, res) => { 
     try {
         const db = getDB(); 
+        const discordId = req.body.discordId || 'Guest';
+        const type = req.body.type;
+        
+        // 🔴 فحص الـ Cooldown (24 ساعة)
+        if (discordId !== 'Guest') {
+            const lastRejected = db.tickets
+                .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+                .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+
+            if (lastRejected && lastRejected.createdAt) {
+                const timePassed = Date.now() - lastRejected.createdAt;
+                const hoursPassed = timePassed / (1000 * 60 * 60);
+                if (hoursPassed < 24) {
+                    const hoursLeft = Math.ceil(24 - hoursPassed);
+                    return res.status(403).json({ 
+                        error: `You must wait ${hoursLeft} hours before applying for ${type} again.` 
+                    });
+                }
+            }
+        }
+
         const ticket = { 
             id: Date.now().toString(), status: 'pending', reason: '', 
             user: req.user ? req.user.username : 'Guest', 
-            discordId: req.body.discordId || 'Guest', ...req.body 
+            discordId: discordId, 
+            createdAt: Date.now(),
+            ...req.body 
         }; 
         db.tickets.push(ticket); saveDB(db); 
         addSiteLog('TICKET_NEW', ticket.user, `Submitted ${ticket.type}`);
@@ -263,15 +287,14 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         if (t.type.includes("Gang")) {
             embed = { title: "❌ Gang Application Rejected", description: `${userMention}\n\n${gangName}\n\nYour application has been rejected because:\n**${t.reason}**\n\nBetter luck next time!`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Roleplay" } };
         } else if (t.type.includes("Police")) {
-            embed = { title: "❌ Police Application Rejected", description: `Sorry ${userMention}, your application for the **Police Department** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 7 days.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Police Dept" } };
+            embed = { title: "❌ Police Application Rejected", description: `Sorry ${userMention}, your application for the **Police Department** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Police Dept" } };
         } else if (t.type.includes("EMS")) {
-            embed = { title: "❌ EMS Application Rejected", description: `Sorry ${userMention}, your application for **EMS** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nKeep practicing and try again soon!`, color: 0xe74c3c, footer: { text: "SouthSide S2 | EMS Dept" } };
+            embed = { title: "❌ EMS Application Rejected", description: `Sorry ${userMention}, your application for **EMS** has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | EMS Dept" } };
         } else {
-            embed = { title: "❌ Whitelist Rejected", description: `Sorry ${userMention}, your Whitelist application has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nFeel free to re-apply after reviewing the rules.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Roleplay" } };
+            embed = { title: "❌ Whitelist Rejected", description: `Sorry ${userMention}, your Whitelist application has been REJECTED ❌\n\n**Reason:** ${t.reason}\n\nYou can re-apply in 24 hours.`, color: 0xe74c3c, footer: { text: "SouthSide S2 | Roleplay" } };
         }
     }
 
-    // 🔴 بعثان الويب هوك مع اللوغز
     if (webhookURL && embed.title) {
         console.log(`[WEBHOOK] Attempting to send to: ${webhookURL}`);
         try {
@@ -279,15 +302,9 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: userMention, embeds: [embed] })
             });
-            if (webhookRes.ok) {
-                console.log(`✅ [WEBHOOK SUCCESS] Message sent to Discord.`);
-            } else {
-                const errData = await webhookRes.text();
-                console.error(`❌ [WEBHOOK FAILED] Discord API Response: ${webhookRes.status} - ${errData}`);
-            }
-        } catch (error) { 
-            console.error("❌ [WEBHOOK ERROR] Exception:", error); 
-        }
+            if (webhookRes.ok) { console.log(`✅ [WEBHOOK SUCCESS] Message sent to Discord.`); } 
+            else { const errData = await webhookRes.text(); console.error(`❌ [WEBHOOK FAILED] Discord API Response: ${webhookRes.status} - ${errData}`); }
+        } catch (error) { console.error("❌ [WEBHOOK ERROR] Exception:", error); }
     } else {
         console.log(`⚠️ [WEBHOOK SKIPPED] URL is missing or Embed is empty.`);
     }
