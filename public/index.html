@@ -567,10 +567,25 @@ const appConfigs = {
 };
 
 let currentType = '';
-function openModal(title) {
+
+// 🔴 هنا نفحصو الـ Cooldown قبل ما يفتح المودال
+async function openModal(title) {
+    if (!loggedInUser) return alert("You must login first!");
+    
     currentType = title;
+    document.getElementById('modalTitle').innerText = appConfigs[title] ? appConfigs[title].title : "Application";
+    
+    // فحص الـ Cooldown
+    try {
+        const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
+        const checkData = await checkRes.json();
+        if (checkData.blocked) {
+            alert(`❌ You have been rejected recently. Please wait ${checkData.hoursLeft} hours before applying again.`);
+            return;
+        }
+    } catch(e) { console.error(e); }
+
     const config = appConfigs[title] || { title: "Support", fields: [] };
-    document.getElementById('modalTitle').innerText = config.title;
     const fieldsContainer = document.getElementById('dynamicFormFields');
     fieldsContainer.innerHTML = '';
     config.fields.forEach(f => {
@@ -598,7 +613,6 @@ document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
 
-// 🔴 Submit Ticket (يخدم كان كي المسخدم مسجل دخول)
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
     if (!loggedInUser) { alert('You must be logged in to submit an application.'); return; }
@@ -613,7 +627,7 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
                 subject: dataObj.char_name || 'N/A', 
                 message: JSON.stringify(dataObj), 
                 discordId: loggedInUser.id,
-                createdAt: Date.now() // نبعثو الوقت
+                createdAt: Date.now()
             })
         });
 
