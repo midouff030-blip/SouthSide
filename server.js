@@ -226,7 +226,6 @@ app.post('/api/tickets', async (req, res) => {
         db.tickets.push(ticket); 
         saveDB(db); 
 
-        // 🔴 إضافة رتبة "Waiting for Interview"
         if (ticket.discordId && ticket.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
             console.log(`[DISCORD API] Attempting to ADD Waiting Role (${CONFIG.ROLE_WAITING_ID}) to User: ${ticket.discordId}`);
             try {
@@ -261,48 +260,38 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
   
   if (t) { 
     t.status = req.body.status; 
-    t.reason = req.body.reason || ''; 
+    t.reason = req.reason || req.body.reason || ''; 
     saveDB(db); 
 
     const webhookResults = CONFIG.DISCORD_WEBHOOK_RESULTS;
     const webhookLogs = CONFIG.DISCORD_WEBHOOK_LOGS;
     const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
 
-    // ✅ إدارة الرتب كي يتم القبول أو الرفض
+    // ✅ تحديث الرتب بـ PATCH
     if (t.discordId && t.discordId !== 'Guest') {
         const botToken = CONFIG.DISCORD_BOT_TOKEN;
         const guildId = CONFIG.GUILD_ID;
 
         if (botToken && guildId) {
             try {
-                // 1. نجيبو الرتب الحالية متاع اليوزر
                 const memberRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}`, {
                     headers: { Authorization: `Bot ${botToken}` }
                 });
 
                 if (memberRes.ok) {
                     const memberData = await memberRes.json();
-                    let currentRoles = memberData.roles || []; // الرتب الحالية (ID)
+                    let currentRoles = memberData.roles || []; 
 
-                    // 2. نشوفو شنوة الـ Status باش نقررو شنوة نعملو
                     if (t.status === 'accepted' && CONFIG.ROLE_ACCEPTED_ID) {
-                        // نزيدو Accepted (إذا موش موجودة)
-                        if (!currentRoles.includes(CONFIG.ROLE_ACCEPTED_ID)) {
-                            currentRoles.push(CONFIG.ROLE_ACCEPTED_ID);
-                        }
-                        // ننحيو Waiting (إذا موجودة)
-                        if (CONFIG.ROLE_WAITING_ID) {
-                            currentRoles = currentRoles.filter(r => r !== CONFIG.ROLE_WAITING_ID);
-                        }
-                        console.log(`[DISCORD API] Updating roles for ${t.discordId}: +Accepted, -Waiting`);
+                        if (!currentRoles.includes(CONFIG.ROLE_ACCEPTED_ID)) currentRoles.push(CONFIG.ROLE_ACCEPTED_ID);
+                        if (CONFIG.ROLE_WAITING_ID) currentRoles = currentRoles.filter(r => r !== CONFIG.ROLE_WAITING_ID);
+                        console.log(`[DISCORD API] Accepted: Patching roles for ${t.discordId}`);
                     } 
                     else if (t.status === 'rejected' && CONFIG.ROLE_WAITING_ID) {
-                        // ننحيو Waiting برك
                         currentRoles = currentRoles.filter(r => r !== CONFIG.ROLE_WAITING_ID);
-                        console.log(`[DISCORD API] Updating roles for ${t.discordId}: -Waiting (Rejected)`);
+                        console.log(`[DISCORD API] Rejected: Patching roles for ${t.discordId}`);
                     }
 
-                    // 3. نبعثو التحديث بالـ PATCH (يبدل الرتب كامل في ضربة وحدة)
                     const updateRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}`, {
                         method: 'PATCH',
                         headers: { 
@@ -313,12 +302,20 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                     });
 
                     if (updateRes.ok) {
-                        console.log(`✅ [SUCCESS] Roles updated successfully for ${t.discordId}`);
+                        console.log(`✅ [SUCCESS] Roles PATCHED successfully for ${t.discordId}`);
                     } else {
                         const errData = await updateRes.text();
-                        console.error(`❌ [FAILED] Could not update roles. Discord API Response: ${updateRes.status} - ${errData}`);
+                        console.error(`❌ [FAILED] PATCH failed: ${updateRes.status} - ${errData}`);
+                        // محاولة احتياطية: نحّيو Waiting بـ DELETE مباشرة
+                        if (t.status === 'accepted' || t.status === 'rejected') {
+                            if (CONFIG.ROLE_WAITING_ID) {
+                                await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                                    method: 'DELETE', headers: { Authorization: `Bot ${botToken}` }
+                                });
+                                console.log(`⚠️ [FALLBACK] Tried direct DELETE for Waiting role.`);
+                            }
+                        }
                     }
-
                 } else {
                     console.error(`❌ [FAILED] Could not fetch member ${t.discordId}. Are they in the server?`);
                 }
@@ -328,7 +325,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         }
     }
 
-    // ===== Webhooks (Logs + Results) =====
+    // ===== Webhooks =====
     if (webhookLogs) {
         const logEmbed = {
             title: `Ticket ${t.status.toUpperCase()}: ${t.type}`,
@@ -337,11 +334,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
             footer: { text: "SouthSide S2 | Logs" }
         };
         try {
-            await fetch(webhookLogs, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ embeds: [logEmbed] })
-            });
+            await fetch(webhookLogs, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [logEmbed] }) });
         } catch (error) { console.error("Log Webhook Error:", error); }
     }
 
@@ -352,10 +345,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 title: "✅ Whitelist (Citizen) Accepted",
                 description: `Congratulations ${userMention}! Your application for **${t.type}** has been **ACCEPTED**.\n\nWelcome aboard!`,
                 color: 0x2ecc71,
-                fields: [
-                    { name: "🛡️ Reviewed By", value: "Staff Team", inline: true },
-                    { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
-                ],
+                fields: [ { name: "🛡️ Reviewed By", value: "Staff Team", inline: true }, { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true } ],
                 footer: { text: "SouthSide S2 | Roleplay" }
             };
         } else if (t.status === 'rejected') {
@@ -363,23 +353,12 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 title: "❌ Whitelist (Citizen) Rejected",
                 description: `Sorry ${userMention}, your application for **${t.type}** has been **REJECTED**.\n\n**Reason:** ${t.reason}`,
                 color: 0xe74c3c,
-                fields: [
-                    { name: "🛡️ Reviewed By", value: "Staff Team", inline: true },
-                    { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
-                ],
+                fields: [ { name: "🛡️ Reviewed By", value: "Staff Team", inline: true }, { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true } ],
                 footer: { text: "SouthSide S2 | Roleplay" }
             };
         }
-
         try {
-            await fetch(webhookResults, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: userMention,
-                    embeds: [resultEmbed]
-                })
-            });
+            await fetch(webhookResults, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: userMention, embeds: [resultEmbed] }) });
         } catch (error) { console.error("Result Webhook Error:", error); }
     }
   }
