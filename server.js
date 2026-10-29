@@ -42,15 +42,15 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions (🔴 هنا كان المشكل، توة يتصلح) =====
+// ===== Sessions =====
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true, // مهم لـ Render
+  proxy: true,
   cookie: { 
-    secure: true, // لازم true خاطر Render HTTPS
-    sameSite: 'none', // باش يخدم مع الديسكورد
+    secure: true, 
+    sameSite: 'none', 
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
@@ -69,7 +69,7 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية بالرتبة =====
+// ===== 🔴 الحماية بالرتبة (مصلحة) =====
 async function isAdmin(req, res, next) {
   if (req.session && req.session.isAdmin) return next(); 
   if (req.user && req.user.id) {
