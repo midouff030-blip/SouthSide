@@ -33,7 +33,6 @@ const CONFIG = {
   FIVEM_LOG_PATH: process.env.FIVEM_LOG_PATH || './fivem.log',
   FIVEM_LOG_KEY: process.env.FIVEM_LOG_KEY || 'secret_key',
   
-  // 🔴 الرتب الجديدة للـ Applications
   ROLE_ACCEPTED_ID: process.env.ROLE_ACCEPTED_ID, 
   ROLE_WAITING_ID: process.env.ROLE_WAITING_ID    
 };
@@ -229,18 +228,24 @@ app.post('/api/tickets', async (req, res) => {
 
         // 🔴 إضافة رتبة "Waiting for Interview"
         if (ticket.discordId && ticket.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
+            console.log(`[DISCORD API] Attempting to ADD Waiting Role (${CONFIG.ROLE_WAITING_ID}) to User: ${ticket.discordId}`);
             try {
                 const botToken = CONFIG.DISCORD_BOT_TOKEN;
                 const guildId = CONFIG.GUILD_ID;
                 if (botToken && guildId) {
-                    await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${ticket.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                    const response = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${ticket.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
                         method: 'PUT',
                         headers: { Authorization: `Bot ${botToken}` }
                     });
-                    console.log(`✅ Waiting Role added to ${ticket.discordId}`);
+                    if (response.ok) {
+                        console.log(`✅ [SUCCESS] Waiting Role ADDED to ${ticket.discordId}`);
+                    } else {
+                        const errData = await response.text();
+                        console.error(`❌ [FAILED] Could not add Waiting Role. Discord API Response: ${response.status} - ${errData}`);
+                    }
                 }
             } catch (err) {
-                console.error("Error adding waiting role:", err);
+                console.error("❌ [ERROR] Exception while adding waiting role:", err);
             }
         }
 
@@ -269,35 +274,39 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         const guildId = CONFIG.GUILD_ID;
 
         if (botToken && guildId) {
-            // 1. نعطيوه رتبة Accepted أولاً (محمي)
+            // 1. نعطيوه رتبة Accepted أولاً
+            console.log(`[DISCORD API] Attempting to ADD Accepted Role (${CONFIG.ROLE_ACCEPTED_ID}) to User: ${t.discordId}`);
             try {
                 const resAdd = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_ACCEPTED_ID}`, {
                     method: 'PUT',
                     headers: { Authorization: `Bot ${botToken}` }
                 });
                 if (resAdd.ok) {
-                    console.log(`✅ Accepted Role added to ${t.discordId}`);
+                    console.log(`✅ [SUCCESS] Accepted Role ADDED to ${t.discordId}`);
                 } else {
-                    console.error(`❌ Failed to add Accepted Role:`, await resAdd.text());
+                    const errData = await resAdd.text();
+                    console.error(`❌ [FAILED] Could not add Accepted Role. Discord API Response: ${resAdd.status} - ${errData}`);
                 }
             } catch (err) {
-                console.error("Error adding accepted role:", err);
+                console.error("❌ [ERROR] Exception while adding accepted role:", err);
             }
 
-            // 2. نحّيو رتبة Waiting (محمي ومستقل، باش ما يطيحش الكود إذا فشل)
+            // 2. نحّيو رتبة Waiting
             if (CONFIG.ROLE_WAITING_ID) {
+                console.log(`[DISCORD API] Attempting to REMOVE Waiting Role (${CONFIG.ROLE_WAITING_ID}) from User: ${t.discordId}`);
                 try {
                     const resDel = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
                         method: 'DELETE',
                         headers: { Authorization: `Bot ${botToken}` }
                     });
                     if (resDel.ok) {
-                        console.log(`✅ Waiting Role removed from ${t.discordId}`);
+                        console.log(`✅ [SUCCESS] Waiting Role REMOVED from ${t.discordId}`);
                     } else {
-                        console.error(`⚠️ Failed to remove Waiting Role (maybe not in server?):`, await resDel.text());
+                        const errData = await resDel.text();
+                        console.error(`❌ [FAILED] Could not remove Waiting Role. Discord API Response: ${resDel.status} - ${errData}`);
                     }
                 } catch (err) {
-                    console.error("Error removing waiting role:", err);
+                    console.error("❌ [ERROR] Exception while removing waiting role:", err);
                 }
             }
         }
@@ -309,14 +318,18 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
             const botToken = CONFIG.DISCORD_BOT_TOKEN;
             const guildId = CONFIG.GUILD_ID;
             if (botToken && guildId) {
-                await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                const resDel = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bot ${botToken}` }
                 });
-                console.log(`✅ Waiting Role removed from ${t.discordId}`);
+                if (resDel.ok) {
+                    console.log(`✅ [SUCCESS] Waiting Role REMOVED (Rejected) from ${t.discordId}`);
+                } else {
+                    console.error(`❌ [FAILED] Could not remove Waiting Role (Rejected).`);
+                }
             }
         } catch (err) {
-            console.error("Error removing waiting role:", err);
+            console.error("❌ [ERROR] Error removing waiting role:", err);
         }
     }
 
