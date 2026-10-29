@@ -106,7 +106,7 @@ app.delete('/api/gangs/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// ===== إضافة عضو (مع Lanyard API للصورة) =====
+// 🔥 إضافة عضو مع جلب الصورة أوتوماتيك بالبوت
 app.post('/api/gangs/:id/members', async (req, res) => {
   try {
     const db = getDB(); 
@@ -117,18 +117,22 @@ app.post('/api/gangs/:id/members', async (req, res) => {
     const memberName = req.body.memberName || 'Member';
     let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; // صورة افتراضية
 
-    try {
-        // Lanyard API كيجيب الصورة الحقيقية ديال الديسكورد
-        const lanyardRes = await fetch(`https://api.lanyard.rest/v1/users/${discordId}`);
-        const lanyardData = await lanyardRes.json();
-        
-        if (lanyardData.success && lanyardData.data.discord_user.avatar) {
-            const user = lanyardData.data.discord_user;
-            const ext = user.avatar.startsWith('a_') ? 'gif' : 'png';
-            avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${user.avatar}.${ext}?size=256`;
-        }
-    } catch (e) { 
-        console.log("Lanyard Error:", e.message); 
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    
+    if (botToken) {
+        try {
+            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
+                headers: { Authorization: `Bot ${botToken}` }
+            });
+            
+            if (discordRes.ok) {
+                const userData = await discordRes.json();
+                if (userData.avatar) {
+                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
+                }
+            }
+        } catch (e) { console.log("Discord API Error:", e.message); }
     }
 
     gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); 
