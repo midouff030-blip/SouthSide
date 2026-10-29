@@ -55,7 +55,7 @@ passport.use(new DiscordStrategy({
   clientID: CONFIG.DISCORD_CLIENT_ID,
   clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
   callbackURL: CONFIG.DISCORD_CALLBACK_URL,
-  scope: ['identify'] // ما نحتاجوش guilds توة خاطر باش نستعملو البوت
+  scope: ['identify'] // ما نحتاجوش guilds توة، البوت هو اللي باش يقرا الرتبة
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 app.use(passport.initialize());
@@ -63,25 +63,26 @@ app.use(passport.session());
 
 // ===== 🔴 الحماية الجديدة: نستعملو البوت باش نتشيكو على الرتبة =====
 async function isAdmin(req, res, next) {
+  // 1. إلا دخل بالباسوورد
   if (req.session && req.session.isAdmin) return next(); 
 
+  // 2. إلا دخل بالديسكورد، نطلبو من البوت يشوف الرتبة
   if (req.user && req.user.id) {
     try {
-      // نطلبو من الديسكورد معلومات العضو بالسيرفر باستعمال البوت
       const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
         headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
       });
       
       if (response.ok) {
         const memberData = await response.json();
-        // نتشيكو هل عنده الرتبة
+        // نتشيكو هل اللاعب عنده الرتبة
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
           return next(); 
         }
       }
     } catch (e) { console.error("Role check error:", e); }
   }
-  res.status(403).json({ error: 'Access Denied.' });
+  res.status(403).json({ error: 'Access Denied. Admins only.' });
 }
 
 // ===== FiveM Stats =====
