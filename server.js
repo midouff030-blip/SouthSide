@@ -29,7 +29,8 @@ const CONFIG = {
   DISCORD_WEBHOOK_RESULTS: process.env.DISCORD_WEBHOOK_RESULTS, 
   DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS, 
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
-  FIVEM_PORT: process.env.FIVEM_PORT || '30120'
+  FIVEM_PORT: process.env.FIVEM_PORT || '30120',
+  FIVEM_LOG_PATH: process.env.FIVEM_LOG_PATH || './fivem.log' // 🔴 مسار ملف اللوقز
 };
 
 // ===== Database =====
@@ -98,6 +99,23 @@ app.get('/api/stats', async (req, res) => {
         res.json({ online: true, players: dyn.clients || 0, maxPlayers: dyn.sv_maxclients || 128, name, ip: `connect ${CONFIG.FIVEM_IP}:${CONFIG.FIVEM_PORT}` });
     } catch (e) {
         res.json({ online: false, players: 0, maxPlayers: 128, name: 'SouthSide S2', ip: 'connect play.southsiderp.tn' });
+    }
+});
+
+// ===== 🚔 FiveM Logs API =====
+app.get('/api/fivem-logs', isAdmin, (req, res) => {
+    const logFilePath = CONFIG.FIVEM_LOG_PATH;
+
+    if (!fs.existsSync(logFilePath)) {
+        return res.json({ error: `Log file not found at: ${logFilePath}` });
+    }
+
+    try {
+        const logs = fs.readFileSync(logFilePath, 'utf8').split('\n').reverse();
+        const last150Logs = logs.filter(line => line.trim() !== '').slice(0, 150);
+        res.json({ logs: last150Logs });
+    } catch (err) {
+        res.status(500).json({ error: "Error reading log file." });
     }
 });
 
@@ -189,7 +207,6 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     const webhookLogs = CONFIG.DISCORD_WEBHOOK_LOGS;
     const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
 
-    // 1️⃣ اللوقز (للإدارة)
     if (webhookLogs) {
         const logEmbed = {
             title: `Ticket ${t.status.toUpperCase()}: ${t.type}`,
@@ -206,7 +223,6 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         } catch (error) { console.error("Log Webhook Error:", error); }
     }
 
-    // 2️⃣ النتيجة (لللاعب)
     if (webhookResults) {
         let resultEmbed = {};
         if (t.status === 'accepted') {
