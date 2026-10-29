@@ -27,6 +27,7 @@ const CONFIG = {
   DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
   
+  // 🔴 Webhooks (نستعملو القديم كـ احتياطي إذا الجديد ماكانش)
   WEBHOOK_WHITELIST: process.env.WEBHOOK_WHITELIST || process.env.DISCORD_WEBHOOK_RESULTS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG || process.env.DISCORD_WEBHOOK_RESULTS,
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE || process.env.DISCORD_WEBHOOK_RESULTS,
@@ -41,11 +42,18 @@ const CONFIG = {
   ROLE_WAITING_ID: process.env.ROLE_WAITING_ID    
 };
 
-// ===== Database =====
+// ===== Database & Logs Setup =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({ shop: [], tickets: [], gangs: [], siteLogs: [] }, null, 2));
 }
+
+// 🔴 نخلقو ملف الفايف إم لوقز إذا ماكانش موجود باش ما يطلعش الخطأ
+const fivemLogPath = path.join(__dirname, CONFIG.FIVEM_LOG_PATH);
+if (!fs.existsSync(fivemLogPath)) {
+  fs.writeFileSync(fivemLogPath, '// FiveM Logs will appear here...\n');
+}
+
 const getDB = () => {
     const db = JSON.parse(fs.readFileSync(dbPath));
     if (!db.gangs) db.gangs = [];
@@ -127,15 +135,14 @@ app.post('/api/fivem-logs', (req, res) => {
     const logData = req.body.log;
     if (!logData) return res.status(400).json({ error: 'No log data' });
     try {
-        fs.appendFileSync(CONFIG.FIVEM_LOG_PATH, `[${new Date().toLocaleTimeString()}] ${logData}\n`);
+        fs.appendFileSync(fivemLogPath, `[${new Date().toLocaleTimeString()}] ${logData}\n`);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: 'Could not write log' }); }
 });
 
 app.get('/api/fivem-logs', isAdmin, (req, res) => {
-    if (!fs.existsSync(CONFIG.FIVEM_LOG_PATH)) return res.json({ error: `Log file not found.` });
     try {
-        const logs = fs.readFileSync(CONFIG.FIVEM_LOG_PATH, 'utf8').split('\n').reverse();
+        const logs = fs.readFileSync(fivemLogPath, 'utf8').split('\n').reverse();
         res.json({ logs: logs.filter(line => line.trim() !== '').slice(0, 150) });
     } catch (err) { res.status(500).json({ error: "Error reading log file." }); }
 });
@@ -197,7 +204,6 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop
 // ===== Tickets & Webhooks =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
 
-// 🔴 Route جديد باش نفحصو الـ Cooldown قبل ما يفتح المودال
 app.get('/api/check-cooldown', async (req, res) => {
     const { discordId, type } = req.query;
     if (!discordId || discordId === 'Guest') return res.json({ blocked: false });
@@ -224,7 +230,6 @@ app.post('/api/tickets', async (req, res) => {
         const discordId = req.body.discordId || 'Guest';
         const type = req.body.type;
         
-        // 🔴 فحص الـ Cooldown (24 ساعة)
         if (discordId !== 'Guest') {
             const lastRejected = db.tickets
                 .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
@@ -289,7 +294,6 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         webhookURL = CONFIG.WEBHOOK_EMS;
     }
 
-    // 🔴 التنسيق المخصص لكل قسم
     if (t.status === 'accepted') {
         if (t.type.includes("Gang")) {
             embed = { title: "🔔 Gang Application Accepted", description: `Congratulations ${userMention}!\nYour gang application has been ACCEPTED ✅\n\n**${gangName}**\n\nPlease contact the <@&${CONFIG.ADMIN_ROLE_ID}> to receive your roles and complete the final setup.\n\nGood luck and represent your gang with pride.`, color: 0x2ecc71, footer: { text: "SouthSide S2 | Roleplay" } };
@@ -312,14 +316,19 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         }
     }
 
+    // 🔴 بعثان الويب هوك مع اللوغز
     if (webhookURL && embed.title) {
+        console.log(`[WEBHOOK] Attempting to send to: ${webhookURL}`);
         try {
             const webhookRes = await fetch(webhookURL, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: userMention, embeds: [embed] })
             });
             if (webhookRes.ok) { console.log(`✅ [WEBHOOK SUCCESS]`); } 
+            else { const errData = await webhookRes.text(); console.error(`❌ [WEBHOOK FAILED] ${webhookRes.status} - ${errData}`); }
         } catch (error) { console.error("❌ [WEBHOOK ERROR]", error); }
+    } else {
+        console.log(`⚠️ [WEBHOOK SKIPPED] URL is missing or Embed is empty.`);
     }
 
     // 🔴 تحديث الرتب
