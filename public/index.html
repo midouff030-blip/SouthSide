@@ -429,28 +429,24 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             </div>
             <div id="adminTab-multi" class="admin-tab">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <span style="color: #555; font-size: 0.8rem;">0/16 streams active</span>
-                    <button class="admin-btn"><i class="fa-solid fa-xmark"></i> Reset</button>
+                    <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
+                    <button class="admin-btn" onclick="resetStreams()"><i class="fa-solid fa-xmark"></i> Reset</button>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; height: calc(100vh - 250px);">
-                    <div class="stream-grid-container">
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                        <div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>
-                    </div>
+                    <!-- Left: Grid -->
+                    <div id="streamGrid" class="stream-grid-container"></div>
+
+                    <!-- Right: Players Sidebar -->
                     <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <h3 style="margin: 0;">Players Online</h3>
-                            <span style="color: #555; font-size: 0.75rem;">0 Active</span>
+                            <span style="color: #555; font-size: 0.75rem;" id="playersActiveText">0 Active</span>
                         </div>
-                        <input class="admin-input" type="text" placeholder="Search players..." style="margin-bottom: 1rem;">
-                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.85rem;">
-                            No players online
+                        <input class="admin-input" type="text" placeholder="Search players..." id="playerSearch" onkeyup="filterPlayers()" style="margin-bottom: 1rem;">
+                        <div style="flex: 1; overflow-y: auto;" id="playersListContainer">
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">
+                                No players online
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -850,6 +846,104 @@ async function removeShopItem(id) {
         await fetch('/api/shop/'+id, { method:'DELETE', headers: getAdminHeaders() });
         loadAdmin();
     }
+}
+
+// 🔴 WebSocket للـ Multi Stream
+let wsClient = null;
+let currentPlayers = [];
+let activeStreams = {};
+
+function connectWS() {
+    wsClient = new WebSocket(`wss://${window.location.host}/ws`);
+
+    wsClient.onopen = () => console.log('✅ Connected to WebSocket for streams');
+    wsClient.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'players_updated') {
+                currentPlayers = data.players;
+                renderPlayersList();
+            }
+            if (data.type === 'new_log') {
+                // لوغ جديد
+            }
+            if (data.type === 'stream_frame') {
+                displayStreamFrame(data.playerId, data.frame);
+            }
+        } catch(e) {}
+    };
+    wsClient.onclose = () => {
+        console.log('❌ WebSocket closed. Reconnecting...');
+        setTimeout(connectWS, 3000);
+    };
+}
+connectWS();
+
+function renderPlayersList() {
+    const container = document.getElementById('playersListContainer');
+    if (!container) return;
+    if (currentPlayers.length === 0) {
+        container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>';
+        document.getElementById('playersActiveText').innerText = `0 Active`;
+        return;
+    }
+    document.getElementById('playersActiveText').innerText = `${currentPlayers.length} Active`;
+    container.innerHTML = currentPlayers.map(p => `
+        <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;" onclick="selectPlayerForStream('${p.id}')" onmouseover="this.style.background='#111'" onmouseout="this.style.background='none'">
+            <span style="color: #fff;">${p.name} (ID: ${p.id})</span>
+            <span style="color: #555; font-size: 0.8rem;">${p.ping}ms</span>
+        </div>
+    `).join('');
+}
+
+function selectPlayerForStream(playerId) {
+    if (activeStreams[playerId]) return;
+    activeStreams[playerId] = true;
+    renderStreamGrid();
+    if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+        wsClient.send(JSON.stringify({ type: 'request_stream', playerId: playerId }));
+    }
+}
+
+function displayStreamFrame(playerId, frameData) {
+    const slot = document.getElementById(`stream-${playerId}`);
+    if (slot) {
+        slot.innerHTML = `<img src="${frameData}" style="width:100%; height:100%; object-fit:cover;">`;
+    }
+}
+
+function renderStreamGrid() {
+    const grid = document.getElementById('streamGrid');
+    if (!grid) return;
+    
+    const activeIds = Object.keys(activeStreams);
+    let html = '';
+    
+    activeIds.forEach(id => {
+        html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading ${id}...</span></div>`;
+    });
+    
+    for (let i = activeIds.length; i < 16; i++) {
+        html += `<div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>`;
+    }
+    
+    grid.innerHTML = html;
+    document.getElementById('streamsActiveText').innerText = `${activeIds.length}/16 streams active`;
+}
+
+renderStreamGrid();
+
+function filterPlayers() {
+    const query = document.getElementById('playerSearch').value.toLowerCase();
+    const items = document.querySelectorAll('.player-item');
+    items.forEach(item => {
+        item.style.display = item.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+    });
+}
+
+function resetStreams() {
+    activeStreams = {};
+    renderStreamGrid();
 }
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
