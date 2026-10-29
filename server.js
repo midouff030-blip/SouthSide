@@ -42,15 +42,15 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions (🔴 بلا memorystore، نستعملو اللي في express-session) =====
+// ===== Sessions (🔴 الإصلاح الجذري) =====
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   proxy: true, 
   cookie: { 
-    secure: false, // 🔴 خليها false باش تخدم على Render
-    sameSite: 'lax', // 🔴 lax باش يخدم مع الـ Proxy
+    secure: true, // 🔴 لازم true خاطر Render HTTPS
+    sameSite: 'none', // 🔴 none باش تخدم مع الـ Proxy
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
