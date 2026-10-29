@@ -26,7 +26,8 @@ const CONFIG = {
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
-  DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL, // 🔴 ويبهوك الديسكورد
+  DISCORD_WEBHOOK_RESULTS: process.env.DISCORD_WEBHOOK_RESULTS, // 🔴 ويبهوك النتائج
+  DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS, // 🔴 ويبهوك اللوقز
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
   FIVEM_PORT: process.env.FIVEM_PORT || '30120'
 };
@@ -62,7 +63,7 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== 🔴 الحماية بالرتبة (Role) =====
+// ===== 🔴 الحماية بالرتبة =====
 async function isAdmin(req, res, next) {
   if (req.session && req.session.isAdmin) return next(); 
 
@@ -184,14 +185,32 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     t.reason = req.body.reason || ''; 
     saveDB(db); 
 
-    const webhookUrl = CONFIG.DISCORD_WEBHOOK_URL; 
-    
-    if (webhookUrl) {
-        let embed = {};
-        const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
+    const webhookResults = CONFIG.DISCORD_WEBHOOK_RESULTS;
+    const webhookLogs = CONFIG.DISCORD_WEBHOOK_LOGS;
+    const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
 
+    // 1️⃣ اللوقز (للإدارة)
+    if (webhookLogs) {
+        const logEmbed = {
+            title: `Ticket ${t.status.toUpperCase()}: ${t.type}`,
+            description: `**User:** ${userMention} (\`${t.discordId || 'N/A'}\`)\n**Action:** ${t.status.toUpperCase()}\n**Reason:** ${t.reason || 'None'}\n**Time:** <t:${Math.floor(Date.now() / 1000)}:F>`,
+            color: t.status === 'accepted' ? 0x2ecc71 : 0xe74c3c,
+            footer: { text: "SouthSide S2 | Logs" }
+        };
+        try {
+            await fetch(webhookLogs, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ embeds: [logEmbed] })
+            });
+        } catch (error) { console.error("Log Webhook Error:", error); }
+    }
+
+    // 2️⃣ النتيجة (لللاعب)
+    if (webhookResults) {
+        let resultEmbed = {};
         if (t.status === 'accepted') {
-            embed = {
+            resultEmbed = {
                 title: "✅ Whitelist (Citizen) Accepted",
                 description: `Congratulations ${userMention}! Your application for **${t.type}** has been **ACCEPTED**.\n\nWelcome aboard!`,
                 color: 0x2ecc71,
@@ -202,7 +221,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
                 footer: { text: "SouthSide S2 | Roleplay" }
             };
         } else if (t.status === 'rejected') {
-            embed = {
+            resultEmbed = {
                 title: "❌ Whitelist (Citizen) Rejected",
                 description: `Sorry ${userMention}, your application for **${t.type}** has been **REJECTED**.\n\n**Reason:** ${t.reason}`,
                 color: 0xe74c3c,
@@ -215,17 +234,15 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         }
 
         try {
-            await fetch(webhookUrl, {
+            await fetch(webhookResults, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     content: userMention,
-                    embeds: [embed]
+                    embeds: [resultEmbed]
                 })
             });
-        } catch (error) {
-            console.error("Error sending to Discord:", error);
-        }
+        } catch (error) { console.error("Result Webhook Error:", error); }
     }
   }
   res.json(t);
