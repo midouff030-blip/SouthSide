@@ -3,7 +3,6 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
-const MemoryStore = require('memorystore')(session); // 🔴 باش الـ Session ما تضيعش
 const passport = require('passport');
 const fetch = require('node-fetch');
 
@@ -11,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
-app.use(cors({ origin: true, credentials: true })); // 🔴 باش الـ Cookie تخدم
+app.use(cors({ origin: true, credentials: true })); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -43,15 +42,14 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions (🔴 الإصلاح الجذري) =====
+// ===== Sessions (🔴 بلا memorystore، نستعملو اللي في express-session) =====
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: new MemoryStore({ checkPeriod: 86400000 }), // يمسح الـ Sessions القديمة
   proxy: true, 
   cookie: { 
-    secure: false, // 🔴 نحيّدو secure باش تخدم على Render
+    secure: false, // 🔴 خليها false باش تخدم على Render
     sameSite: 'lax', // 🔴 lax باش يخدم مع الـ Proxy
     maxAge: 24 * 60 * 60 * 1000 
   }
