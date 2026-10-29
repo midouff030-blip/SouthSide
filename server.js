@@ -87,18 +87,89 @@ app.delete('/api/streamers/:id', (req, res) => {
 
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
-app.post('/api/gangs', (req, res) => {
-  const db = getDB(); if (!db.gangs) db.gangs = [];
-  const gang = { 
-      id: Date.now().toString(), 
-      name: req.body.name || 'Unknown',
-      boss: req.body.boss || '', 
-      bossId: req.body.bossId || '',
-      underboss: req.body.underboss || '', 
-      underbossId: req.body.underbossId || '',
-      members: [] 
-  };
-  db.gangs.push(gang); saveDB(db); res.json(gang);
+
+app.post('/api/gangs', async (req, res) => {
+  try {
+    const db = getDB(); if (!db.gangs) db.gangs = [];
+    
+    let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+
+    if (botToken && req.body.bossId) {
+        try {
+            const res1 = await fetch(`https://discord.com/api/v10/users/${req.body.bossId}`, { headers: { Authorization: `Bot ${botToken}` } });
+            if (res1.ok) {
+                const data1 = await res1.json();
+                if (data1.avatar) {
+                    const ext = data1.avatar.startsWith('a_') ? 'gif' : 'png';
+                    bossAvatar = `https://cdn.discordapp.com/avatars/${req.body.bossId}/${data1.avatar}.${ext}?size=256`;
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (botToken && req.body.underbossId) {
+        try {
+            const res2 = await fetch(`https://discord.com/api/v10/users/${req.body.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } });
+            if (res2.ok) {
+                const data2 = await res2.json();
+                if (data2.avatar) {
+                    const ext = data2.avatar.startsWith('a_') ? 'gif' : 'png';
+                    underbossAvatar = `https://cdn.discordapp.com/avatars/${req.body.underbossId}/${data2.avatar}.${ext}?size=256`;
+                }
+            }
+        } catch (e) {}
+    }
+
+    const gang = { 
+        id: Date.now().toString(), 
+        name: req.body.name || 'Unknown',
+        logo: req.body.logo || '',
+        boss: req.body.boss || '', 
+        bossId: req.body.bossId || '',
+        bossAvatar: bossAvatar,
+        underboss: req.body.underboss || '', 
+        underbossId: req.body.underbossId || '',
+        underbossAvatar: underbossAvatar,
+        members: [] 
+    };
+    db.gangs.push(gang); saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/gangs/:id', async (req, res) => {
+  try {
+    const db = getDB(); 
+    const gang = db.gangs.find(g => g.id === req.params.id);
+    if (!gang) return res.status(404).json({ error: 'Gang not found' });
+    
+    gang.name = req.body.name || gang.name;
+    gang.logo = req.body.logo || gang.logo;
+    gang.boss = req.body.boss || gang.boss;
+    gang.bossId = req.body.bossId || gang.bossId;
+    gang.underboss = req.body.underboss || gang.underboss;
+    gang.underbossId = req.body.underbossId || gang.underbossId;
+
+    // تحديث الصور إلا تبدل الـ ID
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    if (botToken) {
+        if (gang.bossId) {
+            try {
+                const r1 = await fetch(`https://discord.com/api/v10/users/${gang.bossId}`, { headers: { Authorization: `Bot ${botToken}` } });
+                if (r1.ok) { const d1 = await r1.json(); if (d1.avatar) gang.bossAvatar = `https://cdn.discordapp.com/avatars/${gang.bossId}/${d1.avatar}.${d1.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; }
+            } catch (e) {}
+        }
+        if (gang.underbossId) {
+            try {
+                const r2 = await fetch(`https://discord.com/api/v10/users/${gang.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } });
+                if (r2.ok) { const d2 = await r2.json(); if (d2.avatar) gang.underbossAvatar = `https://cdn.discordapp.com/avatars/${gang.underbossId}/${d2.avatar}.${d2.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; }
+            } catch (e) {}
+        }
+    }
+
+    saveDB(db); res.json(gang);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/gangs/:id', (req, res) => {
@@ -106,7 +177,6 @@ app.delete('/api/gangs/:id', (req, res) => {
   saveDB(db); res.json({ success: true });
 });
 
-// 🔥 إضافة عضو مع جلب الصورة أوتوماتيك بالبوت
 app.post('/api/gangs/:id/members', async (req, res) => {
   try {
     const db = getDB(); 
@@ -115,16 +185,12 @@ app.post('/api/gangs/:id/members', async (req, res) => {
 
     const discordId = req.body.discordId;
     const memberName = req.body.memberName || 'Member';
-    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png'; // صورة افتراضية
+    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
     const botToken = process.env.DISCORD_BOT_TOKEN;
-    
-    if (botToken) {
+    if (botToken && discordId) {
         try {
-            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
-                headers: { Authorization: `Bot ${botToken}` }
-            });
-            
+            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, { headers: { Authorization: `Bot ${botToken}` } });
             if (discordRes.ok) {
                 const userData = await discordRes.json();
                 if (userData.avatar) {
@@ -132,13 +198,18 @@ app.post('/api/gangs/:id/members', async (req, res) => {
                     avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
                 }
             }
-        } catch (e) { console.log("Discord API Error:", e.message); }
+        } catch (e) {}
     }
 
     gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); 
-    saveDB(db); 
-    res.json(gang);
+    saveDB(db); res.json(gang);
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/gangs/:id/members/:discordId', (req, res) => {
+  const db = getDB(); const gang = db.gangs.find(g => g.id === req.params.id);
+  if (gang) { gang.members = gang.members.filter(m => m.discordId !== req.params.discordId); saveDB(db); }
+  res.json(gang);
 });
 
 // ===== Shop =====
