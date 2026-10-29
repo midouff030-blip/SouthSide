@@ -15,19 +15,22 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
-// ⚠️ حط بياناتك هنا مباشرة (بلا .env)
+// ⚠️ حط بياناتك هنا (بدل اللي بين '...')
 // ==========================================
 const CONFIG = {
-  SESSION_SECRET: 'southside-secret-123', // أي كلمة سر
-  ADMIN_PASSWORD: 'admin123', // الباسوورد اللي باش تدخل بيها للـ Admin
-  ADMIN_DISCORD_ID: '123456789012345678', // 🔴 حط الـ ID متاعك هنا
+  // --- إعدادات الأمان ---
+  SESSION_SECRET: 'southside_secret_xyz123', // أي كلمة سر كيفما تحب
+  ADMIN_PASSWORD: 'adminpassword123', // 🔴 الباسوورد اللي باش تدخل بيها في لوحة التحكم
+  ADMIN_DISCORD_ID: '123456789012345678', // 🔴 حط الـ Discord ID متاعك هنا (أرقام فقط)
   
-  DISCORD_CLIENT_ID: 'your_client_id', // 🔴 حط الـ Client ID
-  DISCORD_CLIENT_SECRET: 'your_client_secret', // 🔴 حط الـ Client Secret
-  DISCORD_CALLBACK_URL: 'https://your-app.onrender.com/api/auth/discord/callback', // 🔴 بدّل بالرابط متاعك
-  DISCORD_BOT_TOKEN: 'your_bot_token', // 🔴 حط التوكن متاع البوت
+  // --- إعدادات Discord ---
+  DISCORD_CLIENT_ID: '1234567890', // 🔴 الـ Client ID متاع التطبيق
+  DISCORD_CLIENT_SECRET: 'abcdefg123456', // 🔴 الـ Client Secret متاع التطبيق
+  DISCORD_BOT_TOKEN: 'MTIzNDU2Nzg5...', // 🔴 التوكن متاع البوت (يلزم البوت يكون في السيرفر)
+  DISCORD_CALLBACK_URL: 'https://your-app-name.onrender.com/api/auth/discord/callback', // 🔴 بدل your-app-name باسم السيرفر متاعك في Render
   
-  FIVEM_IP: '127.0.0.1', // 🔴 بدّلها بـ IP متاع السيرفر
+  // --- إعدادات FiveM ---
+  FIVEM_IP: '127.0.0.1', // 🔴 حط IP متاع السيرفر (إلا ما عندكش، خليها 127.0.0.1)
   FIVEM_PORT: '30120'
 };
 
@@ -44,10 +47,10 @@ app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true,
+  proxy: true, // ✅ ضروري لـ Render
   cookie: { 
-    secure: true, 
-    sameSite: 'none', 
+    secure: true, // ✅ ضروري لـ Render
+    sameSite: 'none', // ✅ يخلي الديسكورد يخدم
     maxAge: 24 * 60 * 60 * 1000 
   }
 }));
