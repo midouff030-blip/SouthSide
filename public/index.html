@@ -545,6 +545,7 @@ async function checkLogin() {
                     document.getElementById('adminLoginView').style.display = 'none';
                     document.getElementById('adminPanelView').style.display = 'grid';
                     loadAdmin(); 
+                    connectWS();
                 }
             } catch (e) { console.log("Not admin"); }
         } else {
@@ -692,6 +693,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         loadAdmin();
         loadFivemLogs();
         loadSiteLogs();
+        connectWS();
     } else alert('Wrong Password');
 });
 
@@ -784,11 +786,9 @@ async function loadFivemLogs() {
         const data = await res.json();
         if (data.error) { container.innerHTML = `<p style="color:#ef4444;">${data.error}</p>`; return; }
         if (data.logs && data.logs.length > 0) {
-            container.innerHTML = data.logs.map(line => {
-                const timeMatch = line.match(/\[(.*?)\]/);
-                const time = timeMatch ? timeMatch[1] : '';
-                const text = line.replace(/\[(.*?)\]/, '').trim();
-                return `<div class="log-line">${time ? `<span class="log-time">[${time}]</span>` : ''}${text}</div>`;
+            container.innerHTML = data.logs.map(log => {
+                const time = new Date(log.time).toLocaleTimeString();
+                return `<div class="log-line"><span class="log-time">[${time}]</span> <b>[${log.category}]</b> ${log.message}</div>`;
             }).join('');
         } else { container.innerHTML = '<p style="color:#555;">No logs found.</p>'; }
     } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
@@ -848,10 +848,11 @@ async function removeShopItem(id) {
     }
 }
 
-// 🔴 WebSocket للـ Multi Stream
+// 🔴 WebSocket للـ Multi Stream (يجيب الصور)
 let wsClient = null;
 let currentPlayers = [];
 let activeStreams = {};
+let streamIntervals = {};
 
 function connectWS() {
     wsClient = new WebSocket(`wss://${window.location.host}/ws`);
@@ -864,12 +865,6 @@ function connectWS() {
                 currentPlayers = data.players;
                 renderPlayersList();
             }
-            if (data.type === 'new_log') {
-                // لوغ جديد
-            }
-            if (data.type === 'stream_frame') {
-                displayStreamFrame(data.playerId, data.frame);
-            }
         } catch(e) {}
     };
     wsClient.onclose = () => {
@@ -877,7 +872,6 @@ function connectWS() {
         setTimeout(connectWS, 3000);
     };
 }
-connectWS();
 
 function renderPlayersList() {
     const container = document.getElementById('playersListContainer');
@@ -900,37 +894,41 @@ function selectPlayerForStream(playerId) {
     if (activeStreams[playerId]) return;
     activeStreams[playerId] = true;
     renderStreamGrid();
+    
     if (wsClient && wsClient.readyState === WebSocket.OPEN) {
         wsClient.send(JSON.stringify({ type: 'request_stream', playerId: playerId }));
     }
-}
 
-function displayStreamFrame(playerId, frameData) {
-    const slot = document.getElementById(`stream-${playerId}`);
-    if (slot) {
-        slot.innerHTML = `<img src="${frameData}" style="width:100%; height:100%; object-fit:cover;">`;
-    }
+    // 🔴 نجيبو الصورة كل 300ms (3 صور في الثانية)
+    streamIntervals[playerId] = setInterval(async () => {
+        try {
+            const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
+            const data = await res.json();
+            if (data.frame) {
+                const slot = document.getElementById(`stream-${playerId}`);
+                if (slot) {
+                    slot.innerHTML = `<img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+            }
+        } catch(e) {}
+    }, 300); // 300ms
 }
 
 function renderStreamGrid() {
     const grid = document.getElementById('streamGrid');
     if (!grid) return;
-    
     const activeIds = Object.keys(activeStreams);
     let html = '';
-    
     activeIds.forEach(id => {
-        html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading ${id}...</span></div>`;
+        const pName = currentPlayers.find(p => p.id == id)?.name || id;
+        html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-spinner fa-spin"></i><span>Connecting to ${pName}...</span></div>`;
     });
-    
     for (let i = activeIds.length; i < 16; i++) {
         html += `<div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>`;
     }
-    
     grid.innerHTML = html;
     document.getElementById('streamsActiveText').innerText = `${activeIds.length}/16 streams active`;
 }
-
 renderStreamGrid();
 
 function filterPlayers() {
@@ -942,6 +940,8 @@ function filterPlayers() {
 }
 
 function resetStreams() {
+    Object.keys(streamIntervals).forEach(id => clearInterval(streamIntervals[id]));
+    streamIntervals = {};
     activeStreams = {};
     renderStreamGrid();
 }
