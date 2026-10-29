@@ -30,7 +30,8 @@ const CONFIG = {
   DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS, 
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
   FIVEM_PORT: process.env.FIVEM_PORT || '30120',
-  FIVEM_LOG_PATH: process.env.FIVEM_LOG_PATH || './fivem.log' // 🔴 مسار ملف اللوقز
+  FIVEM_LOG_PATH: process.env.FIVEM_LOG_PATH || './fivem.log',
+  FIVEM_LOG_KEY: process.env.FIVEM_LOG_KEY || 'secret_key'
 };
 
 // ===== Database =====
@@ -41,13 +42,17 @@ if (!fs.existsSync(dbPath)) {
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
-// ===== Sessions =====
+// ===== Sessions (🔴 هنا كان المشكل، توة يتصلح) =====
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true,
-  cookie: { secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 }
+  proxy: true, // مهم لـ Render
+  cookie: { 
+    secure: true, // لازم true خاطر Render HTTPS
+    sameSite: 'none', // باش يخدم مع الديسكورد
+    maxAge: 24 * 60 * 60 * 1000 
+  }
 }));
 
 // ===== Discord Auth =====
@@ -67,7 +72,6 @@ app.use(passport.session());
 // ===== 🔴 الحماية بالرتبة =====
 async function isAdmin(req, res, next) {
   if (req.session && req.session.isAdmin) return next(); 
-
   if (req.user && req.user.id) {
     try {
       const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
@@ -102,14 +106,28 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ===== 🚔 FiveM Logs API =====
+// ===== 📥 استقبال اللوقز من FiveM =====
+app.post('/api/fivem-logs', (req, res) => {
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const logData = req.body.log;
+    if (!logData) return res.status(400).json({ error: 'No log data' });
+    const logFilePath = CONFIG.FIVEM_LOG_PATH;
+    try {
+        fs.appendFileSync(logFilePath, `[${new Date().toLocaleTimeString()}] ${logData}\n`);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Could not write log' });
+    }
+});
+
+// ===== 🚔 قراءة اللوقز للوحة التحكم =====
 app.get('/api/fivem-logs', isAdmin, (req, res) => {
     const logFilePath = CONFIG.FIVEM_LOG_PATH;
-
     if (!fs.existsSync(logFilePath)) {
         return res.json({ error: `Log file not found at: ${logFilePath}` });
     }
-
     try {
         const logs = fs.readFileSync(logFilePath, 'utf8').split('\n').reverse();
         const last150Logs = logs.filter(line => line.trim() !== '').slice(0, 150);
