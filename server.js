@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ==========================================
 const CONFIG = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'default_secret',
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'admin123', // 👈 زيدنا default باش تخدم
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'admin123',
   GUILD_ID: process.env.GUILD_ID,
   ADMIN_ROLE_ID: process.env.ADMIN_ROLE_ID,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -31,7 +31,11 @@ const CONFIG = {
   FIVEM_IP: process.env.FIVEM_IP || '127.0.0.1',
   FIVEM_PORT: process.env.FIVEM_PORT || '30120',
   FIVEM_LOG_PATH: process.env.FIVEM_LOG_PATH || './fivem.log',
-  FIVEM_LOG_KEY: process.env.FIVEM_LOG_KEY || 'secret_key'
+  FIVEM_LOG_KEY: process.env.FIVEM_LOG_KEY || 'secret_key',
+  
+  // 🔴 الرتب الجديدة للـ Applications
+  ROLE_ACCEPTED_ID: process.env.ROLE_ACCEPTED_ID, // رتبة Accepted
+  ROLE_WAITING_ID: process.env.ROLE_WAITING_ID    // رتبة Waiting for Interview
 };
 
 // ===== Database =====
@@ -211,19 +215,43 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop
 
 // ===== Tickets =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
-app.post('/api/tickets', (req, res) => { 
-    const db = getDB(); 
-    const ticket = { 
-        id: Date.now().toString(), 
-        status: 'pending', 
-        reason: '', 
-        user: req.user ? req.user.username : 'Guest', 
-        discordId: req.body.discordId || 'Guest',
-        ...req.body 
-    }; 
-    db.tickets.push(ticket); 
-    saveDB(db); 
-    res.json(ticket); 
+
+// ✅ إنشاء Ticket مع إضافة الرتبة الأوتوماتيكية
+app.post('/api/tickets', async (req, res) => { 
+    try {
+        const db = getDB(); 
+        const ticket = { 
+            id: Date.now().toString(), 
+            status: 'pending', 
+            reason: '', 
+            user: req.user ? req.user.username : 'Guest', 
+            discordId: req.body.discordId || 'Guest',
+            ...req.body 
+        }; 
+        db.tickets.push(ticket); 
+        saveDB(db); 
+
+        // 🔴 إضافة رتبة "Waiting for Interview"
+        if (ticket.discordId && ticket.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
+            try {
+                const botToken = CONFIG.DISCORD_BOT_TOKEN;
+                const guildId = CONFIG.GUILD_ID;
+                if (botToken && guildId) {
+                    await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${ticket.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                        method: 'PUT',
+                        headers: { Authorization: `Bot ${botToken}` }
+                    });
+                    console.log(`✅ Waiting Role added to ${ticket.discordId}`);
+                }
+            } catch (err) {
+                console.error("Error adding waiting role:", err);
+            }
+        }
+
+        res.json(ticket); 
+    } catch(e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 app.put('/api/tickets/:id', isAdmin, async (req, res) => {
@@ -239,6 +267,50 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     const webhookLogs = CONFIG.DISCORD_WEBHOOK_LOGS;
     const userMention = t.discordId && t.discordId !== 'Guest' ? `<@${t.discordId}>` : `**${t.user}**`;
 
+    // ✅ إضافة رتبة "Accepted" كي يتقبل
+    if (t.status === 'accepted' && t.discordId && t.discordId !== 'Guest' && CONFIG.ROLE_ACCEPTED_ID) {
+        try {
+            const botToken = CONFIG.DISCORD_BOT_TOKEN;
+            const guildId = CONFIG.GUILD_ID;
+            if (botToken && guildId) {
+                // نعطيو الرتبة الجديدة
+                await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_ACCEPTED_ID}`, {
+                    method: 'PUT',
+                    headers: { Authorization: `Bot ${botToken}` }
+                });
+
+                // نحّيو الرتبة القديمة (Waiting) إذا موجودة
+                if (CONFIG.ROLE_WAITING_ID) {
+                    await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bot ${botToken}` }
+                    });
+                }
+                console.log(`✅ Accepted Role added to ${t.discordId}`);
+            }
+        } catch (err) {
+            console.error("Error adding accepted role:", err);
+        }
+    }
+
+    // ✅ نحّيو رتبة "Waiting" كي يترفض
+    if (t.status === 'rejected' && t.discordId && t.discordId !== 'Guest' && CONFIG.ROLE_WAITING_ID) {
+        try {
+            const botToken = CONFIG.DISCORD_BOT_TOKEN;
+            const guildId = CONFIG.GUILD_ID;
+            if (botToken && guildId) {
+                await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${t.discordId}/roles/${CONFIG.ROLE_WAITING_ID}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bot ${botToken}` }
+                });
+                console.log(`✅ Waiting Role removed from ${t.discordId}`);
+            }
+        } catch (err) {
+            console.error("Error removing waiting role:", err);
+        }
+    }
+
+    // ===== Webhooks (Logs + Results) =====
     if (webhookLogs) {
         const logEmbed = {
             title: `Ticket ${t.status.toUpperCase()}: ${t.type}`,
