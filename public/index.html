@@ -173,7 +173,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 .admin-table button.accept:hover { background: rgba(34, 197, 94, 0.25); }
 .admin-table button.reject { background: rgba(255, 0, 0, 0.15); color: #ff0000; border: 1px solid rgba(255, 0, 0, 0.3); }
 .admin-table button.reject:hover { background: rgba(255, 0, 0, 0.25); }
-.logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
+.logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
 .log-line { border-bottom: 1px solid #0a0a0a; padding: 0.4rem 0; }
 .log-time { color: #ff0000; font-weight: bold; margin-right: 10px; }
 .stream-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1rem; height: calc(100vh - 250px); min-height: 500px; }
@@ -252,7 +252,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     <div id="tab-apps" class="tab">
         <div class="section-title"><h2>Applications</h2><p>Select a department to submit your official application</p></div>
         
-        <!-- 🔴 هنا حطينا رسالة تظهر كان ما عملش Login -->
         <div id="loginRequiredMsg" style="display: none; text-align: center; padding: 4rem; background: var(--card); border: 1px dashed var(--border);">
             <i class="fa-brands fa-discord" style="font-size: 4rem; color: #5865F2; margin-bottom: 1rem;"></i>
             <h3 style="font-family: var(--font-title); font-size: 2rem; color: #fff; margin-bottom: 1rem;">Login Required</h3>
@@ -260,7 +259,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
         </div>
 
-        <!-- 🔴 هنا الفورمات، تظهر كان عمل Login -->
         <div class="apps-grid" id="appsGrid" style="display: none;">
             <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
             <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
@@ -383,10 +381,17 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <div id="adminTab-logs" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Server Logs</h3>
+                        <h3 style="margin: 0;">Website Logs</h3>
+                        <button class="admin-btn" onclick="loadSiteLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <div class="logs-container" id="siteLogsContainer"><p style="color: #555;">Click refresh to load site logs...</p></div>
+                </div>
+                <div class="admin-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">FiveM Server Logs</h3>
                         <button class="admin-btn" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                     </div>
-                    <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
+                    <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load FiveM logs...</p></div>
                 </div>
             </div>
             <div id="adminTab-gangs" class="admin-tab">
@@ -515,27 +520,19 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     setTimeout(() => t.innerHTML = old, 2000);
 });
 
-// 🔴 هنا التعديلات المهمة
-let loggedInUser = null; // متغير باش نخزنو فيه اليوزر
+let loggedInUser = null;
 
 async function checkLogin() {
     try {
         const res = await fetch('/api/auth/me'); 
         const data = await res.json();
         if (data.loggedIn) {
-            loggedInUser = data; // نخزنو الـ ID والـ Username
-            
-            // نبدلو الـ Header
+            loggedInUser = data;
             document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
-            
-            // نخبو رسالة "Login Required" ونظهرو الـ Apps
             document.getElementById('loginRequiredMsg').style.display = 'none';
             document.getElementById('appsGrid').style.display = 'grid';
-            
-            // نجهزو الـ Admin
             document.getElementById('adminUsername').innerText = data.username;
             if(data.avatar) document.getElementById('adminAvatar').src = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
-            
             try {
                 const adminCheck = await fetch('/api/auth/check-admin');
                 if (adminCheck.ok) { 
@@ -555,7 +552,6 @@ async function checkLogin() {
                 }
             } catch (e) { console.log("Not admin"); }
         } else {
-            // 🔴 إذا ما كانش مسجل دخول، نظهرو رسالة Login ونخبو الـ Apps
             document.getElementById('loginRequiredMsg').style.display = 'block';
             document.getElementById('appsGrid').style.display = 'none';
         }
@@ -563,7 +559,6 @@ async function checkLogin() {
 }
 checkLogin();
 
-// Forms Config
 const appConfigs = {
     "Whitelist App": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
     "Gang & Family App": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true }, { label: "Members IDs *", type: "textarea", name: "members_ids", placeholder: "8+ IDs...", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
@@ -603,29 +598,15 @@ document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
 
-// 🔴 Submit Ticket (يخدم كان كي المسخدم مسجل دخول)
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    
-    // 🔴 إذا ما كانش مسجل دخول، نرفضوه
-    if (!loggedInUser) {
-        alert('You must be logged in to submit an application.');
-        return;
-    }
-
+    if (!loggedInUser) { alert('You must be logged in to submit an application.'); return; }
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
-    
-    // 🔴 ناخذو الـ ID من اليوزر المسجل دخول مباشرة
-    let finalDiscordId = loggedInUser.id; 
-
     await fetch('/api/tickets', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-            type: currentType, 
-            subject: dataObj.char_name || 'N/A', 
-            message: JSON.stringify(dataObj), 
-            discordId: finalDiscordId // 👈 الـ ID الحقيقي متاع الديسكورد
+            type: currentType, subject: dataObj.char_name || 'N/A', message: JSON.stringify(dataObj), discordId: loggedInUser.id 
         })
     });
     alert('✅ Application Submitted!');
@@ -686,6 +667,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         document.getElementById('adminPanelView').style.display = 'grid';
         loadAdmin();
         loadFivemLogs();
+        loadSiteLogs();
     } else alert('Wrong Password');
 });
 
@@ -749,6 +731,24 @@ async function updateTicket(id, st) {
     }
     await fetch('/api/tickets/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({status:st, reason:reason}) }); 
     loadAdmin(); 
+}
+
+async function loadSiteLogs() {
+    const container = document.getElementById('siteLogsContainer');
+    if (!container) return; 
+    container.innerHTML = '<p style="color:#555;">Loading logs...</p>';
+    try {
+        const res = await fetch('/api/site-logs', { headers: getAdminHeaders() });
+        const data = await res.json();
+        if (data.length > 0) {
+            container.innerHTML = data.map(log => `
+                <div class="log-line">
+                    <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
+                    <span style="color: var(--accent);">${log.action}</span> - ${log.details} (by ${log.user})
+                </div>
+            `).join('');
+        } else { container.innerHTML = '<p style="color:#555;">No site logs found.</p>'; }
+    } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
 }
 
 async function loadFivemLogs() {
