@@ -130,14 +130,9 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 
 /* ========== 🔴 ADMIN PANEL (FULL SCREEN كيما HeRo Shield) ========== */
 
-/* نخليو الـ Header و الـ Main يختفيو كي نكونو في تاب الأدمن */
-body.admin-mode header, body.admin-mode main {
-    display: none;
-}
-body.admin-mode {
-    padding: 0;
-    margin: 0;
-}
+/* كي نكونو في الأدمن، نخليو الصفحة كلها هي اللوحة */
+body.admin-mode header, body.admin-mode main { display: none; }
+body.admin-mode { background: #030305; }
 
 /* حاوية الأدمن */
 #tab-admin {
@@ -176,6 +171,7 @@ body.admin-mode {
 }
 .admin-nav-btn:hover { background: #111; color: #fff; }
 .admin-nav-btn.active { background: #1a1a1a; color: #fff; }
+.admin-nav-btn i { width: 16px; text-align: center; }
 
 .admin-user { margin-top: auto; padding-top: 1rem; border-top: 1px solid #1a1a1a; display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; color: #ccc; font-size: 0.85rem; }
 .admin-user img { width: 30px; height: 30px; border-radius: 50%; }
