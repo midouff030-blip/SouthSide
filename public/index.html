@@ -587,14 +587,12 @@ async function checkLogin() {
     const data = await res.json();
     
     if (data.loggedIn) {
-        // نتأكدو هل اللاعب عنده رتبة الأدمن في السيرفر
         const adminCheck = await fetch('/api/auth/check-admin');
         
-        if (adminCheck.ok) { // إذا رجع 200 يعني عنده الرتبة
+        if (adminCheck.ok) { 
             document.getElementById('mainNav').innerHTML += `<button class="nav-btn" data-tab="admin" style="color: var(--accent); border: 1px solid var(--accent);">Admin</button>`;
             document.querySelector('.nav-btn[data-tab="admin"]').addEventListener('click', function(){ switchTab('admin'); });
             
-            // نخليو لوحة التحكم تبان دغيا بلا باسوورد
             document.getElementById('adminLoginView').style.display = 'none';
             document.getElementById('adminPanelView').style.display = 'block';
             loadAdmin();
