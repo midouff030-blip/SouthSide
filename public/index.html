@@ -598,19 +598,35 @@ document.querySelectorAll('[data-app]').forEach(el => {
     el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
 });
 
+// 🔴 Submit Ticket (يخدم كان كي المسخدم مسجل دخول)
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
     if (!loggedInUser) { alert('You must be logged in to submit an application.'); return; }
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
-    await fetch('/api/tickets', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            type: currentType, subject: dataObj.char_name || 'N/A', message: JSON.stringify(dataObj), discordId: loggedInUser.id 
-        })
-    });
-    alert('✅ Application Submitted!');
-    closeModal(); this.reset();
+    
+    try {
+        const res = await fetch('/api/tickets', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                type: currentType, 
+                subject: dataObj.char_name || 'N/A', 
+                message: JSON.stringify(dataObj), 
+                discordId: loggedInUser.id,
+                createdAt: Date.now() // نبعثو الوقت
+            })
+        });
+
+        if (res.ok) {
+            alert('✅ Application Submitted!');
+            closeModal(); this.reset();
+        } else {
+            const data = await res.json();
+            alert(`❌ ${data.error}`);
+        }
+    } catch(err) {
+        alert('❌ Error submitting application. Please try again.');
+    }
 });
 
 async function loadStats() {
