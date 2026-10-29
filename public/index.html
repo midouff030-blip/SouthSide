@@ -568,14 +568,12 @@ const appConfigs = {
 
 let currentType = '';
 
-// 🔴 هنا نفحصو الـ Cooldown قبل ما يفتح المودال
 async function openModal(title) {
     if (!loggedInUser) return alert("You must login first!");
     
     currentType = title;
     document.getElementById('modalTitle').innerText = appConfigs[title] ? appConfigs[title].title : "Application";
     
-    // فحص الـ Cooldown
     try {
         const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
         const checkData = await checkRes.json();
