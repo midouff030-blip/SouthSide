@@ -14,6 +14,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ==========================================
+// ⚠️ حط بياناتك هنا مباشرة (بلا .env)
+// ==========================================
+const CONFIG = {
+  SESSION_SECRET: 'southside-secret-123', // أي كلمة سر
+  ADMIN_PASSWORD: 'admin123', // الباسوورد اللي باش تدخل بيها للـ Admin
+  ADMIN_DISCORD_ID: '123456789012345678', // 🔴 حط الـ ID متاعك هنا
+  
+  DISCORD_CLIENT_ID: 'your_client_id', // 🔴 حط الـ Client ID
+  DISCORD_CLIENT_SECRET: 'your_client_secret', // 🔴 حط الـ Client Secret
+  DISCORD_CALLBACK_URL: 'https://your-app.onrender.com/api/auth/discord/callback', // 🔴 بدّل بالرابط متاعك
+  DISCORD_BOT_TOKEN: 'your_bot_token', // 🔴 حط التوكن متاع البوت
+  
+  FIVEM_IP: '127.0.0.1', // 🔴 بدّلها بـ IP متاع السيرفر
+  FIVEM_PORT: '30120'
+};
+
 // ===== Database =====
 const dbPath = path.join(__dirname, 'data.json');
 if (!fs.existsSync(dbPath)) {
@@ -24,10 +41,15 @@ const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2))
 
 // ===== Sessions =====
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'southside-secret',
+  secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 }
+  proxy: true,
+  cookie: { 
+    secure: true, 
+    sameSite: 'none', 
+    maxAge: 24 * 60 * 60 * 1000 
+  }
 }));
 
 // ===== Discord Auth =====
@@ -35,19 +57,18 @@ const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 passport.use(new DiscordStrategy({
-  clientID: process.env.DISCORD_CLIENT_ID,
-  clientSecret: process.env.DISCORD_CLIENT_SECRET,
-  callbackURL: process.env.DISCORD_CALLBACK_URL,
+  clientID: CONFIG.DISCORD_CLIENT_ID,
+  clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
+  callbackURL: CONFIG.DISCORD_CALLBACK_URL,
   scope: ['identify']
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== Admin Protection Middleware =====
+// ===== Admin Protection =====
 function isAdmin(req, res, next) {
-  const adminId = process.env.ADMIN_DISCORD_ID; // نحطو ID متاعك في .env
-  if (req.user && req.user.id === adminId) {
+  if (req.user && req.user.id === CONFIG.ADMIN_DISCORD_ID) {
     return next();
   }
   res.status(403).json({ error: 'Access Denied. Admins only.' });
@@ -56,9 +77,7 @@ function isAdmin(req, res, next) {
 // ===== FiveM Stats =====
 app.get('/api/stats', async (req, res) => {
     try {
-        const FIVEM_IP = process.env.FIVEM_IP || '127.0.0.1';
-        const FIVEM_PORT = process.env.FIVEM_PORT || '30120';
-        const base = `http://${FIVEM_IP}:${FIVEM_PORT}`;
+        const base = `http://${CONFIG.FIVEM_IP}:${CONFIG.FIVEM_PORT}`;
         const dynRes = await fetch(`${base}/dynamic.json`, { timeout: 5000 });
         if (!dynRes.ok) throw new Error('unreachable');
         const dyn = await dynRes.json();
@@ -67,7 +86,7 @@ app.get('/api/stats', async (req, res) => {
             const infoRes = await fetch(`${base}/info.json`, { timeout: 3000 });
             if (infoRes.ok) { const info = await infoRes.json(); name = info.hostname || name; }
         } catch (_) {}
-        res.json({ online: true, players: dyn.clients || 0, maxPlayers: dyn.sv_maxclients || 128, name, ip: `connect ${FIVEM_IP}:${FIVEM_PORT}` });
+        res.json({ online: true, players: dyn.clients || 0, maxPlayers: dyn.sv_maxclients || 128, name, ip: `connect ${CONFIG.FIVEM_IP}:${CONFIG.FIVEM_PORT}` });
     } catch (e) {
         res.json({ online: false, players: 0, maxPlayers: 128, name: 'SouthSide S2', ip: 'connect play.southsiderp.tn' });
     }
@@ -85,12 +104,12 @@ app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 // ===== Gangs =====
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 
-app.post('/api/gangs', isAdmin, async (req, res) => { // 🔒 محمية
+app.post('/api/gangs', isAdmin, async (req, res) => {
   try {
     const db = getDB(); if (!db.gangs) db.gangs = [];
     let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
     let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
-    const botToken = process.env.DISCORD_BOT_TOKEN;
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
 
     if (botToken && req.body.bossId) {
         try {
@@ -107,22 +126,16 @@ app.post('/api/gangs', isAdmin, async (req, res) => { // 🔒 محمية
     }
 
     const gang = { 
-        id: Date.now().toString(), 
-        name: req.body.name || 'Unknown',
-        logo: req.body.logo || '',
-        boss: req.body.boss || '', 
-        bossId: req.body.bossId || '',
-        bossAvatar: bossAvatar,
-        underboss: req.body.underboss || '', 
-        underbossId: req.body.underbossId || '',
-        underbossAvatar: underbossAvatar,
+        id: Date.now().toString(), name: req.body.name || 'Unknown', logo: req.body.logo || '',
+        boss: req.body.boss || '', bossId: req.body.bossId || '', bossAvatar: bossAvatar,
+        underboss: req.body.underboss || '', underbossId: req.body.underbossId || '', underbossAvatar: underbossAvatar,
         members: [] 
     };
     db.gangs.push(gang); saveDB(db); res.json(gang);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.put('/api/gangs/:id', isAdmin, async (req, res) => { // 🔒 محمية
+app.put('/api/gangs/:id', isAdmin, async (req, res) => {
   try {
     const db = getDB(); 
     const gang = db.gangs.find(g => g.id === req.params.id);
@@ -135,7 +148,7 @@ app.put('/api/gangs/:id', isAdmin, async (req, res) => { // 🔒 محمية
     gang.underboss = req.body.underboss || gang.underboss;
     gang.underbossId = req.body.underbossId || gang.underbossId;
 
-    const botToken = process.env.DISCORD_BOT_TOKEN;
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
     if (botToken) {
         if (gang.bossId) {
             try {
@@ -155,12 +168,12 @@ app.put('/api/gangs/:id', isAdmin, async (req, res) => { // 🔒 محمية
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/gangs/:id', isAdmin, (req, res) => { // 🔒 محمية
+app.delete('/api/gangs/:id', isAdmin, (req, res) => {
   const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
-app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { // 🔒 محمية
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => {
   try {
     const db = getDB(); 
     const gang = db.gangs.find(g => g.id === req.params.id);
@@ -170,7 +183,7 @@ app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { // 🔒 محم
     const memberName = req.body.memberName || 'Member';
     let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-    const botToken = process.env.DISCORD_BOT_TOKEN;
+    const botToken = CONFIG.DISCORD_BOT_TOKEN;
     if (botToken && discordId) {
         try {
             const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, { headers: { Authorization: `Bot ${botToken}` } });
@@ -191,27 +204,23 @@ app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { // 🔒 محم
 
 // ===== Shop =====
 app.get('/api/shop', (req, res) => res.json(getDB().shop));
-
-app.post('/api/shop', isAdmin, (req, res) => { // 🔒 محمية
+app.post('/api/shop', isAdmin, (req, res) => {
   const db = getDB(); const item = { id: Date.now().toString(), ...req.body };
   db.shop.push(item); saveDB(db); res.json(item);
 });
-
-app.delete('/api/shop/:id', isAdmin, (req, res) => { // 🔒 محمية
+app.delete('/api/shop/:id', isAdmin, (req, res) => {
   const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id);
   saveDB(db); res.json({ success: true });
 });
 
 // ===== Tickets =====
-app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets)); // 🔒 محمية
-
-app.post('/api/tickets', (req, res) => { // مفتوحة للجميع باش يقدموا
+app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
+app.post('/api/tickets', (req, res) => {
   const db = getDB();
   const ticket = { id: Date.now().toString(), status: 'pending', reason: '', user: req.user ? req.user.username : 'Guest', ...req.body };
   db.tickets.push(ticket); saveDB(db); res.json(ticket);
 });
-
-app.put('/api/tickets/:id', isAdmin, (req, res) => { // 🔒 محمية
+app.put('/api/tickets/:id', isAdmin, (req, res) => {
   const db = getDB(); const t = db.tickets.find(x => x.id === req.params.id);
   if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); }
   res.json(t);
@@ -219,8 +228,8 @@ app.put('/api/tickets/:id', isAdmin, (req, res) => { // 🔒 محمية
 
 // ===== Admin =====
 app.post('/api/admin-login', (req, res) => {
-  if (req.body.password === process.env.ADMIN_PASSWORD) {
-    req.session.isAdmin = true; // ✅ نحطو الجلسة
+  if (req.body.password === CONFIG.ADMIN_PASSWORD) {
+    req.session.isAdmin = true;
     res.json({ success: true });
   } else {
     res.status(401).json({ success: false });
