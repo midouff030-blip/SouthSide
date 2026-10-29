@@ -27,7 +27,6 @@ const CONFIG = {
   DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
   
-  // 🔴 Webhooks لكل قسم
   WEBHOOK_WHITELIST: process.env.WEBHOOK_WHITELIST || process.env.DISCORD_WEBHOOK_RESULTS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG || process.env.DISCORD_WEBHOOK_RESULTS,
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE || process.env.DISCORD_WEBHOOK_RESULTS,
@@ -198,7 +197,27 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => { const db = getDB(); db.shop
 // ===== Tickets & Webhooks =====
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
 
-// ✅ إنشاء Ticket مع إضافة الرتبة الأوتوماتيكية + فحص الـ Cooldown
+// 🔴 Route جديد باش نفحصو الـ Cooldown قبل ما يفتح المودال
+app.get('/api/check-cooldown', async (req, res) => {
+    const { discordId, type } = req.query;
+    if (!discordId || discordId === 'Guest') return res.json({ blocked: false });
+    
+    const db = getDB();
+    const lastRejected = db.tickets
+        .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+
+    if (lastRejected && lastRejected.createdAt) {
+        const timePassed = Date.now() - lastRejected.createdAt;
+        const hoursPassed = timePassed / (1000 * 60 * 60);
+        if (hoursPassed < 24) {
+            const hoursLeft = Math.ceil(24 - hoursPassed);
+            return res.json({ blocked: true, hoursLeft: hoursLeft });
+        }
+    }
+    res.json({ blocked: false });
+});
+
 app.post('/api/tickets', async (req, res) => { 
     try {
         const db = getDB(); 
@@ -216,9 +235,7 @@ app.post('/api/tickets', async (req, res) => {
                 const hoursPassed = timePassed / (1000 * 60 * 60);
                 if (hoursPassed < 24) {
                     const hoursLeft = Math.ceil(24 - hoursPassed);
-                    return res.status(403).json({ 
-                        error: `You must wait ${hoursLeft} hours before applying for ${type} again.` 
-                    });
+                    return res.status(403).json({ error: `You must wait ${hoursLeft} hours before applying for ${type} again.` });
                 }
             }
         }
@@ -296,17 +313,13 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     }
 
     if (webhookURL && embed.title) {
-        console.log(`[WEBHOOK] Attempting to send to: ${webhookURL}`);
         try {
             const webhookRes = await fetch(webhookURL, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: userMention, embeds: [embed] })
             });
-            if (webhookRes.ok) { console.log(`✅ [WEBHOOK SUCCESS] Message sent to Discord.`); } 
-            else { const errData = await webhookRes.text(); console.error(`❌ [WEBHOOK FAILED] Discord API Response: ${webhookRes.status} - ${errData}`); }
-        } catch (error) { console.error("❌ [WEBHOOK ERROR] Exception:", error); }
-    } else {
-        console.log(`⚠️ [WEBHOOK SKIPPED] URL is missing or Embed is empty.`);
+            if (webhookRes.ok) { console.log(`✅ [WEBHOOK SUCCESS]`); } 
+        } catch (error) { console.error("❌ [WEBHOOK ERROR]", error); }
     }
 
     // 🔴 تحديث الرتب
