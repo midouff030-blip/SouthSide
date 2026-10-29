@@ -342,7 +342,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         let resultEmbed = {};
         if (t.status === 'accepted') {
             resultEmbed = {
-                title: "✅ Whitelist (Citizen) Accepted",
+                title: "✅ Whitelist (Citizen) Accepted (Go to voice chanel Waiting For check To get Role Whitelsited",
                 description: `Congratulations ${userMention}! Your application for **${t.type}** has been **ACCEPTED**.\n\nWelcome aboard!`,
                 color: 0x2ecc71,
                 fields: [ { name: "🛡️ Reviewed By", value: "Staff Team", inline: true }, { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true } ],
