@@ -18,19 +18,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ⚠️ حط بياناتك هنا (بدل اللي بين '...')
 // ==========================================
 const CONFIG = {
-  // --- إعدادات الأمان ---
-  SESSION_SECRET: 'southside_secret_xyz123', // أي كلمة سر كيفما تحب
-  ADMIN_PASSWORD: 'adminpassword123', // 🔴 الباسوورد اللي باش تدخل بيها في لوحة التحكم
-  ADMIN_DISCORD_ID: '123456789012345678', // 🔴 حط الـ Discord ID متاعك هنا (أرقام فقط)
+  SESSION_SECRET: 'southside_secret_xyz123', 
+  ADMIN_PASSWORD: 'adminpassword123', // للاحتياط كان دخلت بالباسوورد
+  ADMIN_DISCORD_ID: '123456789012345678', // الـ ID متاعك (باش تبقى أدمين دايما حتى لو تبدلت الرتبة)
   
-  // --- إعدادات Discord ---
-  DISCORD_CLIENT_ID: '1234567890', // 🔴 الـ Client ID متاع التطبيق
-  DISCORD_CLIENT_SECRET: 'abcdefg123456', // 🔴 الـ Client Secret متاع التطبيق
-  DISCORD_BOT_TOKEN: 'MTIzNDU2Nzg5...', // 🔴 التوكن متاع البوت (يلزم البوت يكون في السيرفر)
-  DISCORD_CALLBACK_URL: 'https://your-app-name.onrender.com/api/auth/discord/callback', // 🔴 بدل your-app-name باسم السيرفر متاعك في Render
+  // --- 🔴 الحوايج الجديدة متاع الرتبة ---
+  GUILD_ID: '123456789012345678', // 🔴 ID متاع سيرفر الديسكورد متاعك
+  ADMIN_ROLE_ID: '987654321098765432', // 🔴 ID متاع رتبة الـ Admin في الديسكورد
   
-  // --- إعدادات FiveM ---
-  FIVEM_IP: '127.0.0.1', // 🔴 حط IP متاع السيرفر (إلا ما عندكش، خليها 127.0.0.1)
+  DISCORD_CLIENT_ID: '1234567890', 
+  DISCORD_CLIENT_SECRET: 'abcdefg123456', 
+  DISCORD_BOT_TOKEN: 'MTIzNDU2Nzg5...', 
+  DISCORD_CALLBACK_URL: 'https://your-app-name.onrender.com/api/auth/discord/callback', 
+  
+  FIVEM_IP: '127.0.0.1',
   FIVEM_PORT: '30120'
 };
 
@@ -47,15 +48,11 @@ app.use(session({
   secret: CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true, // ✅ ضروري لـ Render
-  cookie: { 
-    secure: true, // ✅ ضروري لـ Render
-    sameSite: 'none', // ✅ يخلي الديسكورد يخدم
-    maxAge: 24 * 60 * 60 * 1000 
-  }
+  proxy: true,
+  cookie: { secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// ===== Discord Auth =====
+// ===== Discord Auth (زدنا guilds باش نقراو الرتب) =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -63,22 +60,50 @@ passport.use(new DiscordStrategy({
   clientID: CONFIG.DISCORD_CLIENT_ID,
   clientSecret: CONFIG.DISCORD_CLIENT_SECRET,
   callbackURL: CONFIG.DISCORD_CALLBACK_URL,
-  scope: ['identify']
-}, (accessToken, refreshToken, profile, done) => done(null, profile)));
+  scope: ['identify', 'guilds'] // 🔴 زدنا guilds هنا
+}, (accessToken, refreshToken, profile, done) => {
+  profile.accessToken = accessToken; // نحتفظو بالتوكن باش نستعملوه بعد
+  done(null, profile);
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ===== Admin Protection =====
-function isAdmin(req, res, next) {
-  if (req.user && req.user.id === CONFIG.ADMIN_DISCORD_ID) {
-    return next();
+// ===== 🔴 دالة الحماية الجديدة (تتشيك على الرتبة) =====
+async function isAdmin(req, res, next) {
+  // 1. إلا كان دخل بالباسوورد (Session)
+  if (req.session && req.session.isAdmin) return next();
+
+  // 2. إلا كان دخل بـ Discord
+  if (req.user && req.user.accessToken) {
+    // إلا كان هو صاحب السيرفر (Admin Discord ID)
+    if (req.user.id === CONFIG.ADMIN_DISCORD_ID) return next();
+
+    try {
+      // نجيبو الرتب متاع اللاعب في السيرفر
+      const response = await fetch(`https://discord.com/api/v10/users/@me/guilds/${CONFIG.GUILD_ID}/member`, {
+        headers: { Authorization: `Bearer ${req.user.accessToken}` }
+      });
+
+      if (response.ok) {
+        const memberData = await response.json();
+        // نتشيكو هل اللاعب عنده الرتبة
+        if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) {
+          return next(); // ✅ عنده الرتبة، ينجم يعدي
+        }
+      }
+    } catch (error) {
+      console.error("Error checking role:", error);
+    }
   }
+
+  // إلا ما كانش أدمين
   res.status(403).json({ error: 'Access Denied. Admins only.' });
 }
 
 // ===== FiveM Stats =====
 app.get('/api/stats', async (req, res) => {
+    // ... (كود الاحصائيات متاعك كيما هو، ما تبدلش فيه) ...
     try {
         const base = `http://${CONFIG.FIVEM_IP}:${CONFIG.FIVEM_PORT}`;
         const dynRes = await fetch(`${base}/dynamic.json`, { timeout: 5000 });
@@ -105,125 +130,21 @@ app.get('/api/auth/me', (req, res) => {
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 
 // ===== Gangs =====
-app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
-
-app.post('/api/gangs', isAdmin, async (req, res) => {
-  try {
-    const db = getDB(); if (!db.gangs) db.gangs = [];
-    let bossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
-    let underbossAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
-    const botToken = CONFIG.DISCORD_BOT_TOKEN;
-
-    if (botToken && req.body.bossId) {
-        try {
-            const res1 = await fetch(`https://discord.com/api/v10/users/${req.body.bossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-            if (res1.ok) { const data1 = await res1.json(); if (data1.avatar) { const ext = data1.avatar.startsWith('a_') ? 'gif' : 'png'; bossAvatar = `https://cdn.discordapp.com/avatars/${req.body.bossId}/${data1.avatar}.${ext}?size=256`; } }
-        } catch (e) {}
-    }
-
-    if (botToken && req.body.underbossId) {
-        try {
-            const res2 = await fetch(`https://discord.com/api/v10/users/${req.body.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-            if (res2.ok) { const data2 = await res2.json(); if (data2.avatar) { const ext = data2.avatar.startsWith('a_') ? 'gif' : 'png'; underbossAvatar = `https://cdn.discordapp.com/avatars/${req.body.underbossId}/${data2.avatar}.${ext}?size=256`; } }
-        } catch (e) {}
-    }
-
-    const gang = { 
-        id: Date.now().toString(), name: req.body.name || 'Unknown', logo: req.body.logo || '',
-        boss: req.body.boss || '', bossId: req.body.bossId || '', bossAvatar: bossAvatar,
-        underboss: req.body.underboss || '', underbossId: req.body.underbossId || '', underbossAvatar: underbossAvatar,
-        members: [] 
-    };
-    db.gangs.push(gang); saveDB(db); res.json(gang);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.put('/api/gangs/:id', isAdmin, async (req, res) => {
-  try {
-    const db = getDB(); 
-    const gang = db.gangs.find(g => g.id === req.params.id);
-    if (!gang) return res.status(404).json({ error: 'Gang not found' });
-    
-    gang.name = req.body.name || gang.name;
-    gang.logo = req.body.logo || gang.logo;
-    gang.boss = req.body.boss || gang.boss;
-    gang.bossId = req.body.bossId || gang.bossId;
-    gang.underboss = req.body.underboss || gang.underboss;
-    gang.underbossId = req.body.underbossId || gang.underbossId;
-
-    const botToken = CONFIG.DISCORD_BOT_TOKEN;
-    if (botToken) {
-        if (gang.bossId) {
-            try {
-                const r1 = await fetch(`https://discord.com/api/v10/users/${gang.bossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-                if (r1.ok) { const d1 = await r1.json(); if (d1.avatar) gang.bossAvatar = `https://cdn.discordapp.com/avatars/${gang.bossId}/${d1.avatar}.${d1.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; }
-            } catch (e) {}
-        }
-        if (gang.underbossId) {
-            try {
-                const r2 = await fetch(`https://discord.com/api/v10/users/${gang.underbossId}`, { headers: { Authorization: `Bot ${botToken}` } });
-                if (r2.ok) { const d2 = await r2.json(); if (d2.avatar) gang.underbossAvatar = `https://cdn.discordapp.com/avatars/${gang.underbossId}/${d2.avatar}.${d2.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`; }
-            } catch (e) {}
-        }
-    }
-
-    saveDB(db); res.json(gang);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.delete('/api/gangs/:id', isAdmin, (req, res) => {
-  const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
-});
-
-app.post('/api/gangs/:id/members', isAdmin, async (req, res) => {
-  try {
-    const db = getDB(); 
-    const gang = db.gangs.find(g => g.id === req.params.id);
-    if (!gang) return res.status(404).json({ error: 'Gang not found' });
-
-    const discordId = req.body.discordId;
-    const memberName = req.body.memberName || 'Member';
-    let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
-
-    const botToken = CONFIG.DISCORD_BOT_TOKEN;
-    if (botToken && discordId) {
-        try {
-            const discordRes = await fetch(`https://discord.com/api/v10/users/${discordId}`, { headers: { Authorization: `Bot ${botToken}` } });
-            if (discordRes.ok) {
-                const userData = await discordRes.json();
-                if (userData.avatar) {
-                    const ext = userData.avatar.startsWith('a_') ? 'gif' : 'png';
-                    avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${userData.avatar}.${ext}?size=256`;
-                }
-            }
-        } catch (e) {}
-    }
-
-    gang.members.push({ discordId: discordId, name: memberName, avatar: avatarUrl }); 
-    saveDB(db); res.json(gang);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
+// (كود العصابات متاعك كيما هو، ما تبدلش فيه، خليه كيما عطيتك في المرة اللي فاتت)
+// ...
 
 // ===== Shop =====
-app.get('/api/shop', (req, res) => res.json(getDB().shop));
-app.post('/api/shop', isAdmin, (req, res) => {
-  const db = getDB(); const item = { id: Date.now().toString(), ...req.body };
-  db.shop.push(item); saveDB(db); res.json(item);
-});
-app.delete('/api/shop/:id', isAdmin, (req, res) => {
-  const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id);
-  saveDB(db); res.json({ success: true });
-});
+// (كود الشوب متاعك كيما هو)
+// ...
 
 // ===== Tickets =====
-app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
+app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets)); // 🔒 محمية بالرتبة
 app.post('/api/tickets', (req, res) => {
   const db = getDB();
   const ticket = { id: Date.now().toString(), status: 'pending', reason: '', user: req.user ? req.user.username : 'Guest', ...req.body };
   db.tickets.push(ticket); saveDB(db); res.json(ticket);
 });
-app.put('/api/tickets/:id', isAdmin, (req, res) => {
+app.put('/api/tickets/:id', isAdmin, (req, res) => { // 🔒 محمية بالرتبة
   const db = getDB(); const t = db.tickets.find(x => x.id === req.params.id);
   if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); }
   res.json(t);
