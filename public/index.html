@@ -20,7 +20,6 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: var(--bg); color: var(--text); font-family: var(--font-main); overflow-x: hidden; min-height: 100vh; }
-
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -86,7 +85,8 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 .gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .gang-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
 .gang-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.gang-logo { width: 40px; height: 40px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; }
+.gang-logo { width: 40px; height: 40px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; overflow: hidden; }
+.gang-logo img { width: 100%; height: 100%; object-fit: cover; }
 .gang-title { font-size: 1.2rem; font-weight: 700; }
 .gang-members-count { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
 .gang-roster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
@@ -260,8 +260,9 @@ main { padding: 9rem 4rem 5rem 4rem; max-width: 1300px; margin: 0 auto; min-heig
 
             <div class="admin-section">
                 <h3>Manage Gangs</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:1.5rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; margin-bottom:1.5rem;">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangName" placeholder="Gang Name">
+                    <input class="admin-input" style="margin:0;" type="text" id="newGangLogo" placeholder="Logo URL">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangBoss" placeholder="Boss Name">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangBossId" placeholder="Boss ID">
                     <input class="admin-input" style="margin:0;" type="text" id="newGangUnderboss" placeholder="Underboss Name">
@@ -448,15 +449,15 @@ async function loadGangs() {
         document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
             <div class="gang-card">
                 <div class="gang-header">
-                    <div class="gang-logo">${g.logo || 'G'}</div>
+                    <div class="gang-logo">${g.logo ? `<img src="${g.logo}">` : (g.logo || 'G')}</div>
                     <div>
                         <div class="gang-title">${g.name}</div>
                         <div class="gang-members-count">${g.members.length} MEMBERS</div>
                     </div>
                 </div>
                 <div class="gang-roster">
-                    ${(g.boss ? `<div class="gang-member"><img src="https://cdn.discordapp.com/embed/avatars/0.png"><span class="gang-member-name">${g.boss}</span></div>` : '')}
-                    ${(g.underboss ? `<div class="gang-member"><img src="https://cdn.discordapp.com/embed/avatars/0.png"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
+                    ${(g.boss ? `<div class="gang-member"><img src="${g.bossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.boss}</span></div>` : '')}
+                    ${(g.underboss ? `<div class="gang-member"><img src="${g.underbossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
                     ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
                 </div>
             </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No gangs registered.</p>';
@@ -522,6 +523,7 @@ async function loadAdmin() {
             <td>${x.members.length} m</td>
             <td>
                 <button onclick="addMember('${x.id}')">Add Member</button>
+                <button onclick="editGang('${x.id}')">Edit</button>
                 <button class="reject" onclick="removeGang('${x.id}')">Delete</button>
             </td>
         </tr>`).join('')}</table>` : '<p style="color:var(--text-muted);">No gangs.</p>';
@@ -544,21 +546,19 @@ async function updateTicket(id, st) {
 // إضافة جانغ جديد
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
     const name = document.getElementById('newGangName').value;
+    const logo = document.getElementById('newGangLogo').value;
     const boss = document.getElementById('newGangBoss').value;
     const bossId = document.getElementById('newGangBossId').value;
     const underboss = document.getElementById('newGangUnderboss').value;
     const underbossId = document.getElementById('newGangUnderbossId').value;
 
     if(!name) return alert('Gang name is required');
-    if(!boss) return alert('Boss name is required');
-    if(!bossId) return alert('Boss ID is required');
-    if(!underboss) return alert('Underboss name is required');
-    if(!underbossId) return alert('Underboss ID is required');
 
     await fetch('/api/gangs', {
         method:'POST', headers:{'Content-Type':'application/json'}, 
         body:JSON.stringify({
             name: name, 
+            logo: logo,
             boss: boss, 
             bossId: bossId,
             underboss: underboss, 
@@ -574,6 +574,30 @@ async function removeGang(id) {
         await fetch('/api/gangs/'+id, {method:'DELETE'});
         loadAdmin();
     }
+}
+
+// Edit Gang (تعديل الداتا)
+async function editGang(id) {
+    const res = await fetch('/api/gangs'); const gangs = await res.json();
+    const g = gangs.find(x => x.id === id);
+    if(!g) return;
+
+    const newName = prompt("Gang Name:", g.name);
+    const newLogo = prompt("Logo URL:", g.logo);
+    const newBoss = prompt("Boss Name:", g.boss);
+    const newBossId = prompt("Boss ID:", g.bossId);
+    const newUnderboss = prompt("Underboss Name:", g.underboss);
+    const newUnderbossId = prompt("Underboss ID:", g.underbossId);
+
+    if(newName === null) return;
+
+    await fetch('/api/gangs/'+id, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, 
+        body:JSON.stringify({
+            name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId
+        })
+    });
+    loadAdmin();
 }
 
 async function addMember(id) { 
