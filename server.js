@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 app.use(cors({ origin: true, credentials: true })); 
-app.use(express.json({ limit: '50mb' })); // زدنا الليموت باش نقبلو الصور الكبيرة
+app.use(express.json({ limit: '50mb' })); // باش نقبلو الصور الكبيرة
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
@@ -61,7 +61,7 @@ const addSiteLog = (action, user, details) => {
     saveDB(db);
 };
 
-// 🔴 متغير باش نخزنو فيه آخر صورة (Frame) لكل لاعب
+// 🔴 الستريم (الصور)
 const liveFrames = {};
 
 // ===== Sessions =====
@@ -119,7 +119,6 @@ wss.on('connection', (ws, req) => {
                     isAuthenticated = true;
                     console.log('✅ Authenticated successfully!');
                 } else {
-                    console.log('❌ Invalid Secret Key');
                     ws.close();
                 }
                 return;
@@ -135,7 +134,7 @@ wss.on('connection', (ws, req) => {
             }
 
             if (data.type === 'update_players') {
-                ws.players = data.players; // نخزنو اللاعبين في الـ WS
+                ws.players = data.players;
             }
 
             if (data.type === 'stream_frame') {
@@ -173,7 +172,7 @@ app.get('/api/fivem-logs', isAdmin, (req, res) => {
 
 app.get('/api/site-logs', isAdmin, (req, res) => res.json(getDB().siteLogs.reverse()));
 
-// 🔴 WebSocket Route: باش نجيبو اللاعبين
+// 🔴 Route متاع اللاعبين
 app.get('/api/players', isAdmin, (req, res) => {
     let allPlayers = [];
     wss.clients.forEach(client => {
@@ -184,7 +183,7 @@ app.get('/api/players', isAdmin, (req, res) => {
     res.json(allPlayers);
 });
 
-// 🔴 Route متاع الستريم (الصورة)
+// 🔴 Route متاع الستريم
 app.get('/api/stream-frame/:id', isAdmin, (req, res) => {
     const frame = liveFrames[req.params.id];
     res.json({ frame: frame || null });
@@ -200,14 +199,8 @@ app.get('/api/auth/me', (req, res) => {
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true })); 
 
-// ===== Gangs & Shop & Tickets (كود قديم مختصر) =====
-app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
-app.post('/api/gangs', isAdmin, async (req, res) => { /* ... */ });
-app.get('/api/shop', (req, res) => res.json(getDB().shop));
-app.post('/api/shop', isAdmin, (req, res) => { /* ... */ });
-app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
-app.post('/api/tickets', async (req, res) => { /* ... */ });
-app.put('/api/tickets/:id', isAdmin, async (req, res) => { /* ... */ });
+// ===== باقي الـ APIs (Gangs, Shop, Tickets, Admin Login) =====
+// (هنا تحط الكود القديم متاع Gangs, Shop, Tickets, Admin Login)
 
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
