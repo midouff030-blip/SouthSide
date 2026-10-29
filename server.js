@@ -10,12 +10,12 @@ const fetch = require('node-fetch');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server, path: '/ws' });
+const wss = new WebSocket.Server({ server, path: '/ws' }); // نخليو WebSocket للـ Logs القديمة (اختياري)
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 app.use(cors({ origin: true, credentials: true })); 
-app.use(express.json({ limit: '50mb' })); // باش نقبلو الصور الكبيرة
+app.use(express.json({ limit: '50mb' })); // باش نقبلو الصور الكبيرة (Base64)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
@@ -61,7 +61,8 @@ const addSiteLog = (action, user, details) => {
     saveDB(db);
 };
 
-// 🔴 الستريم (الصور)
+// 🔴 متغيرات للستريم واللاعبين (بدل WebSocket)
+let currentPlayers = [];
 const liveFrames = {};
 
 // ===== Sessions =====
@@ -105,49 +106,22 @@ async function isAdmin(req, res, next) {
   res.status(403).json({ error: 'Access Denied.' });
 }
 
-// ===== WebSocket =====
+// ===== WebSocket (احتياطي للوقز القديمة، ما نستعملوهش توا) =====
 wss.on('connection', (ws, req) => {
-    console.log('🔗 Client Connected');
-    let isAuthenticated = false;
-
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
-
-            if (data.type === 'auth') {
-                if (data.key === CONFIG.FIVEM_LOG_KEY) {
-                    isAuthenticated = true;
-                    console.log('✅ Authenticated successfully!');
-                } else {
-                    ws.close();
-                }
-                return;
-            }
-
-            if (!isAuthenticated) return;
-
-            if (data.type === 'log') {
+            if (data.type === 'log' && data.key === CONFIG.FIVEM_LOG_KEY) {
                 const db = getDB();
                 db.fivemLogs.push({ time: new Date().toISOString(), message: data.message, category: data.category });
                 if (db.fivemLogs.length > 500) db.fivemLogs.shift();
                 saveDB(db);
             }
-
-            if (data.type === 'update_players') {
-                ws.players = data.players;
-            }
-
-            if (data.type === 'stream_frame') {
-                liveFrames[data.playerId] = data.frame;
-            }
-
         } catch (err) {}
     });
-
-    ws.on('close', () => console.log('🔗 Client Disconnected'));
 });
 
-// ===== FiveM Stats & Logs =====
+// ===== FiveM Stats =====
 app.get('/api/stats', async (req, res) => {
     try {
         const base = `http://${CONFIG.FIVEM_IP}:${CONFIG.FIVEM_PORT}`;
@@ -165,29 +139,56 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
+// ===== 🔴 Routes الجديدة (HTTP بدل WebSocket) =====
+
+// استقبال اللاعبين من فايف إم
+app.post('/api/update-players', (req, res) => {
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+    currentPlayers = req.body.players || [];
+    res.json({ success: true });
+});
+
+// استقبال الصورة من فايف إم
+app.post('/api/stream-frame', (req, res) => {
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+    const { playerId, frame } = req.body;
+    if (playerId && frame) {
+        liveFrames[playerId] = frame;
+    }
+    res.json({ success: true });
+});
+
+// استقبال اللوقز من فايف إم (الطريقة الجديدة)
+app.post('/api/send-log', (req, res) => {
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+    const { category, message } = req.body;
+    if (category && message) {
+        const db = getDB();
+        db.fivemLogs.push({ time: new Date().toISOString(), message: message, category: category });
+        if (db.fivemLogs.length > 500) db.fivemLogs.shift();
+        saveDB(db);
+    }
+    res.json({ success: true });
+});
+
+// جلب اللاعبين للـ Admin Panel
+app.get('/api/players', isAdmin, (req, res) => {
+    res.json(currentPlayers);
+});
+
+// جلب الصورة للـ Admin Panel
+app.get('/api/stream-frame/:id', isAdmin, (req, res) => {
+    const frame = liveFrames[req.params.id];
+    res.json({ frame: frame || null });
+});
+
+// ===== جلب اللوقز =====
 app.get('/api/fivem-logs', isAdmin, (req, res) => {
     const db = getDB();
     res.json({ logs: db.fivemLogs.slice(-150).reverse() });
 });
 
 app.get('/api/site-logs', isAdmin, (req, res) => res.json(getDB().siteLogs.reverse()));
-
-// 🔴 Route متاع اللاعبين
-app.get('/api/players', isAdmin, (req, res) => {
-    let allPlayers = [];
-    wss.clients.forEach(client => {
-        if (client.players && client.players.length > 0) {
-            allPlayers = client.players;
-        }
-    });
-    res.json(allPlayers);
-});
-
-// 🔴 Route متاع الستريم
-app.get('/api/stream-frame/:id', isAdmin, (req, res) => {
-    const frame = liveFrames[req.params.id];
-    res.json({ frame: frame || null });
-});
 
 // ===== Auth Routes =====
 app.get('/api/auth/discord', passport.authenticate('discord'));
@@ -199,9 +200,24 @@ app.get('/api/auth/me', (req, res) => {
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true })); 
 
-// ===== باقي الـ APIs (Gangs, Shop, Tickets, Admin Login) =====
-// (هنا تحط الكود القديم متاع Gangs, Shop, Tickets, Admin Login)
+// ===== Gangs =====
+app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
+app.post('/api/gangs', isAdmin, async (req, res) => { /* كود قديم */ });
+app.put('/api/gangs/:id', isAdmin, async (req, res) => { /* كود قديم */ });
+app.delete('/api/gangs/:id', isAdmin, (req, res) => { /* كود قديم */ });
+app.post('/api/gangs/:id/members', isAdmin, async (req, res) => { /* كود قديم */ });
 
+// ===== Shop =====
+app.get('/api/shop', (req, res) => res.json(getDB().shop));
+app.post('/api/shop', isAdmin, (req, res) => { /* كود قديم */ });
+app.delete('/api/shop/:id', isAdmin, (req, res) => { /* كود قديم */ });
+
+// ===== Tickets =====
+app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets));
+app.post('/api/tickets', async (req, res) => { /* كود قديم */ });
+app.put('/api/tickets/:id', isAdmin, async (req, res) => { /* كود قديم */ });
+
+// ===== Admin =====
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
   else { res.status(401).json({ success: false }); }
