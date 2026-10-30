@@ -777,6 +777,61 @@ nav { background-color:rgba(0,0,0,.78); }
 .stat-block p, .section-title h2 em, .bar-fill, .admin-nav-btn.active { color:#ff0000; }
 .bar-fill { background:linear-gradient(90deg,#990000,#ff0000); }
 ::selection { background:#ff0000; color:white; }
+
+/* ============================================================
+   SOUTH SIDE S2 / RED LIGHT EDITION — ACCESSIBLE LIGHTING PASS
+   Pure red / true black retained, with balanced readable surfaces.
+   ============================================================ */
+:root { --bg:#080808; --card:#181818; --primary:#fff; --accent:#ff0000; --text:#fff; --text-muted:#c3c3c3; --border:#474747; color-scheme:dark; }
+html { scroll-behavior:smooth; }
+body { background:#0b0b0b; color:#f8f8f8; }
+body::before { opacity:.32 !important; }
+body::after { opacity:.24 !important; pointer-events:none; }
+#tab-home { isolation:isolate; }
+#tab-home .hero-doc { background:linear-gradient(112deg,rgba(23,23,23,.90),rgba(29,10,10,.78) 58%,rgba(17,17,17,.83)) !important; border:1px solid rgba(255,255,255,.22) !important; box-shadow:0 25px 70px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.15),0 0 50px rgba(255,0,0,.08) !important; }
+#tab-home .hero-doc::before { opacity:.48 !important; }
+#tab-home .hero-doc h1 { color:#fff !important; text-shadow:0 2px 18px rgba(0,0,0,.28) !important; }
+#tab-home .hero-doc h1 em { color:#ff2929 !important; text-shadow:0 0 26px rgba(255,0,0,.35) !important; }
+#tab-home .hero-doc p, .section-title p, .stat-block p, .status-box p { color:#dedede !important; }
+#tab-home .stat-block, #tab-home .status-box { background:linear-gradient(142deg,rgba(37,37,37,.97),rgba(26,26,26,.98) 65%,rgba(44,16,16,.97)) !important; border:1px solid rgba(255,255,255,.23) !important; box-shadow:0 18px 38px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.13),0 0 26px rgba(255,0,0,.055) !important; }
+#tab-home .stat-block:hover, #tab-home .status-box:hover { border-color:rgba(255,52,52,.65) !important; box-shadow:0 24px 46px rgba(0,0,0,.3),0 0 34px rgba(255,0,0,.17),inset 0 1px rgba(255,255,255,.18) !important; transform:translateY(-5px); }
+#tab-home .stat-block h3 { color:#fff !important; text-shadow:0 0 15px rgba(255,255,255,.10); }
+#tab-home .stat-block::after { background:linear-gradient(90deg,transparent,#ff0000,#ff6b6b,#ff0000,transparent) !important; }
+.status-box .ip-row, .ip-row { background:rgba(255,255,255,.075) !important; border:1px solid rgba(255,255,255,.21) !important; }
+.status-label, .status-name, .ip-row, .ip-row span { color:#f6f6f6 !important; }
+nav { background:rgba(23,23,23,.94) !important; border:1px solid rgba(255,255,255,.15) !important; box-shadow:0 10px 32px rgba(0,0,0,.28) !important; backdrop-filter:blur(18px) saturate(130%); }
+.nav-btn { color:#e6e6e6 !important; }
+.nav-btn:hover { color:#fff !important; background:rgba(255,0,0,.13) !important; }
+.nav-btn.active { color:#fff !important; background:linear-gradient(120deg,#ff0000,#b90000) !important; box-shadow:0 5px 19px rgba(255,0,0,.2) !important; }
+.section-title h2, .rules-heading h2 { color:#fff !important; }
+.rule-card, .app-card, .gang-card, .shop-card, .admin-card, .profile-card { background:linear-gradient(150deg,#242424,#171717) !important; border-color:rgba(255,255,255,.19) !important; box-shadow:0 12px 32px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.085) !important; }
+.rule-card:hover, .app-card:hover, .gang-card:hover, .shop-card:hover, .admin-card:hover { border-color:rgba(255,0,0,.48) !important; box-shadow:0 16px 35px rgba(0,0,0,.26),0 0 22px rgba(255,0,0,.10) !important; }
+.rule-card p,.rule-card li,.rules-intro span,.app-card p,.gang-card p,.shop-card p { color:#dedede !important; }
+button, a, .stat-block, .rule-card, .app-card, .gang-card, .shop-card { transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,border-color .3s ease,background-color .3s ease,color .25s ease; }
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible { outline:2px solid #ff4444 !important; outline-offset:4px; }
+.btn-copy { background:linear-gradient(120deg,#ff1010,#bd0000) !important; color:#fff !important; box-shadow:0 6px 22px rgba(255,0,0,.22) !important; }
+.btn-copy:hover { filter:brightness(1.14); box-shadow:0 9px 27px rgba(255,0,0,.35) !important; }
+input,textarea,select { background:#262626 !important; color:#fff !important; border-color:#666 !important; }
+input::placeholder,textarea::placeholder { color:#bdbdbd !important; }
+/* Moving red shine is deliberately subtle to keep the text comfortable. */
+#tab-home .stat-block { position:relative; overflow:hidden; }
+#tab-home .stat-block::before { opacity:.22 !important; }
+@keyframes redBreath { 0%,100% { box-shadow:0 0 0 rgba(255,0,0,0); } 50% { box-shadow:0 0 24px rgba(255,0,0,.16); } }
+#tab-home .status-box { animation:redBreath 5.5s ease-in-out infinite; }
+@media(max-width:768px) { #tab-home .hero-doc { background:rgba(28,23,23,.94) !important; } nav { backdrop-filter:blur(12px); } }
+@media(prefers-reduced-motion:reduce) { #tab-home .status-box { animation:none !important; } html { scroll-behavior:auto; } }
+
+
+/* SOUTH SIDE — premium in-page notifications */
+#ss-toast-stack{position:fixed;right:24px;top:92px;z-index:2147483640;display:flex;flex-direction:column;gap:13px;width:min(390px,calc(100vw - 32px));pointer-events:none}
+.ss-toast{--accent:#ff0000;pointer-events:auto;position:relative;overflow:hidden;display:flex;gap:14px;align-items:flex-start;padding:18px 44px 19px 17px;border:1px solid rgba(255,255,255,.23);border-left:3px solid var(--accent);border-radius:16px;background:linear-gradient(125deg,rgba(54,54,54,.97),rgba(20,20,20,.98));box-shadow:0 20px 65px rgba(0,0,0,.44),0 0 32px rgba(255,0,0,.10);color:#fff;backdrop-filter:blur(24px);animation:ssToastIn .38s cubic-bezier(.2,.85,.25,1) both}
+.ss-toast[data-kind="success"]{--accent:#45e5a0}.ss-toast[data-kind="error"]{--accent:#ff3434}.ss-toast[data-kind="info"]{--accent:#ff2626}
+.ss-toast-icon{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--accent) 17%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);color:var(--accent);font-size:19px;font-weight:800}
+.ss-toast-content{flex:1;min-width:0}.ss-toast-title{font-weight:850;letter-spacing:.02em;font-size:14px;line-height:1.35;margin:1px 0 5px}.ss-toast-message{font-size:13px;line-height:1.55;color:#e2e2e2;overflow-wrap:anywhere}.ss-toast-close{position:absolute;right:13px;top:12px;width:25px;height:25px;border:0;border-radius:8px;background:rgba(255,255,255,.10);color:#eee;font-size:19px;cursor:pointer}.ss-toast-close:hover{background:rgba(255,0,0,.3)}
+.ss-toast-progress{position:absolute;bottom:0;left:0;height:3px;width:100%;background:var(--accent);transform-origin:left;animation:ssToastTimer 5.5s linear forwards}.ss-toast.ss-out{animation:ssToastOut .25s ease forwards}
+@keyframes ssToastIn{from{opacity:0;transform:translateX(50px) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}@keyframes ssToastOut{to{opacity:0;transform:translateX(42px) scale(.97)}}@keyframes ssToastTimer{to{transform:scaleX(0)}}
+@media(max-width:600px){#ss-toast-stack{top:78px;right:12px;width:calc(100vw - 24px)}.ss-toast{padding:15px 42px 16px 14px}}@media(prefers-reduced-motion:reduce){.ss-toast,.ss-toast.ss-out,.ss-toast-progress{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -1262,13 +1317,13 @@ const appConfigs = {
 
 let currentType = '';
 async function openModal(title) {
-    if (!loggedInUser) return alert("You must login first!");
+    if (!loggedInUser) return ssNotify("You must login first!");
 
     try {
         const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
         const checkData = await checkRes.json();
         if (checkData.blocked) {
-            alert(`❌ Your previous application for ${title} was rejected. Please wait ${checkData.hoursLeft} hours before applying again.`);
+            ssNotify(`❌ Your previous application for ${title} was rejected. Please wait ${checkData.hoursLeft} hours before applying again.`);
             return;
         }
     } catch(e) {}
@@ -1303,7 +1358,7 @@ document.querySelectorAll('[data-app]').forEach(el => {
 
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    if (!loggedInUser) { alert('You must be logged in.'); return; }
+    if (!loggedInUser) { ssNotify('You must be logged in.'); return; }
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
     try {
@@ -1316,12 +1371,12 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
                 discordId: loggedInUser.id
             })
         });
-        if (res.ok) { alert('✅ Application Submitted!'); closeModal(); this.reset(); }
+        if (res.ok) { closeModal(); this.reset(); ssNotify('✅ Application Submitted!', 'success'); }
         else { 
             const data = await res.json();
-            alert(`❌ ${data.error || 'Error submitting application.'}`); 
+            ssNotify(`❌ ${data.error || 'Error submitting application.'}`); 
         }
-    } catch(err) { alert('❌ Error submitting application.'); }
+    } catch(err) { ssNotify('❌ Error submitting application.'); }
 });
 
 async function loadStats() {
@@ -1368,7 +1423,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         document.getElementById('adminPanelView').style.display = 'grid';
         loadAdmin();
         loadFivemLogs();
-    } else alert('Wrong Password');
+    } else ssNotify('Wrong Password');
 });
 
 function getAdminHeaders() {
@@ -1523,7 +1578,7 @@ async function actionPlayer(type) {
     const reason = prompt(`Reason for ${type}:`);
     if (reason === null) return;
     await fetch('/api/action', { method: 'POST', headers: getAdminHeaders(), body: JSON.stringify({ playerId: selectedPlayer.id, type, reason }) });
-    alert(`Player ${type}ed!`);
+    ssNotify(`Player ${type}ed!`);
     closeProfileModal();
     fetchPlayers();
 }
@@ -1600,6 +1655,31 @@ function startFetchingPlayers() {
 }
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
+</script>
+
+<script>
+/* Custom notifications: replaces browser alerts without changing API behavior. */
+(function(){
+  const stack=document.createElement('div');stack.id='ss-toast-stack';stack.setAttribute('aria-live','polite');stack.setAttribute('aria-atomic','false');document.body.appendChild(stack);
+  window.ssNotify=function(message,kind){
+    let text=String(message??'');
+    const isError=/❌|error|wrong|rejected|must |wait |failed|ban/i.test(text);
+    const isSuccess=/✅|submitted|success/i.test(text);
+    kind=kind||(isError?'error':isSuccess?'success':'info');
+    text=text.replace(/^[✅❌✔️⚠️]+\s*/u,'').trim();
+    const toast=document.createElement('div');toast.className='ss-toast';toast.dataset.kind=kind;toast.setAttribute('role',kind==='error'?'alert':'status');
+    const icon=document.createElement('span');icon.className='ss-toast-icon';icon.textContent=kind==='success'?'✓':kind==='error'?'!':'i';
+    const body=document.createElement('div');body.className='ss-toast-content';
+    const title=document.createElement('div');title.className='ss-toast-title';title.textContent=kind==='success'?'APPLICATION SUCCESS':kind==='error'?'SOUTHSIDE ALERT':'SOUTHSIDE S2';
+    const msg=document.createElement('div');msg.className='ss-toast-message';msg.textContent=text;
+    const close=document.createElement('button');close.type='button';close.className='ss-toast-close';close.setAttribute('aria-label','Dismiss notification');close.textContent='×';
+    const progress=document.createElement('div');progress.className='ss-toast-progress';
+    body.append(title,msg);toast.append(icon,body,close,progress);stack.prepend(toast);
+    const dismiss=()=>{if(toast.classList.contains('ss-out'))return;toast.classList.add('ss-out');setTimeout(()=>toast.remove(),280)};
+    close.addEventListener('click',dismiss);setTimeout(dismiss,5500);
+    while(stack.children.length>4)stack.lastElementChild.remove();
+  };
+})();
 </script>
 </body>
 </html>
