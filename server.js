@@ -188,6 +188,26 @@ async function sendStatusWebhook(ticket, status, reason) {
     } catch(e) { console.error("Status webhook error:", e); }
 }
 
+async function sendServerLogWebhook(message, category) {
+    const webhookUrl = CONFIG.DISCORD_WEBHOOK_LOGS;
+    if (!webhookUrl) return;
+
+    try {
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                embeds: [{
+                    title: `📋 Server Log [${category || 'INFO'}]`,
+                    description: message,
+                    color: 3447003,
+                    timestamp: new Date().toISOString()
+                }]
+            })
+        });
+    } catch(e) { console.error("Log webhook error:", e); }
+}
+
 // ===== Routes =====
 
 app.get('/api/check-cooldown', (req, res) => {
@@ -252,12 +272,14 @@ app.get('/api/players', isAdmin, (req, res) => {
     res.json(players);
 });
 
-app.post('/api/send-log', (req, res) => {
+app.post('/api/send-log', async (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
     db.logs.push({ time: new Date().toISOString(), message: req.body.message, category: req.body.category });
     if (db.logs.length > 500) db.logs.shift();
     saveDB(db);
+
+    await sendServerLogWebhook(req.body.message, req.body.category);
     res.json({ success: true });
 });
 
@@ -341,7 +363,6 @@ app.post('/api/tickets', async (req, res) => {
     
     const { discordId, type } = req.body;
     
-    // Server-side Cooldown verification
     const lastRejected = (db.tickets || [])
         .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
         .sort((a, b) => b.createdAt - a.createdAt)[0];
