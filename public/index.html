@@ -1362,7 +1362,16 @@ checkLogin();
 
 const appConfigs = {
     "Whitelist": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
-    "Gang Application": { title: "Gang Application", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
+    "Gang Application": { title: "Gang Application", fields: [
+        { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Gang Name", required: true },
+        { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "Gang Color", required: true },
+        { label: "Discord ID Boss *", type: "input", name: "discord_id_boss", placeholder: "Discord ID Boss", required: true },
+        { label: "Age Boss *", type: "input", name: "age_boss", placeholder: "Age Boss", required: true },
+        { label: "Discord ID Under Boss *", type: "input", name: "discord_id_under_boss", placeholder: "Discord ID Under Boss", required: true },
+        { label: "Age Underboss *", type: "input", name: "age_underboss", placeholder: "Age Underboss", required: true },
+        { label: "Discord ID Members *", type: "textarea", name: "discord_id_members", placeholder: "One Discord ID per line", required: true },
+        { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Describe your gang objective...", required: true }
+    ]},
     "Staff Application": { title: "Staff Application", fields: [ { label: "Full Name *", type: "input", name: "char_name", placeholder: "Your name", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Discord Username *", type: "input", name: "discord_username", placeholder: "Your Discord username", required: true }, { label: "Previous Staff Experience *", type: "textarea", name: "experience", placeholder: "Describe your experience", required: true }, { label: "Why do you want to join the staff team? *", type: "textarea", name: "motivation", placeholder: "Your motivation", required: true }, { label: "Weekly Availability *", type: "textarea", name: "availability", placeholder: "Days and hours", required: true } ]},
 };
 
