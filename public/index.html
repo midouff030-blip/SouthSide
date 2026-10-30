@@ -21,7 +21,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
 body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); z-index: -1; pointer-events: none; }
 
-/* Header (العادي) */
+/* Header (السيت العادي) */
 header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border); }
 .brand { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
 .brand img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #333; }
@@ -42,7 +42,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .tab { display: none; }
 .tab.active { display: block; }
 
-/* باقي الصفحات */
+/* باقي صفحات السيت */
 .hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
 .hero-doc h1 { font-family: var(--font-title); font-size: 7rem; letter-spacing: 2px; line-height: 1; margin-bottom: 1.5rem; color: #fff; text-transform: uppercase; }
 .hero-doc h1 em { color: transparent; -webkit-text-stroke: 2px var(--accent); font-style: normal; }
@@ -117,7 +117,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .rule-card .punish { display: inline-block; margin-top: 1rem; font-family: var(--font-sub); font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255,0,0,0.15); border: 1px solid var(--accent); padding: 0.3rem 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 .rule-card .punish.perma { background: var(--accent); }
 
-/* Modal */
+/* Modal للسيت */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -176,25 +176,19 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 .logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
 .log-line { border-bottom: 1px solid #0a0a0a; padding: 0.4rem 0; }
 .log-time { color: #ff0000; font-weight: bold; margin-right: 10px; }
-
-/* 🔴 Multi Stream Grid */
 .stream-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; height: calc(100vh - 250px); min-height: 500px; }
 .stream-slot { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #555; transition: 0.2s; cursor: pointer; position: relative; overflow: hidden; }
 .stream-slot:hover { border-color: #ff0000; background: #111; }
 .stream-slot i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
 .stream-slot span { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-/* Full Screen Button */
 .fs-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 10; }
 .stream-slot:hover .fs-btn { opacity: 1; }
-
-/* Player Profile Modal */
 #playerProfileModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 2rem; }
 .profile-card { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 12px; width: 100%; max-width: 700px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
 .profile-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f1f1f; padding-bottom: 1rem; margin-bottom: 1.5rem; }
 .profile-header h2 { font-family: var(--font-title); font-size: 2rem; color: #fff; }
 .id-badge { background: #111; border: 1px solid #333; padding: 0.4rem 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.9rem; color: #ccc; margin-bottom: 0.5rem; display: inline-block; margin-right: 0.5rem; }
-
+#adminLoginView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; z-index: 100; background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); }
 @media (max-width: 992px) { 
     #tab-admin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     #adminPanelView { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
@@ -343,11 +337,10 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             </div>
             <h3>SERVER</h3>
             <button class="admin-nav-btn active" onclick="switchAdminTab('overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('applications', this)"><i class="fa-solid fa-file-lines"></i> Applications</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('detections', this)"><i class="fa-solid fa-triangle-exclamation"></i> Detections</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('bans', this)"><i class="fa-solid fa-ban"></i> Bans</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('players', this)"><i class="fa-solid fa-users"></i> Players</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('logs', this)"><i class="fa-solid fa-terminal"></i> Logs</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('gangs', this)"><i class="fa-solid fa-users"></i> Gangs</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('shop', this)"><i class="fa-solid fa-store"></i> Shop</button>
-            <h3>SCREENSHARE</h3>
             <button class="admin-nav-btn" onclick="switchAdminTab('multi', this)"><i class="fa-solid fa-desktop"></i> Multi Stream</button>
             <div class="admin-user" id="adminUserInfo">
                 <img src="/logo.png" alt="Avatar" id="adminAvatar">
@@ -364,6 +357,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <button class="logout-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back to Site</button>
                 </div>
             </div>
+            <!-- Overview Tab -->
             <div id="adminTab-overview" class="admin-tab active">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
                     <div class="admin-card" style="margin: 0;">
@@ -379,67 +373,48 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <h3 style="font-size: 1.8rem; margin: 0; color: #fff;" id="ovTickets">0</h3>
                     </div>
                 </div>
+            </div>
+            <!-- Detections Tab -->
+            <div id="adminTab-detections" class="admin-tab">
                 <div class="admin-card">
-                    <h3>Quick Actions</h3>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button class="admin-btn" onclick="switchAdminTab('applications', document.querySelectorAll('.admin-nav-btn')[1])">Review Applications</button>
-                        <button class="admin-btn" onclick="switchAdminTab('logs', document.querySelectorAll('.admin-nav-btn')[2])">View Logs</button>
-                        <button class="admin-btn" onclick="switchAdminTab('gangs', document.querySelectorAll('.admin-nav-btn')[3])">Manage Gangs</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Detections</h3>
+                        <button class="admin-btn" onclick="loadDetections()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                     </div>
+                    <div id="detectionsList"><p style="color: #555;">Click refresh to load...</p></div>
                 </div>
             </div>
-            <div id="adminTab-applications" class="admin-tab">
-                <div id="adminTickets"></div>
+            <!-- Bans Tab -->
+            <div id="adminTab-bans" class="admin-tab">
+                <div class="admin-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Bans</h3>
+                        <button class="admin-btn" onclick="loadBans()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <div id="bansList"><p style="color: #555;">Click refresh to load...</p></div>
+                </div>
             </div>
+            <!-- Players Tab -->
+            <div id="adminTab-players" class="admin-tab">
+                <div class="admin-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Players Online</h3>
+                        <button class="admin-btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
+                </div>
+            </div>
+            <!-- Logs Tab -->
             <div id="adminTab-logs" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Website Logs</h3>
-                        <button class="admin-btn" onclick="loadSiteLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div class="logs-container" id="siteLogsContainer"><p style="color: #555;">Click refresh to load site logs...</p></div>
-                </div>
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">FiveM Server Logs</h3>
+                        <h3 style="margin: 0;">Server Logs</h3>
                         <button class="admin-btn" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                     </div>
-                    <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load FiveM logs...</p></div>
+                    <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
                 </div>
             </div>
-            <div id="adminTab-gangs" class="admin-tab">
-                <div class="admin-card">
-                    <h3>Add New Gang</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                        <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name">
-                        <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL">
-                        <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
-                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID">
-                        <input class="admin-input" type="text" id="newGangUnderboss" placeholder="Underboss Name">
-                        <input class="admin-input" type="text" id="newGangUnderbossId" placeholder="Underboss ID">
-                    </div>
-                    <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
-                </div>
-                <div class="admin-card">
-                    <h3>Registered Gangs</h3>
-                    <div id="adminGangs"></div>
-                </div>
-            </div>
-            <div id="adminTab-shop" class="admin-tab">
-                <div class="admin-card">
-                    <h3>Add New Item</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                        <input class="admin-input" type="text" id="newShopName" placeholder="Item Name">
-                        <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)">
-                        <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL" style="grid-column: 1 / -1;">
-                    </div>
-                    <button class="admin-btn primary" id="addShopBtn">Add Item</button>
-                </div>
-                <div class="admin-card">
-                    <h3>Shop Items</h3>
-                    <div id="adminShop"></div>
-                </div>
-            </div>
+            <!-- Multi Stream Tab -->
             <div id="adminTab-multi" class="admin-tab">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
@@ -463,7 +438,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     </div>
 </div>
 
-<!-- 🔴 Player Profile Modal (الملف الشخصي للاعب) -->
+<!-- Player Profile Modal -->
 <div id="playerProfileModal">
     <div class="profile-card">
         <button onclick="closeProfileModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
@@ -503,7 +478,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL للسيت -->
 <div id="ticketModal" class="modal">
     <div class="modal-body" id="modalCardBody">
         <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
@@ -554,7 +529,10 @@ function switchAdminTab(name, btn) {
     document.getElementById('adminTab-' + name).classList.add('active');
     if (btn) btn.classList.add('active');
     document.getElementById('adminPageTitle').innerText = name.charAt(0).toUpperCase() + name.slice(1);
-    if (name === 'multi') { startFetchingPlayers(); } // 🔴 نبداو نجيبو اللاعبين كي ندخلو للـ Multi Stream
+    if (name === 'multi') { startFetchingPlayers(); }
+    if (name === 'logs') { loadFivemLogs(); }
+    if (name === 'bans') { loadBans(); }
+    if (name === 'detections') { loadDetections(); }
 }
 
 document.getElementById('copyBtn').addEventListener('click', function(){
@@ -740,7 +718,6 @@ document.getElementById('adminLoginBtn').addEventListener('click', async functio
         document.getElementById('adminPanelView').style.display = 'grid';
         loadAdmin();
         loadFivemLogs();
-        loadSiteLogs();
     } else alert('Wrong Password');
 });
 
@@ -806,38 +783,52 @@ async function updateTicket(id, st) {
     loadAdmin(); 
 }
 
-async function loadSiteLogs() {
-    const container = document.getElementById('siteLogsContainer');
-    if (!container) return; 
-    container.innerHTML = '<p style="color:#555;">Loading logs...</p>';
-    try {
-        const res = await fetch('/api/site-logs', { headers: getAdminHeaders() });
-        const data = await res.json();
-        if (data.length > 0) {
-            container.innerHTML = data.map(log => `
-                <div class="log-line">
-                    <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
-                    <span style="color: var(--accent);">${log.action}</span> - ${log.details} (by ${log.user})
-                </div>
-            `).join('');
-        } else { container.innerHTML = '<p style="color:#555;">No site logs found.</p>'; }
-    } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
-}
-
 async function loadFivemLogs() {
     const container = document.getElementById('fivemLogsContainer');
     if (!container) return; 
     container.innerHTML = '<p style="color:#555;">Loading logs...</p>';
     try {
-        const res = await fetch('/api/fivem-logs', { headers: getAdminHeaders() });
+        const res = await fetch('/api/logs', { headers: getAdminHeaders() });
         const data = await res.json();
-        if (data.logs && data.logs.length > 0) {
-            container.innerHTML = data.logs.map(log => {
-                const time = new Date(log.time).toLocaleTimeString();
-                return `<div class="log-line"><span class="log-time">[${time}]</span> <b>[${log.category}]</b> ${log.message}</div>`;
-            }).join('');
+        if (data.length > 0) {
+            container.innerHTML = data.map(log => `
+                <div class="log-line">
+                    <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
+                    <span style="color: var(--accent);">[${log.category}]</span> - ${log.message}
+                </div>
+            `).join('');
         } else { container.innerHTML = '<p style="color:#555;">No logs found.</p>'; }
     } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
+}
+
+async function loadBans() {
+    const container = document.getElementById('bansList');
+    if (!container) return;
+    container.innerHTML = '<p style="color:#555;">Loading...</p>';
+    try {
+        const res = await fetch('/api/bans', { headers: getAdminHeaders() });
+        const bans = await res.json();
+        if (bans.length === 0) { container.innerHTML = '<p style="color:#555;">No bans found.</p>'; return; }
+        container.innerHTML = `<table class="admin-table">
+            <tr><th>Player</th><th>Reason</th><th>Date</th></tr>
+            ${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}
+        </table>`;
+    } catch(e) {}
+}
+
+async function loadDetections() {
+    const container = document.getElementById('detectionsList');
+    if (!container) return;
+    container.innerHTML = '<p style="color:#555;">Loading...</p>';
+    try {
+        const res = await fetch('/api/detections', { headers: getAdminHeaders() });
+        const dets = await res.json();
+        if (dets.length === 0) { container.innerHTML = '<p style="color:#555;">No detections found.</p>'; return; }
+        container.innerHTML = `<table class="admin-table">
+            <tr><th>Player</th><th>Type</th><th>Date</th></tr>
+            ${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}
+        </table>`;
+    } catch(e) {}
 }
 
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
