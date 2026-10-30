@@ -852,14 +852,23 @@ function toggleStream(playerId, playerName) {
             try {
                 const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
                 const data = await res.json();
-                if (data && data.frame) {
-                    const slot = document.getElementById(`stream-slot-${playerId}`);
-                    if (slot) {
-                        slot.innerHTML = `<img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;"><button class="fs-btn" onclick="requestFullscreen('stream-slot-${playerId}')"><i class="fa-solid fa-expand"></i></button>`;
+                const slot = document.getElementById(`stream-slot-${playerId}`);
+                if (slot) {
+                    if (data && data.frame) {
+                        slot.innerHTML = `
+                            <img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;">
+                            <button class="fs-btn" onclick="requestFullscreen('stream-slot-${playerId}')"><i class="fa-solid fa-expand"></i></button>
+                        `;
+                    } else {
+                        slot.innerHTML = `
+                            <i class="fa-solid fa-video-slash" style="font-size:2rem; color:#ff0000; margin-bottom:0.5rem;"></i>
+                            <span style="color:#888; font-size:0.8rem;">Waiting for stream from ${playerName}...</span>
+                            <button class="fs-btn" onclick="requestFullscreen('stream-slot-${playerId}')"><i class="fa-solid fa-expand"></i></button>
+                        `;
                     }
                 }
             } catch(e) {}
-        }, 500);
+        }, 1000);
     }
     renderStreamGrid();
 }
