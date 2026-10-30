@@ -125,7 +125,6 @@ app.get('/api/players', isAdmin, (req, res) => {
     const db = getDB();
     let players = db.players || [];
     
-    // نضيفو stats لكل لاعب
     players = players.map(p => {
         const stats = (db.playerStats && db.playerStats[p.id]) || { bans: 0, warns: 0, kicks: 0 };
         return { ...p, stats };
