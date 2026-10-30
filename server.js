@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
@@ -10,12 +9,11 @@ const fetch = require('node-fetch');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server, path: '/ws' }); // 🔴 WebSocket للستريم
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 app.use(cors({ origin: true, credentials: true })); 
-app.use(express.json({ limit: '50mb' })); 
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const CONFIG = {
@@ -60,42 +58,6 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// ===== WebSocket للستريم =====
-wss.on('connection', (ws) => {
-    console.log('🔗 Client Connected to WebSocket');
-    ws.on('message', (message) => {
-        try {
-            const data = JSON.parse(message);
-            
-            if (data.type === 'auth' && data.key === CONFIG.FIVEM_LOG_KEY) {
-                console.log('✅ WebSocket Authenticated');
-                ws.isAuthed = true;
-            }
-            
-            // استقبال الصورة من فايف إم وبعثها للسيت
-            if (data.type === 'stream_frame' && ws.isAuthed) {
-                const db = getDB();
-                if (!db.liveFrames) db.liveFrames = {};
-                db.liveFrames[data.playerId] = data.frame;
-                saveDB(db);
-                
-                // نبعثوها للسيت (اللي فاتح الـ Multi Stream)
-                wss.clients.forEach(client => {
-                    if (client.readyState === WebSocket.OPEN && client !== ws && client.isAdminPanel) {
-                        client.send(JSON.stringify({ type: 'new_frame', playerId: data.playerId, frame: data.frame }));
-                    }
-                });
-            }
-
-            if (data.type === 'admin_connect') {
-                ws.isAdminPanel = true;
-                console.log('🖥️ Admin Panel Connected to Stream');
-            }
-
-        } catch (err) { console.error(err); }
-    });
-});
-
 // ===== Auth =====
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
@@ -122,20 +84,28 @@ async function isAdmin(req, res, next) {
         const memberData = await response.json();
         if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) return next(); 
       }
-    } catch (e) {}
+    } catch (e) { console.error("Role check error:", e); }
   }
   res.status(403).json({ error: 'Access Denied.' });
 }
 
 // ===== Routes =====
+
+// 🔴 1. استقبال Stats من فايف إم
 app.post('/api/server-stats', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
-    db.stats = { online: true, players: req.body.players || 0, maxPlayers: req.body.maxPlayers || 128, lastUpdate: Date.now() };
+    db.stats = { 
+        online: req.body.online || true, 
+        players: req.body.players || 0, 
+        maxPlayers: req.body.maxPlayers || 128, 
+        lastUpdate: Date.now() 
+    };
     saveDB(db);
     res.json({ success: true });
 });
 
+// 🔴 2. جلب Stats للواجهة (Overview)
 app.get('/api/stats', (req, res) => {
     const db = getDB();
     const isOnline = db.stats.lastUpdate && (Date.now() - db.stats.lastUpdate < 30000);
@@ -148,6 +118,7 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
+// 🔴 3. استقبال اللاعبين من فايف إم
 app.post('/api/update-players', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
@@ -156,6 +127,7 @@ app.post('/api/update-players', (req, res) => {
     res.json({ success: true });
 });
 
+// 🔴 4. جلب اللاعبين للـ Admin Panel
 app.get('/api/players', isAdmin, (req, res) => {
     const db = getDB();
     let players = db.players || [];
@@ -166,6 +138,7 @@ app.get('/api/players', isAdmin, (req, res) => {
     res.json(players);
 });
 
+// 🔴 5. استقبال اللوقز
 app.post('/api/send-log', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
@@ -180,11 +153,22 @@ app.get('/api/logs', isAdmin, (req, res) => {
     res.json(db.logs.slice(-150).reverse());
 });
 
+// 🔴 6. استقبال الصورة من الستريم
+app.post('/api/stream-frame', (req, res) => {
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+    const db = getDB();
+    if (!db.liveFrames) db.liveFrames = {};
+    if (req.body.playerId && req.body.frame) db.liveFrames[req.body.playerId] = req.body.frame;
+    saveDB(db);
+    res.json({ success: true });
+});
+
 app.get('/api/stream-frame/:id', isAdmin, (req, res) => {
     const db = getDB();
     res.json({ frame: (db.liveFrames && db.liveFrames[req.params.id]) || null });
 });
 
+// 🔴 7. الأوامر (Ban, Kick, Warn, Stream)
 app.post('/api/action', isAdmin, (req, res) => {
     const { playerId, type, reason } = req.body;
     if (!playerId || !type) return res.status(400).json({ error: 'Missing data' });
@@ -200,7 +184,7 @@ app.post('/api/action', isAdmin, (req, res) => {
     if (type === 'warn') db.playerStats[playerId].warns++;
     if (type === 'kick') db.playerStats[playerId].kicks++;
     
-    db.logs.push({ time: new Date().toISOString(), message: `Action: ${type.toUpperCase()} on Player ID ${playerId}`, category: 'ADMIN' });
+    db.logs.push({ time: new Date().toISOString(), message: `Action: ${type.toUpperCase()} on Player ID ${playerId} | Reason: ${reason}`, category: 'ADMIN' });
     saveDB(db);
 
     res.json({ success: true });
@@ -215,6 +199,7 @@ app.post('/api/get-actions', (req, res) => {
     res.json({ actions });
 });
 
+// 🔴 8. Bans & Detections
 app.get('/api/bans', isAdmin, (req, res) => {
     const db = getDB();
     res.json(db.bans || []);
@@ -225,6 +210,7 @@ app.get('/api/detections', isAdmin, (req, res) => {
     res.json(db.detections || []);
 });
 
+// 🔴 9. Player Stats & Logs
 app.get('/api/player-stats/:id', isAdmin, (req, res) => {
     const db = getDB();
     const stats = (db.playerStats && db.playerStats[req.params.id]) || { bans: 0, warns: 0, kicks: 0 };
@@ -237,7 +223,7 @@ app.get('/api/player-logs/:id', isAdmin, (req, res) => {
     res.json(logs);
 });
 
-// ===== باقي الـ Routes (Tickets, Gangs, Shop, Auth, Admin) =====
+// 🔴 10. Tickets
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets || []));
 app.post('/api/tickets', (req, res) => {
     const db = getDB(); if (!db.tickets) db.tickets = [];
@@ -249,6 +235,7 @@ app.put('/api/tickets/:id', isAdmin, (req, res) => {
     if (t) { t.status = req.body.status; t.reason = req.body.reason || ''; saveDB(db); } res.json(t);
 });
 
+// 🔴 11. Gangs
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', isAdmin, (req, res) => {
     const db = getDB(); if (!db.gangs) db.gangs = [];
@@ -258,6 +245,7 @@ app.delete('/api/gangs/:id', isAdmin, (req, res) => {
     const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id); saveDB(db); res.json({ success: true });
 });
 
+// 🔴 12. Shop
 app.get('/api/shop', (req, res) => res.json(getDB().shop || []));
 app.post('/api/shop', isAdmin, (req, res) => {
     const db = getDB(); if (!db.shop) db.shop = [];
@@ -267,12 +255,20 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => {
     const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id); saveDB(db); res.json({ success: true });
 });
 
+// 🔴 13. Auth Routes
 app.get('/api/auth/discord', passport.authenticate('discord'));
 app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
-app.get('/api/auth/me', (req, res) => { if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar }); else res.json({ loggedIn: false }); });
+app.get('/api/auth/me', (req, res) => {
+  if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
+  else res.json({ loggedIn: false });
+});
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true }));
-app.post('/api/admin-login', (req, res) => { if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } else { res.status(401).json({ success: false }); } });
+
+app.post('/api/admin-login', (req, res) => {
+  if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
+  else { res.status(401).json({ success: false }); }
+});
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 server.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
