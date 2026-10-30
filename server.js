@@ -30,7 +30,11 @@ const CONFIG = {
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE,
   WEBHOOK_EMS: process.env.WEBHOOK_EMS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG,
-  DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS
+  DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS,
+  ROLE_ACCEPTED_WHITELIST: process.env.ROLE_ACCEPTED_WHITELIST || process.env.ROLE_ACCEPTED_ID,
+  ROLE_ACCEPTED_POLICE: process.env.ROLE_ACCEPTED_POLICE,
+  ROLE_ACCEPTED_EMS: process.env.ROLE_ACCEPTED_EMS,
+  ROLE_ACCEPTED_GANG: process.env.ROLE_ACCEPTED_GANG
 };
 
 // ===== Database =====
@@ -92,7 +96,7 @@ async function isAdmin(req, res, next) {
   res.status(403).json({ error: 'Access Denied.' });
 }
 
-// ===== Webhook Helpers =====
+// ===== Webhook & Role Helpers =====
 function getWebhookUrl(type) {
     if (!type) return CONFIG.WEBHOOK_WHITELIST;
     if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST;
@@ -102,9 +106,32 @@ function getWebhookUrl(type) {
     return CONFIG.WEBHOOK_WHITELIST;
 }
 
+async function assignDiscordRole(discordId, type) {
+    if (!CONFIG.DISCORD_BOT_TOKEN || !CONFIG.GUILD_ID || !discordId) return;
+    let roleId = '';
+    if (type.includes('Whitelist')) roleId = CONFIG.ROLE_ACCEPTED_WHITELIST;
+    else if (type.includes('Police')) roleId = CONFIG.ROLE_ACCEPTED_POLICE;
+    else if (type.includes('EMS')) roleId = CONFIG.ROLE_ACCEPTED_EMS;
+    else if (type.includes('Gang')) roleId = CONFIG.ROLE_ACCEPTED_GANG;
+
+    if (!roleId) return;
+
+    try {
+        await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${discordId}/roles/${roleId}`, {
+            method: 'PUT',
+            headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
+        });
+    } catch(e) { console.error("Error assigning role:", e); }
+}
+
 async function sendAppWebhook(type, subject, username, details, discordId) {
     const webhookUrl = getWebhookUrl(type);
     if (!webhookUrl) return;
+
+    let appTitle = type;
+    if (!appTitle.toLowerCase().includes('application')) {
+        appTitle = `${type} Application`;
+    }
 
     try {
         await fetch(webhookUrl, {
@@ -113,7 +140,7 @@ async function sendAppWebhook(type, subject, username, details, discordId) {
             body: JSON.stringify({
                 content: `<@${discordId || ''}>`,
                 embeds: [{
-                    title: `📥 New ${type} Application`,
+                    title: `📥 New ${appTitle}`,
                     color: 16711680,
                     fields: [
                         { name: "Subject / Name", value: subject, inline: true },
@@ -135,9 +162,10 @@ async function sendStatusWebhook(ticket, status, reason) {
     const isAccepted = status === 'accepted';
     const title = isAccepted ? `🎉 ${type} Accepted` : `❌ ${type} Rejected`;
     const color = isAccepted ? 5763719 : 15548997; 
+    
     const desc = isAccepted 
         ? `Congratulations <@${ticket.discordId || ''}>! Your application for **${type}** has been ACCEPTED. ✅\n\nWelcome aboard!`
-        : `Sorry <@${ticket.discordId || ''}>. Your application for **${type}** has been REJECTED. ❌\n\n**Reason:** ${reason || 'No reason provided.'}`;
+        : `Sorry <@${ticket.discordId || ''}>. Your application for **${type}** has been REJECTED. ❌\n\n**Reason:** ${reason || 'No reason provided.'}\n\n*You can re-apply for this specific department after 24 hours.*`;
 
     try {
         await fetch(webhookUrl, {
@@ -161,6 +189,25 @@ async function sendStatusWebhook(ticket, status, reason) {
 }
 
 // ===== Routes =====
+
+app.get('/api/check-cooldown', (req, res) => {
+    const { discordId, type } = req.query;
+    if (!discordId || !type) return res.json({ blocked: false });
+    
+    const db = getDB();
+    const lastRejected = (db.tickets || [])
+        .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+        .sort((a, b) => b.createdAt - a.createdAt)[0];
+        
+    if (lastRejected) {
+        const hoursPassed = (Date.now() - (lastRejected.createdAt || Date.now())) / (1000 * 60 * 60);
+        if (hoursPassed < 24) {
+            const hoursLeft = Math.ceil(24 - hoursPassed);
+            return res.json({ blocked: true, hoursLeft });
+        }
+    }
+    res.json({ blocked: false });
+});
 
 app.post('/api/server-stats', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
@@ -287,14 +334,31 @@ app.get('/api/player-logs/:id', isAdmin, (req, res) => {
 
 // Tickets & Applications Routes
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets || []));
+
 app.post('/api/tickets', async (req, res) => {
     const db = getDB(); 
     if (!db.tickets) db.tickets = [];
+    
+    const { discordId, type } = req.body;
+    
+    // Server-side Cooldown verification
+    const lastRejected = (db.tickets || [])
+        .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
+        .sort((a, b) => b.createdAt - a.createdAt)[0];
+        
+    if (lastRejected) {
+        const hoursPassed = (Date.now() - (lastRejected.createdAt || Date.now())) / (1000 * 60 * 60);
+        if (hoursPassed < 24) {
+            return res.status(400).json({ error: `You must wait 24 hours before applying for ${type} again.` });
+        }
+    }
+
     const username = req.user ? req.user.username : 'Guest';
     const ticket = { 
         id: Date.now().toString(), 
         status: 'pending', 
-        user: username, 
+        user: username,
+        createdAt: Date.now(),
         ...req.body 
     };
     db.tickets.push(ticket); 
@@ -320,6 +384,10 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         t.status = req.body.status; 
         t.reason = req.body.reason || ''; 
         saveDB(db); 
+
+        if (t.status === 'accepted') {
+            await assignDiscordRole(t.discordId, t.type);
+        }
 
         await sendStatusWebhook(t, t.status, t.reason);
     } 
