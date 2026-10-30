@@ -31,14 +31,14 @@ const CONFIG = {
 };
 
 const dbPath = path.join(__dirname, 'data.json');
-if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ fivemLogs: [], bans: [], warns: [], playerStats: {} }, null, 2));
+if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ fivemLogs: [], bans: [], detections: [], playerStats: {} }, null, 2));
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
 const saveDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
 let currentPlayers = [];
 let serverStats = { online: false, players: 0, maxPlayers: 128, lastUpdate: 0 };
 let liveFrames = {};
-let actionQueue = []; // قائمة الأوامر (Ban, Kick, Warn)
+let actionQueue = []; 
 
 app.use(session({
   secret: CONFIG.SESSION_SECRET,
@@ -48,7 +48,6 @@ app.use(session({
   cookie: { secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// Discord Auth
 const DiscordStrategy = require('passport-discord').Strategy;
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -65,7 +64,7 @@ app.use(passport.session());
 async function isAdmin(req, res, next) {
   if (req.headers['x-admin-password'] === CONFIG.ADMIN_PASSWORD) return next();
   if (req.session && req.session.isAdmin) return next(); 
-  if (req.user) return next(); // تبسيط: نعتبرو أي واحد داخل بالديسكورد أدمن
+  if (req.user) return next();
   res.status(403).json({ error: 'Access Denied.' });
 }
 
@@ -111,7 +110,7 @@ app.post('/api/stream-frame', (req, res) => {
 
 app.get('/api/stream-frame/:id', isAdmin, (req, res) => res.json({ frame: liveFrames[req.params.id] || null }));
 
-// 🔴 Actions (Ban, Kick, Warn)
+// 🔴 Actions (Ban, Kick, Warn, Stream)
 app.post('/api/action', isAdmin, (req, res) => {
     const { playerId, type, reason } = req.body;
     if (!playerId || !type) return res.status(400).json({ error: 'Missing data' });
@@ -134,7 +133,7 @@ app.post('/api/action', isAdmin, (req, res) => {
 app.post('/api/get-actions', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const actions = [...actionQueue];
-    actionQueue = []; // نفرغو القائمة
+    actionQueue = [];
     res.json({ actions });
 });
 
@@ -146,9 +145,20 @@ app.get('/api/player-stats/:id', isAdmin, (req, res) => {
 
 app.get('/api/player-logs/:id', isAdmin, (req, res) => {
     const db = getDB();
-    // نفلترو اللوقز اللي فيها اسم اللاعب ولا الـ ID
     const logs = db.fivemLogs.filter(l => l.message.includes(req.params.id) || l.message.includes(req.params.name)).reverse();
     res.json(logs);
+});
+
+// 🔴 Bans Tab
+app.get('/api/bans', isAdmin, (req, res) => {
+    const db = getDB();
+    res.json(db.bans || []);
+});
+
+// 🔴 Detections Tab
+app.get('/api/detections', isAdmin, (req, res) => {
+    const db = getDB();
+    res.json(db.detections || []);
 });
 
 app.post('/api/admin-login', (req, res) => {
