@@ -43,7 +43,8 @@ if (!fs.existsSync(dbPath)) {
         liveFrames: {},
         tickets: [],
         gangs: [],
-        shop: []
+        shop: [],
+        playerStats: {}
     }, null, 2));
 }
 const getDB = () => JSON.parse(fs.readFileSync(dbPath));
@@ -122,7 +123,15 @@ app.post('/api/update-players', (req, res) => {
 
 app.get('/api/players', isAdmin, (req, res) => {
     const db = getDB();
-    res.json(db.players);
+    let players = db.players || [];
+    
+    // نضيفو stats لكل لاعب
+    players = players.map(p => {
+        const stats = (db.playerStats && db.playerStats[p.id]) || { bans: 0, warns: 0, kicks: 0 };
+        return { ...p, stats };
+    });
+    
+    res.json(players);
 });
 
 // 3. Logs
@@ -140,7 +149,7 @@ app.get('/api/logs', isAdmin, (req, res) => {
     res.json(db.logs.slice(-150).reverse());
 });
 
-// 4. Stream (الصورة)
+// 4. Stream
 app.post('/api/stream-frame', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
@@ -162,7 +171,15 @@ app.post('/api/action', isAdmin, (req, res) => {
     
     const db = getDB();
     if (!db.actions) db.actions = [];
-    db.actions.push({ playerId, type, reason });
+    if (!db.playerStats) db.playerStats = {};
+    
+    db.actions.push({ playerId, type, reason, time: new Date().toISOString() });
+    
+    if (!db.playerStats[playerId]) db.playerStats[playerId] = { bans: 0, warns: 0, kicks: 0 };
+    if (type === 'ban') db.playerStats[playerId].bans++;
+    if (type === 'warn') db.playerStats[playerId].warns++;
+    if (type === 'kick') db.playerStats[playerId].kicks++;
+    
     db.logs.push({ time: new Date().toISOString(), message: `Action: ${type.toUpperCase()} on Player ID ${playerId} | Reason: ${reason}`, category: 'ADMIN' });
     saveDB(db);
 
@@ -228,7 +245,7 @@ app.put('/api/tickets/:id', isAdmin, (req, res) => {
     res.json(t);
 });
 
-// 9. Gangs & Shop
+// 9. Gangs
 app.get('/api/gangs', (req, res) => {
     const db = getDB();
     res.json(db.gangs || []);
@@ -250,6 +267,7 @@ app.delete('/api/gangs/:id', isAdmin, (req, res) => {
     res.json({ success: true });
 });
 
+// 10. Shop
 app.get('/api/shop', (req, res) => {
     const db = getDB();
     res.json(db.shop || []);
@@ -258,7 +276,13 @@ app.get('/api/shop', (req, res) => {
 app.post('/api/shop', isAdmin, (req, res) => {
     const db = getDB();
     if (!db.shop) db.shop = [];
-    const item = { id: Date.now().toString(), ...req.body };
+    const item = { 
+        id: Date.now().toString(), 
+        name: req.body.name, 
+        price: req.body.price, 
+        image: req.body.image,
+        category: req.body.category || 'Other'
+    };
     db.shop.push(item);
     saveDB(db);
     res.json(item);
@@ -271,13 +295,7 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => {
     res.json({ success: true });
 });
 
-// 10. Login (Admin password)
-app.post('/api/admin-login', (req, res) => {
-  if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
-  else { res.status(401).json({ success: false }); }
-});
-
-// 🔴 Auth Routes (Discord Login)
+// 11. Auth Routes
 app.get('/api/auth/discord', passport.authenticate('discord'));
 app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
 app.get('/api/auth/me', (req, res) => {
@@ -286,6 +304,11 @@ app.get('/api/auth/me', (req, res) => {
 });
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true }));
+
+app.post('/api/admin-login', (req, res) => {
+  if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
+  else { res.status(401).json({ success: false }); }
+});
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 server.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
