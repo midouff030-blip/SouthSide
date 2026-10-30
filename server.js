@@ -234,9 +234,41 @@ app.get('/api/gangs', (req, res) => {
     res.json(db.gangs || []);
 });
 
+app.post('/api/gangs', isAdmin, async (req, res) => { 
+    const db = getDB();
+    if (!db.gangs) db.gangs = [];
+    const gang = { id: Date.now().toString(), name: req.body.name, logo: req.body.logo, boss: req.body.boss, members: [] };
+    db.gangs.push(gang);
+    saveDB(db);
+    res.json(gang);
+});
+
+app.delete('/api/gangs/:id', isAdmin, (req, res) => {
+    const db = getDB();
+    db.gangs = db.gangs.filter(g => g.id !== req.params.id);
+    saveDB(db);
+    res.json({ success: true });
+});
+
 app.get('/api/shop', (req, res) => {
     const db = getDB();
     res.json(db.shop || []);
+});
+
+app.post('/api/shop', isAdmin, (req, res) => {
+    const db = getDB();
+    if (!db.shop) db.shop = [];
+    const item = { id: Date.now().toString(), ...req.body };
+    db.shop.push(item);
+    saveDB(db);
+    res.json(item);
+});
+
+app.delete('/api/shop/:id', isAdmin, (req, res) => {
+    const db = getDB();
+    db.shop = db.shop.filter(i => i.id !== req.params.id);
+    saveDB(db);
+    res.json({ success: true });
 });
 
 // 10. Login
@@ -245,11 +277,14 @@ app.post('/api/admin-login', (req, res) => {
   else { res.status(401).json({ success: false }); }
 });
 
+// 🔴 Auth Routes (إصلاح الـ Login)
+app.get('/api/auth/discord', passport.authenticate('discord'));
+app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
 app.get('/api/auth/me', (req, res) => {
   if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
   else res.json({ loggedIn: false });
 });
-
+app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true }));
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
