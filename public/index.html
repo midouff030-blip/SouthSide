@@ -337,10 +337,14 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             </div>
             <h3>SERVER</h3>
             <button class="admin-nav-btn active" onclick="switchAdminTab('overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('applications', this)"><i class="fa-solid fa-file-lines"></i> Applications</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('detections', this)"><i class="fa-solid fa-triangle-exclamation"></i> Detections</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('bans', this)"><i class="fa-solid fa-ban"></i> Bans</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('players', this)"><i class="fa-solid fa-users"></i> Players</button>
             <button class="admin-nav-btn" onclick="switchAdminTab('logs', this)"><i class="fa-solid fa-terminal"></i> Logs</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('gangs', this)"><i class="fa-solid fa-users"></i> Gangs</button>
+            <button class="admin-nav-btn" onclick="switchAdminTab('shop', this)"><i class="fa-solid fa-store"></i> Shop</button>
+            <h3>SCREENSHARE</h3>
             <button class="admin-nav-btn" onclick="switchAdminTab('multi', this)"><i class="fa-solid fa-desktop"></i> Multi Stream</button>
             <div class="admin-user" id="adminUserInfo">
                 <img src="/logo.png" alt="Avatar" id="adminAvatar">
@@ -373,6 +377,18 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <h3 style="font-size: 1.8rem; margin: 0; color: #fff;" id="ovTickets">0</h3>
                     </div>
                 </div>
+                <div class="admin-card">
+                    <h3>Quick Actions</h3>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="admin-btn" onclick="switchAdminTab('applications', document.querySelectorAll('.admin-nav-btn')[1])">Review Applications</button>
+                        <button class="admin-btn" onclick="switchAdminTab('logs', document.querySelectorAll('.admin-nav-btn')[2])">View Logs</button>
+                        <button class="admin-btn" onclick="switchAdminTab('gangs', document.querySelectorAll('.admin-nav-btn')[3])">Manage Gangs</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Applications Tab -->
+            <div id="adminTab-applications" class="admin-tab">
+                <div id="adminTickets"></div>
             </div>
             <!-- Detections Tab -->
             <div id="adminTab-detections" class="admin-tab">
@@ -412,6 +428,41 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <button class="admin-btn" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                     </div>
                     <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
+                </div>
+            </div>
+            <!-- Gangs Tab -->
+            <div id="adminTab-gangs" class="admin-tab">
+                <div class="admin-card">
+                    <h3>Add New Gang</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name">
+                        <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL">
+                        <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
+                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID">
+                        <input class="admin-input" type="text" id="newGangUnderboss" placeholder="Underboss Name">
+                        <input class="admin-input" type="text" id="newGangUnderbossId" placeholder="Underboss ID">
+                    </div>
+                    <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
+                </div>
+                <div class="admin-card">
+                    <h3>Registered Gangs</h3>
+                    <div id="adminGangs"></div>
+                </div>
+            </div>
+            <!-- Shop Tab -->
+            <div id="adminTab-shop" class="admin-tab">
+                <div class="admin-card">
+                    <h3>Add New Item</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <input class="admin-input" type="text" id="newShopName" placeholder="Item Name">
+                        <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)">
+                        <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL" style="grid-column: 1 / -1;">
+                    </div>
+                    <button class="admin-btn primary" id="addShopBtn">Add Item</button>
+                </div>
+                <div class="admin-card">
+                    <h3>Shop Items</h3>
+                    <div id="adminShop"></div>
                 </div>
             </div>
             <!-- Multi Stream Tab -->
@@ -533,6 +584,9 @@ function switchAdminTab(name, btn) {
     if (name === 'logs') { loadFivemLogs(); }
     if (name === 'bans') { loadBans(); }
     if (name === 'detections') { loadDetections(); }
+    if (name === 'applications') { loadAdmin(); }
+    if (name === 'gangs') { loadAdmin(); }
+    if (name === 'shop') { loadAdmin(); }
 }
 
 document.getElementById('copyBtn').addEventListener('click', function(){
