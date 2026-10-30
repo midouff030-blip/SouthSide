@@ -134,7 +134,7 @@ async function assignDiscordRole(discordId, type) {
 function getSubmissionWebhookUrl(type) {
     // One dedicated inbox for all NEW applications (Whitelist, Gang, Staff).
     // Accepted/rejected decisions still use their category-specific webhooks.
-    return CONFIG.WEBHOOK_NEW_APPLICATIONS || getWebhookUrl(type);
+    return CONFIG.WEBHOOK_NEW_APPLICATIONS; // STRICT: never route new submissions to result webhooks
 }
 
 async function sendAppWebhook(type, subject, username, details, discordId) {
@@ -432,4 +432,5 @@ app.post('/api/admin-login', (req, res) => {
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+console.log('[WEBHOOK ROUTING] New applications:', CONFIG.WEBHOOK_NEW_APPLICATIONS ? 'configured (dedicated)' : 'MISSING — submissions will fail, never fallback');
 server.listen(PORT, '0.0.0.0', () => console.log(`🔥 Live on ${PORT}`));
