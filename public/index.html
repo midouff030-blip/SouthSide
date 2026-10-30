@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ========== إعدادات عامة ========== */
 :root {
     --bg: #000000; --card: #0a0a0a; --primary: #ffffff; --accent: #ff0000; 
     --text: #ffffff; --text-muted: #888888; --border: #1f1f1f;
@@ -21,7 +20,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
 body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); z-index: -1; pointer-events: none; }
 
-/* Header */
 header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border); }
 .brand { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
 .brand img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #333; }
@@ -42,7 +40,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .tab { display: none; }
 .tab.active { display: block; }
 
-/* باقي الصفحات */
 .hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
 .hero-doc h1 { font-family: var(--font-title); font-size: 7rem; letter-spacing: 2px; line-height: 1; margin-bottom: 1.5rem; color: #fff; text-transform: uppercase; }
 .hero-doc h1 em { color: transparent; -webkit-text-stroke: 2px var(--accent); font-style: normal; }
@@ -117,7 +114,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .rule-card .punish { display: inline-block; margin-top: 1rem; font-family: var(--font-sub); font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255,0,0,0.15); border: 1px solid var(--accent); padding: 0.3rem 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 .rule-card .punish.perma { background: var(--accent); }
 
-/* Modal */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
 .modal-body { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -128,7 +124,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .form-input:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 100px; }
 
-/* ========== 🔴 ADMIN PANEL ========== */
 body.admin-mode header, body.admin-mode main { display: none !important; }
 body.admin-mode { background: #050505; overflow: hidden !important; }
 #tab-admin { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #050505; grid-template-columns: 260px 1fr; }
@@ -220,7 +215,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 </header>
 
 <main>
-    <!-- HOME -->
     <div id="tab-home" class="tab active">
         <div class="hero-doc">
             <h1>Join The <em>Elite.</em></h1>
@@ -255,17 +249,14 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
         </div>
     </div>
 
-    <!-- APPS -->
     <div id="tab-apps" class="tab">
         <div class="section-title"><h2>Applications</h2><p>Select a department to submit your official application</p></div>
-        
         <div id="loginRequiredMsg" style="display: none; text-align: center; padding: 4rem; background: var(--card); border: 1px dashed var(--border);">
             <i class="fa-brands fa-discord" style="font-size: 4rem; color: #5865F2; margin-bottom: 1rem;"></i>
             <h3 style="font-family: var(--font-title); font-size: 2rem; color: #fff; margin-bottom: 1rem;">Login Required</h3>
             <p style="color: var(--text-muted); margin-bottom: 2rem;">You must be logged in with Discord to submit an application.</p>
             <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
         </div>
-
         <div class="apps-grid" id="appsGrid" style="display: none;">
             <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
             <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
@@ -274,13 +265,11 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
         </div>
     </div>
 
-    <!-- ILLEGAL -->
     <div id="tab-illegal" class="tab">
         <div class="section-title"><h2>Illegal Network</h2><p>Gangs, heists, and rankings synced from Discord and the server!</p></div>
         <div class="gangs-grid" id="gangsGrid"></div>
     </div>
 
-    <!-- RULES -->
     <div id="tab-rules" class="tab">
         <div class="section-title"><h2>Server Rules</h2><p>Read carefully — breaking these rules leads to punishment.</p></div>
         <div class="rules-grid">
@@ -299,20 +288,18 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <div class="rule-card"><h3><i class="fa-solid fa-rotate-right"></i> New Life Rule</h3><ul><li>Ki dou5 w trespawni fel sbitar tansa el scene eli do5t feha.</li><li>Ki dou5 w fay9k EMS wala hazouk le sbitar tetfakr scene eli mot faha.</li></ul></div>
             <div class="rule-card"><h3><i class="fa-solid fa-gavel"></i> Third Party Rules Update</h3><ul><li>Ay player ya3ml f ay Robbery, ma 3andkch l7a9 treacty m3ah kan maykaml robbery mta3o.</li><li>Kan haz rahina w makhlatech 3alih 9bal maywsal l robbery, ma andekch lha9 treacty m3ah.</li></ul></div>
             <div class="rule-card"><h3><i class="fa-solid fa-comment-slash"></i> Toxic RP</h3><ul><li>Matnajamch tseb l3bed mn ghir 7ata reason.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-ban"></i> Disrespect Player</h3><ul><li>Mamnou3 SABEN LOM - KAFRAN RABI.</li><li>Matnajamch treacti m3a 3abd dey5 (Only GG).</li><li>T7ot wa7ed fi boubala.</li><li>Random + fanet + ...</li></ul></div>
+            <div class="rule-card"><h3><i class="fa-solid fa-ban"></i> Disrespect Player</h3><ul><li>Mamnou3 SABEN LOM - KAFRAN RABI.</li><li>Matnajamch treacti m3a 3abd deyfs (Only GG).</li><li>T7ot wa7ed fi boubala.</li><li>Random + fanet + ...</li></ul></div>
             <div class="rule-card"><h3><i class="fa-solid fa-crosshairs"></i> Free Kill</h3><ul><li>To9tel player min ghir warning.</li></ul></div>
             <div class="rule-card"><h3><i class="fa-solid fa-user-tie"></i> Acting As Admin</h3><ul><li>Tahki wela tetsaref fil RP keyink admin. Exemple: twa9ef scene / 3andek 3omra 2d / li ta3ml fi ghalit haw chnd3i bik...</li></ul></div>
         </div>
     </div>
 
-    <!-- SHOP -->
     <div id="tab-shop" class="tab">
         <div class="section-title"><h2>Shop</h2></div>
         <div class="shop-grid" id="shopGrid"></div>
     </div>
 </main>
 
-<!-- 🔴 ADMIN PANEL -->
 <div id="tab-admin" class="tab">
     <div id="adminLoginView">
         <div class="admin-card" style="max-width: 400px; width: 100%; text-align: center; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
@@ -361,7 +348,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <button class="logout-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back to Site</button>
                 </div>
             </div>
-            <!-- Overview Tab -->
             <div id="adminTab-overview" class="admin-tab active">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
                     <div class="admin-card" style="margin: 0;">
@@ -378,11 +364,9 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     </div>
                 </div>
             </div>
-            <!-- Applications Tab -->
             <div id="adminTab-applications" class="admin-tab">
                 <div id="adminTickets"></div>
             </div>
-            <!-- Detections Tab -->
             <div id="adminTab-detections" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -392,7 +376,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="detectionsList"><p style="color: #555;">Click refresh to load...</p></div>
                 </div>
             </div>
-            <!-- Bans Tab -->
             <div id="adminTab-bans" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -402,7 +385,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="bansList"><p style="color: #555;">Click refresh to load...</p></div>
                 </div>
             </div>
-            <!-- Players Tab -->
             <div id="adminTab-players" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -412,7 +394,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
                 </div>
             </div>
-            <!-- Logs Tab -->
             <div id="adminTab-logs" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -422,7 +403,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
                 </div>
             </div>
-            <!-- Gangs Tab -->
             <div id="adminTab-gangs" class="admin-tab">
                 <div class="admin-card">
                     <h3>Add New Gang</h3>
@@ -441,7 +421,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="adminGangs"></div>
                 </div>
             </div>
-            <!-- Shop Tab -->
             <div id="adminTab-shop" class="admin-tab">
                 <div class="admin-card">
                     <h3>Add New Item</h3>
@@ -465,7 +444,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="adminShop"></div>
                 </div>
             </div>
-            <!-- Multi Stream Tab -->
             <div id="adminTab-multi" class="admin-tab">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
@@ -489,7 +467,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     </div>
 </div>
 
-<!-- Player Profile Modal -->
 <div id="playerProfileModal">
     <div class="profile-card">
         <button onclick="closeProfileModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
@@ -529,7 +506,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     </div>
 </div>
 
-<!-- MODAL للسيت -->
 <div id="ticketModal" class="modal">
     <div class="modal-body" id="modalCardBody">
         <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
@@ -542,7 +518,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 </div>
 
 <script>
-// 🌟 Background
 (function(){
     var c = document.getElementById('bg-canvas');
     if (!c) return;
@@ -648,19 +623,9 @@ let currentType = '';
 
 async function openModal(title) {
     if (!loggedInUser) return alert("You must login first!");
-    
     currentType = title;
     document.getElementById('modalTitle').innerText = appConfigs[title] ? appConfigs[title].title : "Application";
     
-    try {
-        const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
-        const checkData = await checkRes.json();
-        if (checkData.blocked) {
-            alert(`❌ You have been rejected recently. Please wait ${checkData.hoursLeft} hours before applying again.`);
-            return;
-        }
-    } catch(e) { console.error(e); }
-
     const config = appConfigs[title] || { title: "Support", fields: [] };
     const fieldsContainer = document.getElementById('dynamicFormFields');
     fieldsContainer.innerHTML = '';
@@ -673,7 +638,6 @@ async function openModal(title) {
         group.appendChild(label);
         let input;
         if (f.type === 'textarea') { input = document.createElement('textarea'); input.className = 'form-input form-textarea'; }
-        else if (f.type === 'select') { input = document.createElement('select'); input.className = 'form-input'; f.options.forEach(opt => { const o = document.createElement('option'); o.value = opt; o.innerText = opt; input.appendChild(o); }); }
         else { input = document.createElement('input'); input.type = f.type || 'text'; input.className = 'form-input'; }
         input.name = f.name; input.placeholder = f.placeholder || '';
         if (f.required) input.required = true;
@@ -712,7 +676,7 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
             closeModal(); this.reset();
         } else {
             const data = await res.json();
-            alert(`❌ ${data.error}`);
+            alert(`❌ ${data.error || 'Error'}`);
         }
     } catch(err) {
         alert('❌ Error submitting application. Please try again.');
@@ -741,13 +705,13 @@ async function loadGangs() {
                     <div class="gang-logo">${g.logo ? `<img src="${g.logo}">` : 'G'}</div>
                     <div>
                         <div class="gang-title">${g.name}</div>
-                        <div class="gang-members-count">${g.members.length} MEMBERS</div>
+                        <div class="gang-members-count">${g.members ? g.members.length : 0} MEMBERS</div>
                     </div>
                 </div>
                 <div class="gang-roster">
-                    ${(g.boss ? `<div class="gang-member"><img src="${g.bossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.boss}</span></div>` : '')}
-                    ${(g.underboss ? `<div class="gang-member"><img src="${g.underbossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
-                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
+                    ${(g.boss ? `<div class="gang-member"><img src="${g.bossAvatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.boss}</span></div>` : '')}
+                    ${(g.underboss ? `<div class="gang-member"><img src="${g.underbossAvatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
+                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
                 </div>
             </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No gangs registered.</p>';
         document.getElementById('ovGangs').innerText = gangs.length;
@@ -758,35 +722,19 @@ async function loadShop() {
     try {
         const res = await fetch('/api/shop'); const items = await res.json();
         const container = document.getElementById('shopGrid');
-        
-        if (items.length === 0) {
+        if (!items || items.length === 0) {
             container.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
             return;
         }
-
-        const categories = {};
-        items.forEach(item => {
-            const cat = item.category || 'Other';
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(item);
-        });
-
         let html = '';
-        for (const [cat, catItems] of Object.entries(categories)) {
-            html += `<div style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;">
-                <h3 style="font-family: var(--font-title); font-size: 2rem; color: var(--accent);">${cat}</h3>
-            </div>`;
-            
-            catItems.forEach(i => {
-                html += `
-                    <div class="shop-item">
-                        <div class="shop-img"><img src="${i.image}"></div>
-                        <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
-                    </div>
-                `;
-            });
-        }
-
+        items.forEach(i => {
+            html += `
+                <div class="shop-item">
+                    <div class="shop-img"><img src="${i.image}"></div>
+                    <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
+                </div>
+            `;
+        });
         container.innerHTML = html;
     } catch(e){}
 }
@@ -823,7 +771,8 @@ async function loadAdmin() {
             try { let parsed = JSON.parse(x.message); details = Object.entries(parsed).map(([k,v]) => `<b>${k}:</b> ${v}`).join('<br>'); } 
             catch(e) { details = x.message; }
             let statusColor = x.status === 'accepted' ? '#22c55e' : x.status === 'rejected' ? '#ef4444' : '#f59e0b';
-            let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${x.id || x._id}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${x.id || x._id}', 'rejected')">Reject</button>` : '';
+            let ticketId = x.id || x._id;
+            let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${ticketId}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${ticketId}', 'rejected')">Reject</button>` : '';
             html += `<div style="background:#0b0f19; border:1px solid #1c2538; padding:1rem; margin-bottom:1rem; border-radius: 8px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                     <strong style="font-size:0.95rem; color:#fff;">${x.type}</strong>
@@ -837,21 +786,6 @@ async function loadAdmin() {
         document.getElementById('adminTickets').innerHTML = html;
         document.getElementById('ovTickets').innerText = t.filter(x => x.status === 'pending').length;
     }
-
-    const g = await (await fetch('/api/gangs')).json();
-    document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`
-        <tr>
-            <td>${x.name}</td>
-            <td>${x.members ? x.members.length : 0} m</td>
-            <td>
-                <button onclick="addMember('${x.id || x._id}')">Add</button>
-                <button onclick="editGang('${x.id || x._id}')">Edit</button>
-                <button class="reject" onclick="removeGang('${x.id || x._id}')">Delete</button>
-            </td>
-        </tr>`).join('')}</table>` : '<p style="color:#555;">No gangs.</p>';
-
-    const s = await (await fetch('/api/shop')).json();
-    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td>${x.category || 'Other'}</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
 }
 
 async function updateTicket(id, st) { 
@@ -871,7 +805,7 @@ async function loadFivemLogs() {
     try {
         const res = await fetch('/api/logs', { headers: getAdminHeaders() });
         const data = await res.json();
-        if (data.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
             container.innerHTML = data.map(log => `
                 <div class="log-line">
                     <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
@@ -889,7 +823,7 @@ async function loadBans() {
     try {
         const res = await fetch('/api/bans', { headers: getAdminHeaders() });
         const bans = await res.json();
-        if (bans.length === 0) { container.innerHTML = '<p style="color:#555;">No bans found.</p>'; return; }
+        if (!Array.isArray(bans) || bans.length === 0) { container.innerHTML = '<p style="color:#555;">No bans found.</p>'; return; }
         container.innerHTML = `<table class="admin-table">
             <tr><th>Player</th><th>Reason</th><th>Date</th></tr>
             ${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}
@@ -904,7 +838,7 @@ async function loadDetections() {
     try {
         const res = await fetch('/api/detections', { headers: getAdminHeaders() });
         const dets = await res.json();
-        if (dets.length === 0) { container.innerHTML = '<p style="color:#555;">No detections found.</p>'; return; }
+        if (!Array.isArray(dets) || dets.length === 0) { container.innerHTML = '<p style="color:#555;">No detections found.</p>'; return; }
         container.innerHTML = `<table class="admin-table">
             <tr><th>Player</th><th>Type</th><th>Date</th></tr>
             ${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}
@@ -912,70 +846,10 @@ async function loadDetections() {
     } catch(e) {}
 }
 
-document.getElementById('addGangBtn').addEventListener('click', async function(){ 
-    const name = document.getElementById('newGangName').value;
-    const logo = document.getElementById('newGangLogo').value;
-    const boss = document.getElementById('newGangBoss').value;
-    const bossId = document.getElementById('newGangBossId').value;
-    const underboss = document.getElementById('newGangUnderboss').value;
-    const underbossId = document.getElementById('newGangUnderbossId').value;
-    if(!name) return alert('Gang name is required');
-    await fetch('/api/gangs', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ name: name, logo: logo, boss: boss, bossId: bossId, underboss: underboss, underbossId: underbossId }) }); 
-    loadAdmin(); 
-});
-
-async function removeGang(id) {
-    if(confirm('Are you sure you want to delete this gang?')) {
-        await fetch('/api/gangs/'+id, { method:'DELETE', headers: getAdminHeaders() });
-        loadAdmin();
-    }
+async function loadPlayers() {
+    fetchPlayers();
 }
 
-async function editGang(id) {
-    const res = await fetch('/api/gangs'); const gangs = await res.json();
-    const g = gangs.find(x => (x.id === id || x._id === id));
-    if(!g) return;
-    const newName = prompt("Gang Name:", g.name);
-    const newLogo = prompt("Logo URL:", g.logo);
-    const newBoss = prompt("Boss Name:", g.boss);
-    const newBossId = prompt("Boss ID:", g.bossId);
-    const newUnderboss = prompt("Underboss Name:", g.underboss);
-    const newUnderbossId = prompt("Underboss ID:", g.underbossId);
-    if(newName === null) return;
-    await fetch('/api/gangs/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({ name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId }) });
-    loadAdmin();
-}
-
-async function addMember(id) { 
-    const discordId = prompt("Discord ID (e.g. 1234567890):"); 
-    if(!discordId) return;
-    const memberName = prompt("Member Name (e.g. John):") || 'Member';
-    await fetch('/api/gangs/'+id+'/members', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ discordId: discordId, memberName: memberName }) }); 
-    loadAdmin(); 
-}
-
-document.getElementById('addShopBtn').addEventListener('click', async function(){ 
-    await fetch('/api/shop', { 
-        method:'POST', 
-        headers: getAdminHeaders(), 
-        body:JSON.stringify({
-            name: document.getElementById('newShopName').value, 
-            price: parseInt(document.getElementById('newShopPrice').value), 
-            image: document.getElementById('newShopImage').value,
-            category: document.getElementById('newShopCategory').value 
-        }) 
-    }); 
-    loadAdmin(); 
-});
-
-async function removeShopItem(id) {
-    if(confirm('Are you sure you want to delete this item?')) {
-        await fetch('/api/shop/'+id, { method:'DELETE', headers: getAdminHeaders() });
-        loadAdmin();
-    }
-}
-
-// 🔴 Multi Stream (مع البان والبروفايل)
 let currentPlayers = [];
 let activeStreams = {};
 let streamIntervals = {};
@@ -984,9 +858,12 @@ let selectedPlayer = null;
 
 function fetchPlayers() {
     fetch('/api/players', { headers: getAdminHeaders() })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error('Unauthorized');
+            return res.json();
+        })
         .then(players => {
-            currentPlayers = players;
+            currentPlayers = Array.isArray(players) ? players : [];
             renderPlayersList();
         })
         .catch(err => console.log("Error fetching players:", err));
@@ -1001,14 +878,10 @@ function renderPlayersList() {
         return;
     }
     
-    const onlineCount = currentPlayers.length; 
-    document.getElementById('playersActiveText').innerText = `${onlineCount} Active`;
+    document.getElementById('playersActiveText').innerText = `${currentPlayers.length} Active`;
 
     container.innerHTML = currentPlayers.map(p => {
-        const discordId = p.identifiers ? p.identifiers.discord : 'N/A';
-        const status = 'Online'; 
-        const statusColor = status === 'Online' ? '#22c55e' : '#ff0000';
-        
+        const discordId = (p.identifiers && p.identifiers.discord) ? p.identifiers.discord : 'N/A';
         return `
             <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openPlayerProfile('${p.id}')">
                 <div>
@@ -1018,7 +891,7 @@ function renderPlayersList() {
                         <i class="fa-brands fa-discord"></i> ${discordId}
                     </div>
                 </div>
-                <span style="font-size: 0.7rem; font-weight: 600; color: ${statusColor}; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">${status}</span>
+                <span style="font-size: 0.7rem; font-weight: 600; color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">Online</span>
             </div>
         `;
     }).join('');
@@ -1051,7 +924,7 @@ async function openPlayerProfile(playerId) {
         const logsRes = await fetch(`/api/player-logs/${playerId}`, { headers: getAdminHeaders() });
         const logs = await logsRes.json();
         const logsContainer = document.getElementById('profileLogs');
-        if (logs.length > 0) {
+        if (Array.isArray(logs) && logs.length > 0) {
             logsContainer.innerHTML = logs.map(log => `<div class="log-line"><span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span> ${log.message}</div>`).join('');
         } else {
             logsContainer.innerHTML = '<p style="color: #555;">No logs found.</p>';
@@ -1100,7 +973,7 @@ function startStream() {
         try {
             const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
             const data = await res.json();
-            if (data.frame) {
+            if (data && data.frame) {
                 const slot = document.getElementById(`stream-${playerId}`);
                 if (slot) {
                     slot.innerHTML = `
@@ -1110,10 +983,11 @@ function startStream() {
                 }
             }
         } catch(e) {}
-    }, 200); 
+    }, 500); 
 
     closeProfileModal();
-    switchTab('multi', document.querySelectorAll('.nav-btn')[5]);
+    switchTab('admin');
+    switchAdminTab('multi', document.querySelectorAll('.admin-nav-btn')[8]);
 }
 
 function requestFullscreen(elementId) {
