@@ -57,12 +57,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .section-title { text-align: center; margin-bottom: 4rem; }
 .section-title h2 { font-family: var(--font-title); font-size: 3.5rem; margin-bottom: 0.5rem; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
 .section-title p { color: var(--text-muted); font-family: var(--font-sub); font-size: 1.2rem; letter-spacing: 1px; }
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 6rem; }
-.feature-card { background: var(--card); border: 1px solid var(--border); padding: 2.5rem 2rem; transition: 0.3s; }
-.feature-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
-.feature-card i { font-size: 2.5rem; color: var(--accent); margin-bottom: 1.5rem; }
-.feature-card h4 { font-family: var(--font-sub); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-.feature-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
+
 .status-box { background: var(--card); border: 1px solid var(--border); padding: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 6rem; }
 .status-label { font-family: var(--font-sub); font-size: 1rem; color: #22c55e; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 2px; }
 .dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #22c55e; }
@@ -80,39 +75,6 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .app-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,0,0.2); }
 .app-card .app-icon { position: relative; z-index: 2; font-size: 2rem; color: #fff; }
 .app-card .app-title { position: relative; z-index: 2; font-family: var(--font-title); font-size: 1.5rem; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
-.gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-.gang-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: 0.3s; }
-.gang-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-.gang-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.gang-logo { width: 50px; height: 50px; background: #222; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 1.5rem; overflow: hidden; }
-.gang-logo img { width: 100%; height: 100%; object-fit: cover; }
-.gang-title { font-family: var(--font-sub); font-size: 1.4rem; font-weight: 600; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
-.gang-members-count { font-family: var(--font-sub); font-size: 0.85rem; color: var(--accent); font-weight: 600; letter-spacing: 1px; }
-.gang-roster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
-.gang-member { text-align: center; }
-.gang-member img { width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--border); transition: 0.2s; }
-.gang-member:hover img { border-color: var(--accent); }
-.gang-member-name { font-family: var(--font-sub); font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-.shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.shop-item { background: var(--card); border: 1px solid var(--border); overflow: hidden; transition: 0.3s; }
-.shop-item:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
-.shop-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.shop-img img { width: 100%; height: 100%; object-fit: cover; }
-.shop-body { padding: 1.5rem; }
-.shop-price { font-family: var(--font-title); font-size: 1.4rem; color: var(--accent); margin-bottom: 0.2rem; letter-spacing: 1px; }
-.shop-title { font-family: var(--font-sub); font-size: 1.1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
-.rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.rule-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: 0.3s; }
-.rule-card:hover { border-color: #333; }
-.rule-card h3 { font-family: var(--font-sub); font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
-.rule-card h3 i { color: var(--accent); }
-.rule-card ul { list-style: none; padding: 0; }
-.rule-card li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; padding: 0.5rem 0 0.5rem 1.5rem; position: relative; border-bottom: 1px solid #121212; }
-.rule-card li:last-child { border-bottom: none; }
-.rule-card li::before { content: '■'; position: absolute; left: 0; color: var(--accent); font-size: 0.6rem; top: 0.8rem; }
-.rule-card li strong { color: #fff; font-weight: 600; }
-.rule-card .punish { display: inline-block; margin-top: 1rem; font-family: var(--font-sub); font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255,0,0,0.15); border: 1px solid var(--accent); padding: 0.3rem 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-.rule-card .punish.perma { background: var(--accent); }
 
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
@@ -171,14 +133,29 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 .logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
 .log-line { border-bottom: 1px solid #0a0a0a; padding: 0.4rem 0; }
 .log-time { color: #ff0000; font-weight: bold; margin-right: 10px; }
-.stream-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; height: calc(100vh - 250px); min-height: 500px; }
-.stream-slot { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #555; transition: 0.2s; cursor: pointer; position: relative; overflow: hidden; }
-.stream-slot:hover { border-color: #ff0000; background: #111; }
-.stream-slot i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
-.stream-slot span { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-.fs-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 10; }
-.stream-slot:hover .fs-btn { opacity: 1; }
-#playerProfileModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 2rem; }
+
+/* Players Table Style */
+.players-table-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; width: 100%; }
+.custom-players-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+.custom-players-table th { padding: 1.2rem 1.5rem; color: var(--text-muted); font-family: var(--font-sub); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid var(--border); font-weight: 700; }
+.custom-players-table td { padding: 1.2rem 1.5rem; border-bottom: 1px solid #111; color: #fff; }
+.custom-players-table tr:hover { background: rgba(255,255,255,0.01); }
+.status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-family: var(--font-sub); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.status-badge.online { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+.status-badge.offline { background: rgba(255, 255, 255, 0.05); color: #777; border: 1px solid var(--border); }
+
+/* Multi-Stream Grid Style */
+.multi-stream-layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; height: calc(100vh - 180px); }
+.stream-grid-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 1rem; position: relative; overflow-y: auto; min-height: 550px; align-content: start; }
+.no-streams-content { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); font-family: var(--font-sub); height: 100%; margin: auto; }
+.no-streams-content i { font-size: 3.5rem; color: #444; margin-bottom: 1rem; }
+.no-streams-content h3 { font-size: 1.5rem; color: #fff; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 1px; }
+.stream-slot { background: #000; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #555; height: 260px; position: relative; overflow: hidden; }
+.fs-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; z-index: 10; }
+
+/* Modal Profile (Z-Index Fix) */
+#playerProfileModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 99999 !important; align-items: center; justify-content: center; padding: 2rem; }
+#playerProfileModal.active { display: flex !important; }
 .profile-card { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 12px; width: 100%; max-width: 700px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
 .profile-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f1f1f; padding-bottom: 1rem; margin-bottom: 1.5rem; }
 .profile-header h2 { font-family: var(--font-title); font-size: 2rem; color: #fff; }
@@ -241,12 +218,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                 <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
             </div>
         </div>
-        <div class="section-title"><h2>Why Choose Us</h2><p>Experience the difference with our custom systems.</p></div>
-        <div class="features-grid">
-            <div class="feature-card"><i class="fa-solid fa-shield-halved"></i><h4>Hardcore Roleplay</h4><p>Real consequences, real stories. You play your character, or you don't play at all.</p></div>
-            <div class="feature-card"><i class="fa-solid fa-bolt"></i><h4>Zero Lag</h4><p>Custom-built scripts and high-end hardware. Smooth gameplay even in full-scale gang wars.</p></div>
-            <div class="feature-card"><i class="fa-solid fa-sack-dollar"></i><h4>Street Economy</h4><p>Grind from the bottom to the top. A fair market where hustlers thrive and kings are made.</p></div>
-        </div>
     </div>
 
     <div id="tab-apps" class="tab">
@@ -258,10 +229,10 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
         </div>
         <div class="apps-grid" id="appsGrid" style="display: none;">
-            <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
-            <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
-            <div class="app-card" data-app="Police App" style="background-image: url('https://i.ibb.co/3Wq0zR5/police.jpg');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
-            <div class="app-card" data-app="EMS App" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-briefcase-medical app-icon"></i><div class="app-title">EMS Dept</div></div>
+            <div class="app-card" data-app="Whitelist" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
+            <div class="app-card" data-app="Gang & Family" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
+            <div class="app-card" data-app="Police Dept" style="background-image: url('https://i.ibb.co/3Wq0zR5/police.jpg');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
+            <div class="app-card" data-app="EMS Dept" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-briefcase-medical app-icon"></i><div class="app-title">EMS Dept</div></div>
         </div>
     </div>
 
@@ -273,24 +244,8 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
     <div id="tab-rules" class="tab">
         <div class="section-title"><h2>Server Rules</h2><p>Read carefully — breaking these rules leads to punishment.</p></div>
         <div class="rules-grid">
-            <div class="rule-card"><h3><i class="fa-solid fa-heart-pulse"></i> Value of Life</h3><ul><li>Idha wehed haz alik sleh lezmk t5af ala hyetk.</li><li>Idha haz alik sleh w nti rakeb fi karhba 7absa lazem thez idek w tahbet mel karhba.</li><li>Idha karhba temchi mehich value of life.</li></ul></div>
+            <div class="rule-card"><h3><i class="fa-solid fa-heart-pulse"></i> Value of Life</h3><ul><li>Idha wehed haz alik sleh lezmk t5af ala hyetk.</li></ul></div>
             <div class="rule-card"><h3><i class="fa-solid fa-car-burst"></i> Vehicle Deathmatch (RVDM)</h3><ul><li>To9tel player bel karhba wela motor.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-skull-crossbones"></i> Random Deathmatch (RDM)</h3><ul><li>To9tel player men ghir sbab.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-tree"></i> Green Zone</h3><ul><li>Blayess mamnou3 ta3ml fihom wala tahki fehom 3la ay 7aja illegal.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-face-frown"></i> Fail RP</h3><ul><li>Ta3mel 7aja moch ma39oula.</li><li>Gang tsob b gang o5ra lel 7akem.</li><li>EMS yo9tel fel l3bed.</li><li>7akem yemchi ya3ml illegal.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-code"></i> Script Abuse</h3><ul><li>Tatla3 f karhba f west fight.</li><li>Testa3mel script bech ta3di sa7bek fi bab msker.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-eye-slash"></i> Meta Gaming</h3><ul><li>Testa3ml Information ta3rfha Hors RP mekch ma5oha in game fel RP.</li><li>Taref wehed b souto, waela tarfo o houwa labes mask.</li><li>Tjib info mel discord wela men Stream.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-users-slash"></i> Third Party</h3><ul><li>Player fi west Robbery w tji 3bed o5ra t7eb tfoklha Robbery mta7a.</li><li>Zoz gangwat fi fight w nti tod5el m3a wa7d menhom (alliance).</li><li>Alliance masmou7 ben zoz gangwat ken fel business.</li><li>Hakem andou lha9 yeda5el ela ba3ed matoufa l fight.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-plug-circle-xmark"></i> Combat Logging</h3><ul><li><strong>ALT+F4 :</strong> Wipe + ban 7 days.</li><li>AFK fi scene.</li><li>Faila m3ak ckoun ma ta3melch ALT+F4, kaml scene w reporti.</li></ul><span class="punish">ALT+F4 → Wipe + Ban 7 Days</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-bug"></i> Glitch</h3><ul><li>Exploiting glitches or bugs is strictly forbidden.</li></ul><span class="punish perma">Perma Ban — NO Unban</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-hand"></i> ROB</h3><ul><li><strong>NO ROB</strong></li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-people-group"></i> Fight Size Limit</h3><ul><li>Akther men 6 players fi fight.</li></ul><span class="punish">Ban 2 Days</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-rotate-right"></i> New Life Rule</h3><ul><li>Ki dou5 w trespawni fel sbitar tansa el scene eli do5t feha.</li><li>Ki dou5 w fay9k EMS wala hazouk le sbitar tetfakr scene eli mot faha.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-gavel"></i> Third Party Rules Update</h3><ul><li>Ay player ya3ml f ay Robbery, ma 3andkch l7a9 treacty m3ah kan maykaml robbery mta3o.</li><li>Kan haz rahina w makhlatech 3alih 9bal maywsal l robbery, ma andekch lha9 treacty m3ah.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-comment-slash"></i> Toxic RP</h3><ul><li>Matnajamch tseb l3bed mn ghir 7ata reason.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-ban"></i> Disrespect Player</h3><ul><li>Mamnou3 SABEN LOM - KAFRAN RABI.</li><li>Matnajamch treacti m3a 3abd deyfs (Only GG).</li><li>T7ot wa7ed fi boubala.</li><li>Random + fanet + ...</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-crosshairs"></i> Free Kill</h3><ul><li>To9tel player min ghir warning.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-user-tie"></i> Acting As Admin</h3><ul><li>Tahki wela tetsaref fil RP keyink admin. Exemple: twa9ef scene / 3andek 3omra 2d / li ta3ml fi ghalit haw chnd3i bik...</li></ul></div>
         </div>
     </div>
 
@@ -386,12 +341,25 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                 </div>
             </div>
             <div id="adminTab-players" class="admin-tab">
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">All Members</h3>
-                        <button class="admin-btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0; font-size: 1.4rem; color: #fff;">Players Management</h3>
+                    <button class="admin-btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                </div>
+                <div class="players-table-container">
+                    <table class="custom-players-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Status</th>
+                                <th>Playtime</th>
+                                <th>Sessions</th>
+                                <th>Last Seen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersTableBody">
+                            <tr><td colspan="5" style="text-align: center; color: #555; padding: 3rem;">Loading players...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div id="adminTab-logs" class="admin-tab">
@@ -411,8 +379,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL">
                         <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
                         <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID">
-                        <input class="admin-input" type="text" id="newGangUnderboss" placeholder="Underboss Name">
-                        <input class="admin-input" type="text" id="newGangUnderbossId" placeholder="Underboss ID">
                     </div>
                     <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
                 </div>
@@ -428,14 +394,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <input class="admin-input" type="text" id="newShopName" placeholder="Item Name">
                         <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)">
                         <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL">
-                        <select class="admin-input" id="newShopCategory" style="background: #000; border: 1px solid #1f1f1f; padding: 0.8rem 1rem; border-radius: 8px; color: #fff; outline: none;">
-                            <option value="Car">Car</option>
-                            <option value="Motor">Motor</option>
-                            <option value="MLO">MLO</option>
-                            <option value="Ped">Ped</option>
-                            <option value="House">House</option>
-                            <option value="Other">Other</option>
-                        </select>
                     </div>
                     <button class="admin-btn primary" id="addShopBtn">Add Item</button>
                 </div>
@@ -445,20 +403,22 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                 </div>
             </div>
             <div id="adminTab-multi" class="admin-tab">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
-                    <button class="admin-btn" onclick="resetStreams()"><i class="fa-solid fa-xmark"></i> Reset</button>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; height: calc(100vh - 250px);">
-                    <div id="streamGrid" class="stream-grid-container"></div>
-                    <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
+                <div class="multi-stream-layout">
+                    <div class="stream-grid-box" id="streamGrid">
+                        <div class="no-streams-content">
+                            <i class="fa-solid fa-video-slash"></i>
+                            <h3>No streams selected</h3>
+                            <p>Select players from the sidebar to start watching</p>
+                        </div>
+                    </div>
+                    <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column; background: var(--card);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0;">All Members</h3>
-                            <span style="color: #555; font-size: 0.75rem;" id="playersActiveText">0 Active</span>
+                            <h3 style="margin: 0; font-size: 1rem; color: #fff;">Players Online</h3>
+                            <span style="color: var(--accent); font-size: 0.8rem; font-weight: 600;" id="playersActiveText">0 Active</span>
                         </div>
                         <input class="admin-input" type="text" placeholder="Search players..." id="playerSearch" onkeyup="filterPlayers()" style="margin-bottom: 1rem;">
                         <div style="flex: 1; overflow-y: auto;" id="playersListContainer">
-                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 0.85rem;">No players online</div>
                         </div>
                     </div>
                 </div>
@@ -474,23 +434,13 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <h2 id="profileName">Player Name</h2>
             <span id="profileId" style="color: var(--accent); font-weight: bold;">ID: -</span>
         </div>
-        
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Identifiers</h3>
         <div id="profileIdentifiers" style="margin-bottom: 1.5rem;"></div>
 
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="admin-card" style="margin: 0; text-align: center;">
-                <p style="color: #555; font-size: 0.8rem;">Bans</p>
-                <h3 id="profileBans" style="color: #ff0000; font-size: 1.5rem;">0</h3>
-            </div>
-            <div class="admin-card" style="margin: 0; text-align: center;">
-                <p style="color: #555; font-size: 0.8rem;">Warns</p>
-                <h3 id="profileWarns" style="color: #f59e0b; font-size: 1.5rem;">0</h3>
-            </div>
-            <div class="admin-card" style="margin: 0; text-align: center;">
-                <p style="color: #555; font-size: 0.8rem;">Kicks</p>
-                <h3 id="profileKicks" style="color: #888; font-size: 1.5rem;">0</h3>
-            </div>
+            <div class="admin-card" style="margin: 0; text-align: center;"><p style="color: #555; font-size: 0.8rem;">Bans</p><h3 id="profileBans" style="color: #ff0000; font-size: 1.5rem;">0</h3></div>
+            <div class="admin-card" style="margin: 0; text-align: center;"><p style="color: #555; font-size: 0.8rem;">Warns</p><h3 id="profileWarns" style="color: #f59e0b; font-size: 1.5rem;">0</h3></div>
+            <div class="admin-card" style="margin: 0; text-align: center;"><p style="color: #555; font-size: 0.8rem;">Kicks</p><h3 id="profileKicks" style="color: #888; font-size: 1.5rem;">0</h3></div>
         </div>
 
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Action</h3>
@@ -498,7 +448,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <button class="admin-btn reject" onclick="actionPlayer('ban')"><i class="fa-solid fa-ban"></i> Ban</button>
             <button class="admin-btn" onclick="actionPlayer('kick')"><i class="fa-solid fa-shoe-prints"></i> Kick</button>
             <button class="admin-btn" style="background: #f59e0b; color: #fff;" onclick="actionPlayer('warn')"><i class="fa-solid fa-triangle-exclamation"></i> Warn</button>
-            <button class="admin-btn primary" onclick="startStream()"><i class="fa-solid fa-camera"></i> Start Stream</button>
         </div>
 
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Recent Logs</h3>
@@ -603,29 +552,37 @@ async function checkLogin() {
                     document.getElementById('adminPanelView').style.display = 'grid';
                     loadAdmin(); 
                 }
-            } catch (e) { console.log("Not admin"); }
+            } catch (e) {}
         } else {
             document.getElementById('loginRequiredMsg').style.display = 'block';
             document.getElementById('appsGrid').style.display = 'none';
         }
-    } catch (e) { console.log("Not logged in"); }
+    } catch (e) {}
 }
 checkLogin();
 
 const appConfigs = {
-    "Whitelist App": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
-    "Gang & Family App": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true }, { label: "Members IDs *", type: "textarea", name: "members_ids", placeholder: "8+ IDs...", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
-    "Police App": { title: "Police Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why PD? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]},
-    "EMS App": { title: "EMS Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why EMS? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]}
+    "Whitelist": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
+    "Gang & Family": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
+    "Police Dept": { title: "Police Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Motivation *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true } ]},
+    "EMS Dept": { title: "EMS Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Motivation *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true } ]}
 };
 
 let currentType = '';
-
 async function openModal(title) {
     if (!loggedInUser) return alert("You must login first!");
+
+    try {
+        const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
+        const checkData = await checkRes.json();
+        if (checkData.blocked) {
+            alert(`❌ Your previous application for ${title} was rejected. Please wait ${checkData.hoursLeft} hours before applying again.`);
+            return;
+        }
+    } catch(e) {}
+
     currentType = title;
     document.getElementById('modalTitle').innerText = appConfigs[title] ? appConfigs[title].title : "Application";
-    
     const config = appConfigs[title] || { title: "Support", fields: [] };
     const fieldsContainer = document.getElementById('dynamicFormFields');
     fieldsContainer.innerHTML = '';
@@ -636,9 +593,8 @@ async function openModal(title) {
         label.className = 'form-label';
         label.innerText = f.label;
         group.appendChild(label);
-        let input;
-        if (f.type === 'textarea') { input = document.createElement('textarea'); input.className = 'form-input form-textarea'; }
-        else { input = document.createElement('input'); input.type = f.type || 'text'; input.className = 'form-input'; }
+        let input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+        input.className = f.type === 'textarea' ? 'form-input form-textarea' : 'form-input';
         input.name = f.name; input.placeholder = f.placeholder || '';
         if (f.required) input.required = true;
         group.appendChild(input);
@@ -655,32 +611,25 @@ document.querySelectorAll('[data-app]').forEach(el => {
 
 document.getElementById('ticketForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    if (!loggedInUser) { alert('You must be logged in to submit an application.'); return; }
+    if (!loggedInUser) { alert('You must be logged in.'); return; }
     const formData = new FormData(this); const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
-    
     try {
         const res = await fetch('/api/tickets', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 type: currentType, 
-                subject: dataObj.char_name || 'N/A', 
-                message: JSON.stringify(dataObj), 
-                discordId: loggedInUser.id,
-                createdAt: Date.now()
+                subject: dataObj.char_name || dataObj.gang_name || 'N/A', 
+                message: JSON.stringify(dataObj),
+                discordId: loggedInUser.id
             })
         });
-
-        if (res.ok) {
-            alert('✅ Application Submitted!');
-            closeModal(); this.reset();
-        } else {
+        if (res.ok) { alert('✅ Application Submitted!'); closeModal(); this.reset(); }
+        else { 
             const data = await res.json();
-            alert(`❌ ${data.error || 'Error'}`);
+            alert(`❌ ${data.error || 'Error submitting application.'}`); 
         }
-    } catch(err) {
-        alert('❌ Error submitting application. Please try again.');
-    }
+    } catch(err) { alert('❌ Error submitting application.'); }
 });
 
 async function loadStats() {
@@ -703,15 +652,7 @@ async function loadGangs() {
             <div class="gang-card">
                 <div class="gang-header">
                     <div class="gang-logo">${g.logo ? `<img src="${g.logo}">` : 'G'}</div>
-                    <div>
-                        <div class="gang-title">${g.name}</div>
-                        <div class="gang-members-count">${g.members ? g.members.length : 0} MEMBERS</div>
-                    </div>
-                </div>
-                <div class="gang-roster">
-                    ${(g.boss ? `<div class="gang-member"><img src="${g.bossAvatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.boss}</span></div>` : '')}
-                    ${(g.underboss ? `<div class="gang-member"><img src="${g.underbossAvatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
-                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar || ''}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
+                    <div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members ? g.members.length : 0} MEMBERS</div></div>
                 </div>
             </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No gangs registered.</p>';
         document.getElementById('ovGangs').innerText = gangs.length;
@@ -721,21 +662,9 @@ async function loadGangs() {
 async function loadShop() {
     try {
         const res = await fetch('/api/shop'); const items = await res.json();
-        const container = document.getElementById('shopGrid');
-        if (!items || items.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
-            return;
-        }
-        let html = '';
-        items.forEach(i => {
-            html += `
-                <div class="shop-item">
-                    <div class="shop-img"><img src="${i.image}"></div>
-                    <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
+        document.getElementById('shopGrid').innerHTML = items.length ? items.map(i => `
+            <div class="shop-item"><div class="shop-img"><img src="${i.image}"></div><div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div></div>
+        `).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
     } catch(e){}
 }
 
@@ -758,9 +687,8 @@ function getAdminHeaders() {
 async function loadAdmin() {
     const headers = getAdminHeaders();
     const tRes = await fetch('/api/tickets', { headers });
-    if (!tRes.ok) { document.getElementById('adminTickets').innerHTML = '<p style="color:#ef4444;">Error loading tickets.</p>'; return; }
+    if (!tRes.ok) return;
     const t = await tRes.json();
-    
     let html = '';
     if (!Array.isArray(t) || t.length === 0) {
         document.getElementById('adminTickets').innerHTML = '<p style="color:#555;">No tickets found.</p>';
@@ -774,14 +702,10 @@ async function loadAdmin() {
             let ticketId = x.id || x._id;
             let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${ticketId}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${ticketId}', 'rejected')">Reject</button>` : '';
             html += `<div style="background:#0b0f19; border:1px solid #1c2538; padding:1rem; margin-bottom:1rem; border-radius: 8px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <strong style="font-size:0.95rem; color:#fff;">${x.type}</strong>
-                    <span style="color:${statusColor}; font-weight:bold; font-size:0.8rem;">${x.status ? x.status.toUpperCase() : 'UNKNOWN'}</span>
-                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><strong style="font-size:0.95rem; color:#fff;">${x.type}</strong><span style="color:${statusColor}; font-weight:bold; font-size:0.8rem;">${x.status.toUpperCase()}</span></div>
                 <div style="font-size:0.85rem; color:#8892a8; margin-bottom:0.8rem; line-height:1.4;">${details}</div>
                 ${x.reason ? `<div style="color:#ef4444; font-size:0.85rem; margin-bottom:0.8rem;"><b>Reason:</b> ${x.reason}</div>` : ''}
-                <div>${actionBtns}</div>
-            </div>`;
+                <div>${actionBtns}</div></div>`;
         });
         document.getElementById('adminTickets').innerHTML = html;
         document.getElementById('ovTickets').innerText = t.filter(x => x.status === 'pending').length;
@@ -790,10 +714,7 @@ async function loadAdmin() {
 
 async function updateTicket(id, st) { 
     let reason = '';
-    if (st === 'rejected') {
-        reason = prompt("Reason for rejection:");
-        if (reason === null) return;
-    }
+    if (st === 'rejected') { reason = prompt("Reason for rejection:"); if (reason === null) return; }
     await fetch('/api/tickets/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({status:st, reason:reason}) }); 
     loadAdmin(); 
 }
@@ -801,54 +722,26 @@ async function updateTicket(id, st) {
 async function loadFivemLogs() {
     const container = document.getElementById('fivemLogsContainer');
     if (!container) return; 
-    container.innerHTML = '<p style="color:#555;">Loading logs...</p>';
     try {
         const res = await fetch('/api/logs', { headers: getAdminHeaders() });
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-            container.innerHTML = data.map(log => `
-                <div class="log-line">
-                    <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
-                    <span style="color: var(--accent);">[${log.category}]</span> - ${log.message}
-                </div>
-            `).join('');
-        } else { container.innerHTML = '<p style="color:#555;">No logs found.</p>'; }
-    } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
+        container.innerHTML = Array.isArray(data) && data.length ? data.map(log => `<div class="log-line"><span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span> <span style="color: var(--accent);">[${log.category}]</span> - ${log.message}</div>`).join('') : '<p style="color:#555;">No logs found.</p>';
+    } catch (e) {}
 }
 
 async function loadBans() {
-    const container = document.getElementById('bansList');
-    if (!container) return;
-    container.innerHTML = '<p style="color:#555;">Loading...</p>';
-    try {
-        const res = await fetch('/api/bans', { headers: getAdminHeaders() });
-        const bans = await res.json();
-        if (!Array.isArray(bans) || bans.length === 0) { container.innerHTML = '<p style="color:#555;">No bans found.</p>'; return; }
-        container.innerHTML = `<table class="admin-table">
-            <tr><th>Player</th><th>Reason</th><th>Date</th></tr>
-            ${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}
-        </table>`;
-    } catch(e) {}
+    const res = await fetch('/api/bans', { headers: getAdminHeaders() });
+    const bans = await res.json();
+    document.getElementById('bansList').innerHTML = Array.isArray(bans) && bans.length ? `<table class="admin-table"><tr><th>Player</th><th>Reason</th><th>Date</th></tr>${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}</table>` : '<p style="color:#555;">No bans found.</p>';
 }
 
 async function loadDetections() {
-    const container = document.getElementById('detectionsList');
-    if (!container) return;
-    container.innerHTML = '<p style="color:#555;">Loading...</p>';
-    try {
-        const res = await fetch('/api/detections', { headers: getAdminHeaders() });
-        const dets = await res.json();
-        if (!Array.isArray(dets) || dets.length === 0) { container.innerHTML = '<p style="color:#555;">No detections found.</p>'; return; }
-        container.innerHTML = `<table class="admin-table">
-            <tr><th>Player</th><th>Type</th><th>Date</th></tr>
-            ${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}
-        </table>`;
-    } catch(e) {}
+    const res = await fetch('/api/detections', { headers: getAdminHeaders() });
+    const dets = await res.json();
+    document.getElementById('detectionsList').innerHTML = Array.isArray(dets) && dets.length ? `<table class="admin-table"><tr><th>Player</th><th>Type</th><th>Date</th></tr>${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}</table>` : '<p style="color:#555;">No detections found.</p>';
 }
 
-async function loadPlayers() {
-    fetchPlayers();
-}
+async function loadPlayers() { fetchPlayers(); }
 
 let currentPlayers = [];
 let activeStreams = {};
@@ -858,43 +751,48 @@ let selectedPlayer = null;
 
 function fetchPlayers() {
     fetch('/api/players', { headers: getAdminHeaders() })
-        .then(res => {
-            if (!res.ok) throw new Error('Unauthorized');
-            return res.json();
-        })
+        .then(res => res.json())
         .then(players => {
             currentPlayers = Array.isArray(players) ? players : [];
             renderPlayersList();
         })
-        .catch(err => console.log("Error fetching players:", err));
+        .catch(err => {});
 }
 
 function renderPlayersList() {
-    const container = document.getElementById('playersListContainer');
-    if (!container) return;
+    const tbody = document.getElementById('playersTableBody');
+    const sidebarContainer = document.getElementById('playersListContainer');
+    if (!tbody) return;
+
     if (currentPlayers.length === 0) {
-        container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>';
-        document.getElementById('playersActiveText').innerText = `0 Active`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #555; padding: 3rem;">No players found.</td></tr>`;
+        if(sidebarContainer) sidebarContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>';
         return;
     }
-    
+
     document.getElementById('playersActiveText').innerText = `${currentPlayers.length} Active`;
 
-    container.innerHTML = currentPlayers.map(p => {
-        const discordId = (p.identifiers && p.identifiers.discord) ? p.identifiers.discord : 'N/A';
+    tbody.innerHTML = currentPlayers.map(p => {
+        const license = (p.identifiers && p.identifiers.license) ? p.identifiers.license : 'N/A';
         return `
-            <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openPlayerProfile('${p.id}')">
-                <div>
-                    <span style="color: #fff; font-weight: 600;">${p.name}</span>
-                    <span style="color: #555; font-size: 0.75rem; margin-left: 0.5rem;">(${p.id})</span>
-                    <div style="font-size: 0.75rem; color: #888; margin-top: 0.2rem;">
-                        <i class="fa-brands fa-discord"></i> ${discordId}
-                    </div>
-                </div>
-                <span style="font-size: 0.7rem; font-weight: 600; color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">Online</span>
-            </div>
+            <tr onclick="openPlayerProfile('${p.id}')" style="cursor: pointer;">
+                <td><div style="font-weight: 600; color: #fff;">${p.name}</div><div style="color: var(--text-muted); font-size: 0.75rem; font-family: monospace;">license:${license}</div></td>
+                <td><span class="status-badge online">ONLINE</span></td>
+                <td style="color: #ccc;">${p.playtime || '0m'}</td>
+                <td style="color: #ccc;">${p.sessions || 1}</td>
+                <td style="color: var(--text-muted);">${p.lastSeen || 'Just now'}</td>
+            </tr>
         `;
     }).join('');
+
+    if(sidebarContainer) {
+        sidebarContainer.innerHTML = currentPlayers.map(p => `
+            <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center;">
+                <div><span style="color: #fff; font-weight: 600; font-size: 0.85rem;">${p.name}</span><span style="color: #555; font-size: 0.75rem; margin-left: 0.4rem;">(${p.id})</span></div>
+                <button class="admin-btn primary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="toggleStream('${p.id}', '${p.name}')"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        `).join('');
+    }
 }
 
 async function openPlayerProfile(playerId) {
@@ -909,7 +807,7 @@ async function openPlayerProfile(playerId) {
         for (const [key, val] of Object.entries(selectedPlayer.identifiers)) {
             idsHtml += `<div class="id-badge"><i class="fa-solid fa-id-card"></i> ${key.toUpperCase()}: ${val}</div>`;
         }
-    } else { idsHtml = '<p style="color: #555;">No identifiers found.</p>'; }
+    }
     document.getElementById('profileIdentifiers').innerHTML = idsHtml;
 
     try {
@@ -920,22 +818,11 @@ async function openPlayerProfile(playerId) {
         document.getElementById('profileKicks').innerText = stats.kicks || 0;
     } catch(e) {}
 
-    try {
-        const logsRes = await fetch(`/api/player-logs/${playerId}`, { headers: getAdminHeaders() });
-        const logs = await logsRes.json();
-        const logsContainer = document.getElementById('profileLogs');
-        if (Array.isArray(logs) && logs.length > 0) {
-            logsContainer.innerHTML = logs.map(log => `<div class="log-line"><span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span> ${log.message}</div>`).join('');
-        } else {
-            logsContainer.innerHTML = '<p style="color: #555;">No logs found.</p>';
-        }
-    } catch(e) { document.getElementById('profileLogs').innerHTML = '<p style="color: #555;">Error loading logs.</p>'; }
-
-    document.getElementById('playerProfileModal').style.display = 'flex';
+    document.getElementById('playerProfileModal').classList.add('active');
 }
 
 function closeProfileModal() {
-    document.getElementById('playerProfileModal').style.display = 'none';
+    document.getElementById('playerProfileModal').classList.remove('active');
     selectedPlayer = null;
 }
 
@@ -943,89 +830,66 @@ async function actionPlayer(type) {
     if (!selectedPlayer) return;
     const reason = prompt(`Reason for ${type}:`);
     if (reason === null) return;
-
-    await fetch('/api/action', {
-        method: 'POST',
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ playerId: selectedPlayer.id, type, reason })
-    });
-
+    await fetch('/api/action', { method: 'POST', headers: getAdminHeaders(), body: JSON.stringify({ playerId: selectedPlayer.id, type, reason }) });
     alert(`Player ${type}ed!`);
     closeProfileModal();
     fetchPlayers();
 }
 
-function startStream() {
-    if (!selectedPlayer) return;
-    const playerId = selectedPlayer.id;
-    if (activeStreams[playerId]) return;
+function toggleStream(playerId, playerName) {
+    if (activeStreams[playerId]) {
+        delete activeStreams[playerId];
+        if (streamIntervals[playerId]) {
+            clearInterval(streamIntervals[playerId]);
+            delete streamIntervals[playerId];
+        }
+        fetch('/api/action', { method: 'POST', headers: getAdminHeaders(), body: JSON.stringify({ playerId, type: 'stream_stop' }) });
+    } else {
+        activeStreams[playerId] = playerName;
+        fetch('/api/action', { method: 'POST', headers: getAdminHeaders(), body: JSON.stringify({ playerId, type: 'stream_start' }) });
 
-    fetch('/api/action', {
-        method: 'POST',
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ playerId, type: 'stream_start' })
-    });
-
-    activeStreams[playerId] = true;
-    renderStreamGrid();
-
-    streamIntervals[playerId] = setInterval(async () => {
-        try {
-            const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
-            const data = await res.json();
-            if (data && data.frame) {
-                const slot = document.getElementById(`stream-${playerId}`);
-                if (slot) {
-                    slot.innerHTML = `
-                        <img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;">
-                        <button class="fs-btn" onclick="requestFullscreen('stream-${playerId}')"><i class="fa-solid fa-expand"></i></button>
-                    `;
+        streamIntervals[playerId] = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
+                const data = await res.json();
+                if (data && data.frame) {
+                    const slot = document.getElementById(`stream-slot-${playerId}`);
+                    if (slot) {
+                        slot.innerHTML = `<img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;"><button class="fs-btn" onclick="requestFullscreen('stream-slot-${playerId}')"><i class="fa-solid fa-expand"></i></button>`;
+                    }
                 }
-            }
-        } catch(e) {}
-    }, 500); 
-
-    closeProfileModal();
-    switchTab('admin');
-    switchAdminTab('multi', document.querySelectorAll('.admin-nav-btn')[8]);
-}
-
-function requestFullscreen(elementId) {
-    const el = document.getElementById(elementId);
-    if (el.requestFullscreen) el.requestFullscreen();
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            } catch(e) {}
+        }, 500);
+    }
+    renderStreamGrid();
 }
 
 function renderStreamGrid() {
     const grid = document.getElementById('streamGrid');
     if (!grid) return;
     const activeIds = Object.keys(activeStreams);
-    let html = '';
-    activeIds.forEach(id => {
-        const pName = currentPlayers.find(p => p.id == id)?.name || id;
-        html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Connecting to ${pName}...</span></div>`;
-    });
-    for (let i = activeIds.length; i < 16; i++) { 
-        html += `<div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>`;
+    if (activeIds.length === 0) {
+        grid.innerHTML = `<div class="no-streams-content"><i class="fa-solid fa-video-slash"></i><h3>No streams selected</h3><p>Select players from the sidebar to start watching</p></div>`;
+        return;
     }
-    grid.innerHTML = html;
-    document.getElementById('streamsActiveText').innerText = `${activeIds.length}/16 streams active`;
+    grid.innerHTML = activeIds.map(id => `
+        <div id="stream-slot-${id}" class="stream-slot">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:0.5rem;"></i>
+            <span>Connecting to ${activeStreams[id]}...</span>
+        </div>
+    `).join('');
 }
-renderStreamGrid();
+
+function requestFullscreen(elementId) {
+    const el = document.getElementById(elementId);
+    if (el.requestFullscreen) el.requestFullscreen();
+}
 
 function filterPlayers() {
     const query = document.getElementById('playerSearch').value.toLowerCase();
-    const items = document.querySelectorAll('.player-item');
-    items.forEach(item => {
+    document.querySelectorAll('.player-item').forEach(item => {
         item.style.display = item.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
     });
-}
-
-function resetStreams() {
-    Object.keys(streamIntervals).forEach(id => clearInterval(streamIntervals[id]));
-    streamIntervals = {};
-    activeStreams = {};
-    renderStreamGrid();
 }
 
 function startFetchingPlayers() {
