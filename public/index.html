@@ -3,486 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SouthSide S2 | Official Portal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>SouthSide S2 | Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ========== إعدادات عامة ========== */
-:root {
-    --bg: #000000; --card: #0a0a0a; --primary: #ffffff; --accent: #ff0000; 
-    --text: #ffffff; --text-muted: #888888; --border: #1f1f1f;
-    --font-title: 'Anton', sans-serif; --font-sub: 'Oswald', sans-serif; --font-body: 'Inter', sans-serif;
-}
+:root { --bg: #050505; --card: #0a0a0a; --accent: #ff0000; --border: #1f1f1f; --text: #fff; --text-muted: #888; --font-title: 'Anton'; --font-sub: 'Oswald'; --font-body: 'Inter'; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
-body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); z-index: -1; pointer-events: none; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; height: 100vh; display: flex; }
 
-/* Header */
-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 4rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border); }
-.brand { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
-.brand img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #333; }
-.brand h1 { font-family: var(--font-title); font-size: 1.6rem; letter-spacing: 1px; line-height: 1; color: #fff; }
-.brand p { color: var(--accent); font-family: var(--font-sub); font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
-nav { display: flex; gap: 0.5rem; background: #111; padding: 0.3rem; border-radius: 10px; border: 1px solid var(--border); }
-.nav-btn { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 7px; cursor: pointer; transition: 0.2s; background: none; border: none; font-family: inherit; text-transform: uppercase; }
-.nav-btn:hover { color: var(--text); }
-.nav-btn.active { color: #fff; background: var(--accent); border: 1px solid var(--accent); }
-#userArea { display: flex; align-items: center; }
-.btn-login { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.5rem; font-family: var(--font-sub); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; border-radius: 4px; }
-.btn-login:hover { background: #cc0000; color: #fff; }
-.user-profile { display: flex; align-items: center; gap: 0.8rem; background: #111; padding: 0.4rem 1rem; border-radius: 4px; border: 1px solid #333; cursor: pointer; }
-.user-profile img { width: 30px; height: 30px; border-radius: 4px; }
-.user-profile span { font-family: var(--font-sub); font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+/* Sidebar */
+.sidebar { width: 260px; background: #09090b; border-right: 1px solid var(--border); padding: 1.5rem 1rem; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 1rem; padding: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+.brand i { font-size: 1.5rem; color: var(--accent); background: rgba(255, 0, 0, 0.1); padding: 0.5rem; border-radius: 8px; }
+.brand h2 { font-size: 1.2rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+.sidebar h3 { color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin: 1.5rem 0 0.5rem 0.5rem; }
+.nav-btn { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1rem; border-radius: 8px; color: #888; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
+.nav-btn:hover { background: #111; color: #fff; }
+.nav-btn.active { background: rgba(255, 0, 0, 0.1); color: var(--accent); border: 1px solid rgba(255, 0, 0, 0.3); box-shadow: 0 0 15px rgba(255, 0, 0, 0.1); }
+.nav-btn i { width: 18px; text-align: center; font-size: 0.95rem; }
+.user-info { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 0.8rem; padding: 1rem 0.5rem; color: #ccc; font-size: 0.85rem; }
+.user-info img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); }
 
-main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-height: 90vh; }
-.tab { display: none; }
-.tab.active { display: block; }
+/* Main Content */
+.content { flex: 1; padding: 2.5rem 3rem; overflow-y: auto; height: 100vh; background-image: linear-gradient(rgba(31, 31, 31, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(31, 31, 31, 0.3) 1px, transparent 1px); background-size: 40px 40px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+.header h1 { font-size: 1.8rem; font-weight: 700; color: #fff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-/* باقي الصفحات */
-.hero-doc { text-align: center; margin-bottom: 6rem; padding-top: 2rem; }
-.hero-doc h1 { font-family: var(--font-title); font-size: 7rem; letter-spacing: 2px; line-height: 1; margin-bottom: 1.5rem; color: #fff; text-transform: uppercase; }
-.hero-doc h1 em { color: transparent; -webkit-text-stroke: 2px var(--accent); font-style: normal; }
-.hero-doc p { color: var(--text-muted); font-family: var(--font-sub); font-size: 1.3rem; max-width: 700px; margin: 0 auto 3rem; line-height: 1.5; letter-spacing: 1px; }
-.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.btn-main { background: var(--accent); color: #fff; border: none; padding: 1rem 2rem; font-family: var(--font-sub); font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; border-radius: 4px; }
-.btn-main:hover { background: #cc0000; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
-.btn-outline { background: #111; color: #fff; border: 1px solid #333; padding: 1rem 2rem; font-family: var(--font-sub); font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; border-radius: 4px; }
-.btn-outline:hover { background: #222; border-color: #555; transform: translateY(-2px); }
-.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 6rem; }
-.stat-block { background: var(--card); border: 1px solid var(--border); padding: 3rem 2rem; text-align: center; transition: 0.3s; }
-.stat-block:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
-.stat-block h3 { font-family: var(--font-title); font-size: 5rem; color: #fff; margin-bottom: 0.5rem; letter-spacing: 1px; line-height: 1; }
-.stat-block p { color: var(--accent); font-family: var(--font-sub); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
-.section-title { text-align: center; margin-bottom: 4rem; }
-.section-title h2 { font-family: var(--font-title); font-size: 3.5rem; margin-bottom: 0.5rem; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
-.section-title p { color: var(--text-muted); font-family: var(--font-sub); font-size: 1.2rem; letter-spacing: 1px; }
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 6rem; }
-.feature-card { background: var(--card); border: 1px solid var(--border); padding: 2.5rem 2rem; transition: 0.3s; }
-.feature-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
-.feature-card i { font-size: 2.5rem; color: var(--accent); margin-bottom: 1.5rem; }
-.feature-card h4 { font-family: var(--font-sub); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-.feature-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
-.status-box { background: var(--card); border: 1px solid var(--border); padding: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 6rem; }
-.status-label { font-family: var(--font-sub); font-size: 1rem; color: #22c55e; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 2px; }
-.dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #22c55e; }
-.status-name { display: flex; justify-content: space-between; font-family: var(--font-sub); font-weight: 600; margin-bottom: 1rem; font-size: 1.2rem; color: #fff; text-transform: uppercase; }
-.bar { width: 100%; height: 8px; background: #222; margin-bottom: 1.5rem; overflow: hidden; }
-.bar-fill { height: 100%; background: var(--accent); width: 0%; transition: 1s; box-shadow: 0 0 10px var(--accent); }
-.ip-row { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 1rem 1.5rem; border: 1px solid var(--border); font-family: monospace; font-size: 1.1rem; color: #fff; margin-bottom: 1rem; }
-.ip-row i { color: var(--accent); }
-.btn-copy { width: 100%; background: var(--accent); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-weight: 600; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
-.btn-copy:hover { background: #cc0000; }
-.apps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.app-card { position: relative; height: 420px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 2rem; transition: 0.4s; }
-.app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9)); transition: 0.4s; z-index: 1; }
-.app-card:hover::before { background: linear-gradient(to bottom, rgba(255,0,0,0.4), rgba(0,0,0,0.95)); }
-.app-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,0,0.2); }
-.app-card .app-icon { position: relative; z-index: 2; font-size: 2rem; color: #fff; }
-.app-card .app-title { position: relative; z-index: 2; font-family: var(--font-title); font-size: 1.5rem; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
-.gangs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-.gang-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: 0.3s; }
-.gang-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-.gang-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.gang-logo { width: 50px; height: 50px; background: #222; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: 1.5rem; overflow: hidden; }
-.gang-logo img { width: 100%; height: 100%; object-fit: cover; }
-.gang-title { font-family: var(--font-sub); font-size: 1.4rem; font-weight: 600; text-transform: uppercase; color: #fff; letter-spacing: 1px; }
-.gang-members-count { font-family: var(--font-sub); font-size: 0.85rem; color: var(--accent); font-weight: 600; letter-spacing: 1px; }
-.gang-roster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
-.gang-member { text-align: center; }
-.gang-member img { width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--border); transition: 0.2s; }
-.gang-member:hover img { border-color: var(--accent); }
-.gang-member-name { font-family: var(--font-sub); font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-.shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.shop-item { background: var(--card); border: 1px solid var(--border); overflow: hidden; transition: 0.3s; }
-.shop-item:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
-.shop-img { height: 200px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.shop-img img { width: 100%; height: 100%; object-fit: cover; }
-.shop-body { padding: 1.5rem; }
-.shop-price { font-family: var(--font-title); font-size: 1.4rem; color: var(--accent); margin-bottom: 0.2rem; letter-spacing: 1px; }
-.shop-title { font-family: var(--font-sub); font-size: 1.1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
-.rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.rule-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: 0.3s; }
-.rule-card:hover { border-color: #333; }
-.rule-card h3 { font-family: var(--font-sub); font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
-.rule-card h3 i { color: var(--accent); }
-.rule-card ul { list-style: none; padding: 0; }
-.rule-card li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; padding: 0.5rem 0 0.5rem 1.5rem; position: relative; border-bottom: 1px solid #121212; }
-.rule-card li:last-child { border-bottom: none; }
-.rule-card li::before { content: '■'; position: absolute; left: 0; color: var(--accent); font-size: 0.6rem; top: 0.8rem; }
-.rule-card li strong { color: #fff; font-weight: 600; }
-.rule-card .punish { display: inline-block; margin-top: 1rem; font-family: var(--font-sub); font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255,0,0,0.15); border: 1px solid var(--accent); padding: 0.3rem 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-.rule-card .punish.perma { background: var(--accent); }
+/* Cards */
+.card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+.card h3 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+.btn { background: #1f1f1f; color: #fff; border: 1px solid transparent; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+.btn:hover { background: #333; }
+.btn.primary { background: var(--accent); }
+.btn.primary:hover { background: #cc0000; }
 
-/* Modal */
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { text-align: left; padding: 0.8rem; color: #555; border-bottom: 1px solid var(--border); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+td { padding: 0.8rem; border-bottom: 1px solid #111; color: #ccc; }
+
+/* 🔴 Multi Stream Grid (HeRo Style) */
+.stream-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.stream-card { background: #000; border: 1px solid #1f1f1f; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 16/9; display: flex; flex-direction: column; }
+.stream-card img { width: 100%; height: 100%; object-fit: cover; }
+.stream-card .live-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 0.3rem; border: 1px solid #333; }
+.stream-card .live-badge .dot { width: 6px; height: 6px; background: #ff0000; border-radius: 50%; box-shadow: 0 0 5px #ff0000; }
+.stream-card .stream-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0.8rem 1rem; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; justify-content: space-between; align-items: center; }
+.stream-card .stream-name { color: #fff; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+.stream-card .stream-name i { font-size: 0.8rem; }
+.stream-card .stop-btn { background: rgba(255,0,0,0.2); color: #ff0000; border: 1px solid rgba(255,0,0,0.5); padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; transition: 0.2s; }
+.stream-card .stop-btn:hover { background: rgba(255,0,0,0.4); }
+.stream-card.connecting { background: #0a0a0a; display: flex; align-items: center; justify-content: center; }
+.stream-card.connecting i { font-size: 2rem; color: #333; animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Player List */
+.player-item { padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+.player-item:hover { background: #111; }
+
+/* Modals */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 2rem; }
 .modal.active { display: flex; }
-.modal-body { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
-.modal-close { position: absolute; top: 1.5rem; right: 1.5rem; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; background: none; border: none; }
-.form-group { margin-bottom: 1rem; text-align: left; }
-.form-label { display: block; font-family: var(--font-sub); font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
-.form-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 1rem; color: #fff; outline: none; font-family: var(--font-body); }
-.form-input:focus { border-color: var(--accent); }
-.form-textarea { resize: vertical; min-height: 100px; }
+.modal-body { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; border-radius: 12px; }
+.close-btn { position: absolute; top: 1.5rem; right: 1.5rem; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; background: none; border: none; }
 
-/* ========== 🔴 ADMIN PANEL ========== */
-body.admin-mode header, body.admin-mode main { display: none !important; }
-body.admin-mode { background: #050505; overflow: hidden !important; }
-#tab-admin { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #050505; grid-template-columns: 260px 1fr; }
-#tab-admin.active { display: grid; }
-#adminPanelView { display: grid; grid-template-columns: 260px 1fr; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-.admin-sidebar { background: #0a0a0a; border-right: 1px solid #1f1f1f; padding: 1.5rem 1rem; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
-.admin-brand { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #1f1f1f; padding-bottom: 1.5rem; }
-.admin-brand i { font-size: 1.5rem; color: #ff0000; background: rgba(255, 0, 0, 0.1); padding: 0.5rem; border-radius: 8px; }
-.admin-brand h2 { font-size: 1.2rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
-.admin-sidebar h3 { color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin: 1.5rem 0 0.5rem 0.5rem; }
-.admin-nav-btn { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 8px; color: #888; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
-.admin-nav-btn:hover { background: #111; color: #fff; }
-.admin-nav-btn.active { background: rgba(255, 0, 0, 0.1); color: #ff0000; border: 1px solid rgba(255, 0, 0, 0.3); box-shadow: 0 0 15px rgba(255, 0, 0, 0.1); }
-.admin-nav-btn i { width: 18px; text-align: center; font-size: 0.95rem; }
-.admin-user { margin-top: auto; padding-top: 1rem; border-top: 1px solid #1f1f1f; display: flex; align-items: center; gap: 0.8rem; padding: 1rem 0.5rem; color: #ccc; font-size: 0.85rem; }
-.admin-user img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #1f1f1f; }
-.admin-user div { display: flex; flex-direction: column; }
-.admin-user div span:last-child { font-size: 0.7rem; color: #555; cursor: pointer; transition: 0.2s; }
-.admin-user div span:last-child:hover { color: #ff0000; }
-.admin-content { padding: 2.5rem 3rem; overflow-y: auto; background: #050505; height: 100vh; background-image: linear-gradient(rgba(31, 31, 31, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(31, 31, 31, 0.3) 1px, transparent 1px); background-size: 40px 40px; }
-.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-.admin-header h2 { font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-.admin-header .logout-btn { background: #0a0a0a; color: #fff; border: 1px solid #1f1f1f; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
-.admin-header .logout-btn:hover { background: #111; border-color: #ff0000; }
-.admin-tab { display: none; }
-.admin-tab.active { display: block; }
-.admin-card { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-.admin-card h3 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
-.admin-input { width: 100%; background: #000; border: 1px solid #1f1f1f; padding: 0.8rem 1rem; border-radius: 8px; color: #fff; margin-bottom: 0.5rem; outline: none; font-family: inherit; font-size: 0.85rem; transition: 0.2s; }
-.admin-input:focus { border-color: #ff0000; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1); }
-.admin-input::placeholder { color: #555; }
-.admin-btn { background: #1f1f1f; color: #fff; border: 1px solid transparent; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; }
-.admin-btn:hover { background: #333; }
-.admin-btn.primary { background: #ff0000; }
-.admin-btn.primary:hover { background: #cc0000; }
-.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-.admin-table th { text-align: left; padding: 0.8rem; color: #555; border-bottom: 1px solid #1f1f1f; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-.admin-table td { padding: 0.8rem; border-bottom: 1px solid #111; color: #ccc; }
-.admin-table button { background: #1f1f1f; border: none; color: #fff; padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; margin-right: 0.3rem; }
-.admin-table button:hover { background: #333; }
-.admin-table button.accept { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
-.admin-table button.accept:hover { background: rgba(34, 197, 94, 0.25); }
-.admin-table button.reject { background: rgba(255, 0, 0, 0.15); color: #ff0000; border: 1px solid rgba(255, 0, 0, 0.3); }
-.admin-table button.reject:hover { background: rgba(255, 0, 0, 0.25); }
-.logs-container { background: #000; border: 1px solid #1f1f1f; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #888; line-height: 1.6; }
-.log-line { border-bottom: 1px solid #0a0a0a; padding: 0.4rem 0; }
-.log-time { color: #ff0000; font-weight: bold; margin-right: 10px; }
-.stream-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; height: calc(100vh - 250px); min-height: 500px; }
-.stream-slot { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #555; transition: 0.2s; cursor: pointer; position: relative; overflow: hidden; }
-.stream-slot:hover { border-color: #ff0000; background: #111; }
-.stream-slot i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
-.stream-slot span { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-.fs-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 10; }
-.stream-slot:hover .fs-btn { opacity: 1; }
-#playerProfileModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 2rem; }
-.profile-card { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 12px; width: 100%; max-width: 700px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
-.profile-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f1f1f; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-.profile-header h2 { font-family: var(--font-title); font-size: 2rem; color: #fff; }
-.id-badge { background: #111; border: 1px solid #333; padding: 0.4rem 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.9rem; color: #ccc; margin-bottom: 0.5rem; display: inline-block; margin-right: 0.5rem; }
-#adminLoginView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #050505; z-index: 100; background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 60%); }
-@media (max-width: 992px) { 
-    #tab-admin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-    #adminPanelView { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-    .admin-sidebar { flex-direction: row; overflow-x: auto; height: auto; padding: 1rem; border-right: none; border-bottom: 1px solid #1f1f1f; }
-    .admin-sidebar h3, .admin-brand { display: none; }
-    .admin-content { padding: 1.5rem; height: auto; }
-}
+/* Login */
+#loginView { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+#loginView .card { width: 100%; max-width: 400px; text-align: center; padding: 3rem; }
 </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-
-<header>
-    <div class="brand" onclick="switchTab('home')">
-        <img src="/logo.png" alt="SS Logo">
-        <div><h1>SOUTHSIDE S2</h1><p>Roleplay</p></div>
+<!-- Login View -->
+<div id="loginView">
+    <div class="card">
+        <i class="fa-solid fa-shield" style="font-size: 3rem; color: var(--accent); margin-bottom: 1.5rem;"></i>
+        <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">Admin Access</h2>
+        <p style="color: #555; font-size: 0.85rem; margin-bottom: 2rem;">SouthSide S2 Staff Panel</p>
+        <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff; margin-bottom: 1rem; outline: none; text-align: center;">
+        <button class="btn primary" id="adminLoginBtn" style="width: 100%; padding: 0.8rem; justify-content: center;">Login</button>
     </div>
-    <nav id="mainNav">
-        <button class="nav-btn active" data-tab="home">Home</button>
-        <button class="nav-btn" data-tab="apps">Applications</button>
-        <button class="nav-btn" data-tab="illegal">Illegal Network</button>
-        <button class="nav-btn" data-tab="rules">Rules</button>
-        <button class="nav-btn" data-tab="shop">Shop</button>
-    </nav>
-    <div id="userArea">
-        <button class="btn-login" id="loginBtn" onclick="window.location.href='/api/auth/discord'"><i class="fa-brands fa-discord"></i> Login</button>
-    </div>
-</header>
+</div>
 
-<main>
-    <!-- HOME -->
-    <div id="tab-home" class="tab active">
-        <div class="hero-doc">
-            <h1>Join The <em>Elite.</em></h1>
-            <p>A serious roleplay experience where your story matters. No pay-to-win, just pure immersion.</p>
-            <div class="hero-buttons">
-                <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Connect Discord</button>
-                <button class="btn-outline" onclick="document.querySelector('[data-tab=apps]').click()">Apply Whitelist</button>
-            </div>
-        </div>
-        <div class="stats-row">
-            <div class="stat-block"><h3 id="playerCount">0 / 128</h3><p>Active Players</p></div>
-            <div class="stat-block"><h3>50+</h3><p>Custom Scripts</p></div>
-            <div class="stat-block"><h3>24/7</h3><p>Staff Support</p></div>
-        </div>
-        <div class="status-box">
-            <div>
-                <h4 id="statusLabel" class="status-label"><span class="dot"></span> <span id="statusText">Connecting...</span></h4>
-                <div class="status-name"><span>SERVER NAME</span><span id="serverName" style="color:var(--accent);">-</span></div>
-                <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-            </div>
-            <div>
-                <h5 style="color: var(--text-muted); font-family: var(--font-sub); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">Direct Connect</h5>
-                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal"></i></div>
-                <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
-            </div>
-        </div>
-        <div class="section-title"><h2>Why Choose Us</h2><p>Experience the difference with our custom systems.</p></div>
-        <div class="features-grid">
-            <div class="feature-card"><i class="fa-solid fa-shield-halved"></i><h4>Hardcore Roleplay</h4><p>Real consequences, real stories. You play your character, or you don't play at all.</p></div>
-            <div class="feature-card"><i class="fa-solid fa-bolt"></i><h4>Zero Lag</h4><p>Custom-built scripts and high-end hardware. Smooth gameplay even in full-scale gang wars.</p></div>
-            <div class="feature-card"><i class="fa-solid fa-sack-dollar"></i><h4>Street Economy</h4><p>Grind from the bottom to the top. A fair market where hustlers thrive and kings are made.</p></div>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar" style="display: none;">
+    <div class="brand">
+        <i class="fa-solid fa-shield"></i>
+        <h2>Admin Panel</h2>
+    </div>
+    <h3>SERVER</h3>
+    <button class="nav-btn active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
+    <button class="nav-btn" onclick="switchTab('applications', this)"><i class="fa-solid fa-file-lines"></i> Applications</button>
+    <button class="nav-btn" onclick="switchTab('detections', this)"><i class="fa-solid fa-triangle-exclamation"></i> Detections</button>
+    <button class="nav-btn" onclick="switchTab('bans', this)"><i class="fa-solid fa-ban"></i> Bans</button>
+    <button class="nav-btn" onclick="switchTab('players', this)"><i class="fa-solid fa-users"></i> Players</button>
+    <button class="nav-btn" onclick="switchTab('logs', this)"><i class="fa-solid fa-terminal"></i> Logs</button>
+    <button class="nav-btn" onclick="switchTab('gangs', this)"><i class="fa-solid fa-users"></i> Gangs</button>
+    <button class="nav-btn" onclick="switchTab('shop', this)"><i class="fa-solid fa-store"></i> Shop</button>
+    <h3>SCREENSHARE</h3>
+    <button class="nav-btn" onclick="switchTab('multi', this)"><i class="fa-solid fa-desktop"></i> Multi Stream</button>
+    
+    <div class="user-info">
+        <img src="https://cdn.discordapp.com/embed/avatars/0.png" id="adminAvatar">
+        <div>
+            <span style="font-weight: 600; color: #fff;" id="adminUsername">Admin</span>
+            <span onclick="window.location.reload()" style="font-size: 0.7rem; color: #555; cursor: pointer;">Log out</span>
         </div>
     </div>
+</div>
 
-    <!-- APPS -->
-    <div id="tab-apps" class="tab">
-        <div class="section-title"><h2>Applications</h2><p>Select a department to submit your official application</p></div>
-        
-        <div id="loginRequiredMsg" style="display: none; text-align: center; padding: 4rem; background: var(--card); border: 1px dashed var(--border);">
-            <i class="fa-brands fa-discord" style="font-size: 4rem; color: #5865F2; margin-bottom: 1rem;"></i>
-            <h3 style="font-family: var(--font-title); font-size: 2rem; color: #fff; margin-bottom: 1rem;">Login Required</h3>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">You must be logged in with Discord to submit an application.</p>
-            <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
-        </div>
+<!-- Content -->
+<div class="content" id="mainContent" style="display: none;">
+    <div class="header">
+        <h1 id="pageTitle">Overview</h1>
+    </div>
 
-        <div class="apps-grid" id="appsGrid" style="display: none;">
-            <div class="app-card" data-app="Whitelist App" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
-            <div class="app-card" data-app="Gang & Family App" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
-            <div class="app-card" data-app="Police App" style="background-image: url('https://i.ibb.co/3Wq0zR5/police.jpg');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
-            <div class="app-card" data-app="EMS App" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-briefcase-medical app-icon"></i><div class="app-title">EMS Dept</div></div>
+    <!-- Overview Tab -->
+    <div id="tab-overview" class="tab-content active">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+            <div class="card" style="margin: 0;">
+                <p style="color: #555; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">Active Players</p>
+                <h3 style="font-size: 1.8rem; margin: 0;" id="ovPlayers">0</h3>
+            </div>
+            <div class="card" style="margin: 0;">
+                <p style="color: #555; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">Server Status</p>
+                <h3 style="font-size: 1.8rem; margin: 0; color: #22c55e;" id="ovStatus">Online</h3>
+            </div>
         </div>
     </div>
 
-    <!-- ILLEGAL -->
-    <div id="tab-illegal" class="tab">
-        <div class="section-title"><h2>Illegal Network</h2><p>Gangs, heists, and rankings synced from Discord and the server!</p></div>
-        <div class="gangs-grid" id="gangsGrid"></div>
-    </div>
-
-    <!-- RULES -->
-    <div id="tab-rules" class="tab">
-        <div class="section-title"><h2>Server Rules</h2><p>Read carefully — breaking these rules leads to punishment.</p></div>
-        <div class="rules-grid">
-            <div class="rule-card"><h3><i class="fa-solid fa-heart-pulse"></i> Value of Life</h3><ul><li>Idha wehed haz alik sleh lezmk t5af ala hyetk.</li><li>Idha haz alik sleh w nti rakeb fi karhba 7absa lazem thez idek w tahbet mel karhba.</li><li>Idha karhba temchi mehich value of life.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-car-burst"></i> Vehicle Deathmatch (RVDM)</h3><ul><li>To9tel player bel karhba wela motor.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-skull-crossbones"></i> Random Deathmatch (RDM)</h3><ul><li>To9tel player men ghir sbab.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-tree"></i> Green Zone</h3><ul><li>Blayess mamnou3 ta3ml fihom wala tahki fehom 3la ay 7aja illegal.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-face-frown"></i> Fail RP</h3><ul><li>Ta3mel 7aja moch ma39oula.</li><li>Gang tsob b gang o5ra lel 7akem.</li><li>EMS yo9tel fel l3bed.</li><li>7akem yemchi ya3ml illegal.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-code"></i> Script Abuse</h3><ul><li>Tatla3 f karhba f west fight.</li><li>Testa3mel script bech ta3di sa7bek fi bab msker.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-eye-slash"></i> Meta Gaming</h3><ul><li>Testa3ml Information ta3rfha Hors RP mekch ma5oha in game fel RP.</li><li>Taref wehed b souto, waela tarfo o houwa labes mask.</li><li>Tjib info mel discord wela men Stream.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-users-slash"></i> Third Party</h3><ul><li>Player fi west Robbery w tji 3bed o5ra t7eb tfoklha Robbery mta7a.</li><li>Zoz gangwat fi fight w nti tod5el m3a wa7d menhom (alliance).</li><li>Alliance masmou7 ben zoz gangwat ken fel business.</li><li>Hakem andou lha9 yeda5el ela ba3ed matoufa l fight.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-plug-circle-xmark"></i> Combat Logging</h3><ul><li><strong>ALT+F4 :</strong> Wipe + ban 7 days.</li><li>AFK fi scene.</li><li>Faila m3ak ckoun ma ta3melch ALT+F4, kaml scene w reporti.</li></ul><span class="punish">ALT+F4 → Wipe + Ban 7 Days</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-bug"></i> Glitch</h3><ul><li>Exploiting glitches or bugs is strictly forbidden.</li></ul><span class="punish perma">Perma Ban — NO Unban</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-hand"></i> ROB</h3><ul><li><strong>NO ROB</strong></li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-people-group"></i> Fight Size Limit</h3><ul><li>Akther men 6 players fi fight.</li></ul><span class="punish">Ban 2 Days</span></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-rotate-right"></i> New Life Rule</h3><ul><li>Ki dou5 w trespawni fel sbitar tansa el scene eli do5t feha.</li><li>Ki dou5 w fay9k EMS wala hazouk le sbitar tetfakr scene eli mot faha.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-gavel"></i> Third Party Rules Update</h3><ul><li>Ay player ya3ml f ay Robbery, ma 3andkch l7a9 treacty m3ah kan maykaml robbery mta3o.</li><li>Kan haz rahina w makhlatech 3alih 9bal maywsal l robbery, ma andekch lha9 treacty m3ah.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-comment-slash"></i> Toxic RP</h3><ul><li>Matnajamch tseb l3bed mn ghir 7ata reason.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-ban"></i> Disrespect Player</h3><ul><li>Mamnou3 SABEN LOM - KAFRAN RABI.</li><li>Matnajamch treacti m3a 3abd dey5 (Only GG).</li><li>T7ot wa7ed fi boubala.</li><li>Random + fanet + ...</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-crosshairs"></i> Free Kill</h3><ul><li>To9tel player min ghir warning.</li></ul></div>
-            <div class="rule-card"><h3><i class="fa-solid fa-user-tie"></i> Acting As Admin</h3><ul><li>Tahki wela tetsaref fil RP keyink admin. Exemple: twa9ef scene / 3andek 3omra 2d / li ta3ml fi ghalit haw chnd3i bik...</li></ul></div>
+    <!-- Applications Tab -->
+    <div id="tab-applications" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Applications</h3>
+                <button class="btn" onclick="loadAdmin()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+            </div>
+            <div id="adminTickets"></div>
         </div>
     </div>
 
-    <!-- SHOP -->
-    <div id="tab-shop" class="tab">
-        <div class="section-title"><h2>Shop</h2></div>
-        <div class="shop-grid" id="shopGrid"></div>
+    <!-- Detections Tab -->
+    <div id="tab-detections" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Detections</h3>
+                <button class="btn" onclick="loadDetections()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+            </div>
+            <div id="detectionsList"><p style="color: #555;">Click refresh to load...</p></div>
+        </div>
     </div>
-</main>
 
-<!-- 🔴 ADMIN PANEL -->
-<div id="tab-admin" class="tab">
-    <div id="adminLoginView">
-        <div class="admin-card" style="max-width: 400px; width: 100%; text-align: center; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-            <i class="fa-solid fa-shield" style="font-size: 3rem; color: #ff0000; margin-bottom: 1.5rem;"></i>
-            <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; letter-spacing: -0.5px;">Admin Access</h2>
-            <p style="color: #555; font-size: 0.85rem; margin-bottom: 2rem;">SouthSide S2 Staff Panel</p>
-            <button onclick="window.location.href='/api/auth/discord'" style="width: 100%; background: #5865F2; color: #fff; margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 0.8rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: 0.2s;">
-                <i class="fa-brands fa-discord"></i> Login with Discord
-            </button>
-            <div style="color: #555; margin-bottom: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 1rem;">
-                <div style="flex: 1; height: 1px; background: #1f1f1f;"></div> OR <div style="flex: 1; height: 1px; background: #1f1f1f;"></div>
+    <!-- Bans Tab -->
+    <div id="tab-bans" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Bans</h3>
+                <button class="btn" onclick="loadBans()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
             </div>
-            <input class="admin-input" type="password" id="adminPassword" placeholder="Enter password" style="padding: 0.8rem; text-align: center;">
-            <button class="admin-btn primary" id="adminLoginBtn" style="width: 100%; padding: 0.8rem;">Login</button>
+            <div id="bansList"><p style="color: #555;">Click refresh to load...</p></div>
         </div>
     </div>
-    <div id="adminPanelView" style="display: none;">
-        <div class="admin-sidebar">
-            <div class="admin-brand">
-                <i class="fa-solid fa-shield"></i>
-                <h2>Admin Panel</h2>
+
+    <!-- Players Tab -->
+    <div id="tab-players" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Players</h3>
+                <button class="btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
             </div>
-            <h3>SERVER</h3>
-            <button class="admin-nav-btn active" onclick="switchAdminTab('overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('applications', this)"><i class="fa-solid fa-file-lines"></i> Applications</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('detections', this)"><i class="fa-solid fa-triangle-exclamation"></i> Detections</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('bans', this)"><i class="fa-solid fa-ban"></i> Bans</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('players', this)"><i class="fa-solid fa-users"></i> Players</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('logs', this)"><i class="fa-solid fa-terminal"></i> Logs</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('gangs', this)"><i class="fa-solid fa-users"></i> Gangs</button>
-            <button class="admin-nav-btn" onclick="switchAdminTab('shop', this)"><i class="fa-solid fa-store"></i> Shop</button>
-            <h3>SCREENSHARE</h3>
-            <button class="admin-nav-btn" onclick="switchAdminTab('multi', this)"><i class="fa-solid fa-desktop"></i> Multi Stream</button>
-            <div class="admin-user" id="adminUserInfo">
-                <img src="/logo.png" alt="Avatar" id="adminAvatar">
-                <div>
-                    <span style="font-weight: 600; color: #fff;" id="adminUsername">Razey</span>
-                    <span onclick="window.location.href='/api/auth/logout'">Log out</span>
-                </div>
-            </div>
+            <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
         </div>
-        <div class="admin-content">
-            <div class="admin-header">
-                <h2 id="adminPageTitle">Overview</h2>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <button class="logout-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back to Site</button>
-                </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="tab-logs" class="tab-content">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Logs</h3>
+                <button class="btn" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
             </div>
-            <!-- Overview Tab -->
-            <div id="adminTab-overview" class="admin-tab active">
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                    <div class="admin-card" style="margin: 0;">
-                        <p style="color: #555; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Active Players</p>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: #fff;"><span id="ovPlayers">0</span> <span style="color: #555; font-size: 1rem;">/ 128</span></h3>
-                    </div>
-                    <div class="admin-card" style="margin: 0;">
-                        <p style="color: #555; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Total Gangs</p>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: #fff;" id="ovGangs">0</h3>
-                    </div>
-                    <div class="admin-card" style="margin: 0;">
-                        <p style="color: #555; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Pending Apps</p>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: #fff;" id="ovTickets">0</h3>
-                    </div>
-                </div>
+            <div id="fivemLogsContainer" style="background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; color: #888;"><p style="color: #555;">Click refresh to load...</p></div>
+        </div>
+    </div>
+
+    <!-- Gangs Tab -->
+    <div id="tab-gangs" class="tab-content">
+        <div class="card">
+            <h3>Add New Gang</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff;">
+                <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff;">
             </div>
-            <!-- Applications Tab -->
-            <div id="adminTab-applications" class="admin-tab">
-                <div id="adminTickets"></div>
+            <button class="btn primary" id="addGangBtn">Add Gang</button>
+        </div>
+        <div class="card">
+            <h3>Registered Gangs</h3>
+            <div id="adminGangs"></div>
+        </div>
+    </div>
+
+    <!-- Shop Tab -->
+    <div id="tab-shop" class="tab-content">
+        <div class="card">
+            <h3>Add New Item</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                <input class="admin-input" type="text" id="newShopName" placeholder="Item Name" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff;">
+                <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff;">
+                <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL" style="grid-column: 1 / -1; width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff;">
             </div>
-            <!-- Detections Tab -->
-            <div id="adminTab-detections" class="admin-tab">
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Detections</h3>
-                        <button class="admin-btn" onclick="loadDetections()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div id="detectionsList"><p style="color: #555;">Click refresh to load...</p></div>
+            <button class="btn primary" id="addShopBtn">Add Item</button>
+        </div>
+        <div class="card">
+            <h3>Shop Items</h3>
+            <div id="adminShop"></div>
+        </div>
+    </div>
+
+    <!-- Multi Stream Tab (HeRo Style) -->
+    <div id="tab-multi" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
+            <button class="btn" onclick="resetStreams()"><i class="fa-solid fa-xmark"></i> Reset</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; height: calc(100vh - 200px);">
+            <div id="streamGrid" class="stream-grid"></div>
+            <div class="card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">All Members</h3>
+                    <span style="color: #555; font-size: 0.75rem;" id="playersActiveText">0 Active</span>
                 </div>
-            </div>
-            <!-- Bans Tab -->
-            <div id="adminTab-bans" class="admin-tab">
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Bans</h3>
-                        <button class="admin-btn" onclick="loadBans()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div id="bansList"><p style="color: #555;">Click refresh to load...</p></div>
-                </div>
-            </div>
-            <!-- Players Tab -->
-            <div id="adminTab-players" class="admin-tab">
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">All Members</h3>
-                        <button class="admin-btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
-                </div>
-            </div>
-            <!-- Logs Tab -->
-            <div id="adminTab-logs" class="admin-tab">
-                <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Server Logs</h3>
-                        <button class="admin-btn" onclick="loadFivemLogs()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-                    </div>
-                    <div class="logs-container" id="fivemLogsContainer"><p style="color: #555;">Click refresh to load logs...</p></div>
-                </div>
-            </div>
-            <!-- Gangs Tab -->
-            <div id="adminTab-gangs" class="admin-tab">
-                <div class="admin-card">
-                    <h3>Add New Gang</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                        <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name">
-                        <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL">
-                        <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
-                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID">
-                        <input class="admin-input" type="text" id="newGangUnderboss" placeholder="Underboss Name">
-                        <input class="admin-input" type="text" id="newGangUnderbossId" placeholder="Underboss ID">
-                    </div>
-                    <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
-                </div>
-                <div class="admin-card">
-                    <h3>Registered Gangs</h3>
-                    <div id="adminGangs"></div>
-                </div>
-            </div>
-            <!-- Shop Tab -->
-            <div id="adminTab-shop" class="admin-tab">
-                <div class="admin-card">
-                    <h3>Add New Item</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                        <input class="admin-input" type="text" id="newShopName" placeholder="Item Name">
-                        <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)">
-                        <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL">
-                        <select class="admin-input" id="newShopCategory" style="background: #000; border: 1px solid #1f1f1f; padding: 0.8rem 1rem; border-radius: 8px; color: #fff; outline: none;">
-                            <option value="Car">Car</option>
-                            <option value="Motor">Motor</option>
-                            <option value="MLO">MLO</option>
-                            <option value="Ped">Ped</option>
-                            <option value="House">House</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <button class="admin-btn primary" id="addShopBtn">Add Item</button>
-                </div>
-                <div class="admin-card">
-                    <h3>Shop Items</h3>
-                    <div id="adminShop"></div>
-                </div>
-            </div>
-            <!-- Multi Stream Tab -->
-            <div id="adminTab-multi" class="admin-tab">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <span style="color: #555; font-size: 0.8rem;" id="streamsActiveText">0/16 streams active</span>
-                    <button class="admin-btn" onclick="resetStreams()"><i class="fa-solid fa-xmark"></i> Reset</button>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; height: calc(100vh - 250px);">
-                    <div id="streamGrid" class="stream-grid-container"></div>
-                    <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0;">All Members</h3>
-                            <span style="color: #555; font-size: 0.75rem;" id="playersActiveText">0 Active</span>
-                        </div>
-                        <input class="admin-input" type="text" placeholder="Search players..." id="playerSearch" onkeyup="filterPlayers()" style="margin-bottom: 1rem;">
-                        <div style="flex: 1; overflow-y: auto;" id="playersListContainer">
-                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>
-                        </div>
-                    </div>
+                <input type="text" id="playerSearch" placeholder="Search players..." onkeyup="filterPlayers()" style="width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; color: #fff; margin-bottom: 1rem; outline: none;">
+                <div style="flex: 1; overflow-y: auto;" id="playersListContainer">
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 0.85rem;">No players online</div>
                 </div>
             </div>
         </div>
@@ -490,11 +245,11 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 </div>
 
 <!-- Player Profile Modal -->
-<div id="playerProfileModal">
-    <div class="profile-card">
-        <button onclick="closeProfileModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-        <div class="profile-header">
-            <h2 id="profileName">Player Name</h2>
+<div id="playerProfileModal" class="modal">
+    <div class="modal-body">
+        <button class="close-btn" onclick="closeProfileModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h2 id="profileName" style="font-family: var(--font-title); font-size: 2rem;">Player Name</h2>
             <span id="profileId" style="color: var(--accent); font-weight: bold;">ID: -</span>
         </div>
         
@@ -502,15 +257,15 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
         <div id="profileIdentifiers" style="margin-bottom: 1.5rem;"></div>
 
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="admin-card" style="margin: 0; text-align: center;">
+            <div class="card" style="margin: 0; text-align: center;">
                 <p style="color: #555; font-size: 0.8rem;">Bans</p>
                 <h3 id="profileBans" style="color: #ff0000; font-size: 1.5rem;">0</h3>
             </div>
-            <div class="admin-card" style="margin: 0; text-align: center;">
+            <div class="card" style="margin: 0; text-align: center;">
                 <p style="color: #555; font-size: 0.8rem;">Warns</p>
                 <h3 id="profileWarns" style="color: #f59e0b; font-size: 1.5rem;">0</h3>
             </div>
-            <div class="admin-card" style="margin: 0; text-align: center;">
+            <div class="card" style="margin: 0; text-align: center;">
                 <p style="color: #555; font-size: 0.8rem;">Kicks</p>
                 <h3 id="profileKicks" style="color: #888; font-size: 1.5rem;">0</h3>
             </div>
@@ -518,293 +273,133 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
 
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Action</h3>
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
-            <button class="admin-btn reject" onclick="actionPlayer('ban')"><i class="fa-solid fa-ban"></i> Ban</button>
-            <button class="admin-btn" onclick="actionPlayer('kick')"><i class="fa-solid fa-shoe-prints"></i> Kick</button>
-            <button class="admin-btn" style="background: #f59e0b; color: #fff;" onclick="actionPlayer('warn')"><i class="fa-solid fa-triangle-exclamation"></i> Warn</button>
-            <button class="admin-btn primary" onclick="startStream()"><i class="fa-solid fa-camera"></i> Start Stream</button>
+            <button class="btn" style="background: rgba(255,0,0,0.15); color: #ff0000; border: 1px solid #ff0000;" onclick="actionPlayer('ban')"><i class="fa-solid fa-ban"></i> Ban</button>
+            <button class="btn" onclick="actionPlayer('kick')"><i class="fa-solid fa-shoe-prints"></i> Kick</button>
+            <button class="btn" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b;" onclick="actionPlayer('warn')"><i class="fa-solid fa-triangle-exclamation"></i> Warn</button>
+            <button class="btn primary" onclick="startStream()"><i class="fa-solid fa-camera"></i> Start Stream</button>
         </div>
 
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Recent Logs</h3>
-        <div class="logs-container" id="profileLogs" style="max-height: 200px;"><p style="color: #555;">Loading logs...</p></div>
-    </div>
-</div>
-
-<!-- MODAL للسيت -->
-<div id="ticketModal" class="modal">
-    <div class="modal-body" id="modalCardBody">
-        <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
-        <h2 id="modalTitle" style="font-family:var(--font-title); font-size:2.5rem; margin-bottom:1.5rem; color:#fff; text-transform:uppercase;">Application</h2>
-        <form id="ticketForm">
-            <div id="dynamicFormFields"></div>
-            <button type="submit" class="admin-btn primary" id="submitFormBtn" style="margin-top: 1.5rem; width: 100%; padding: 1rem;">Submit Application</button>
-        </form>
+        <div id="profileLogs" style="background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; color: #888;"><p style="color: #555;">Loading logs...</p></div>
     </div>
 </div>
 
 <script>
-// 🌟 Background
-(function(){
-    var c = document.getElementById('bg-canvas');
-    if (!c) return;
-    var ctx = c.getContext('2d');
-    function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
-    var p = [];
-    for (var i = 0; i < 50; i++) { p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*1.5+0.5, vy: -Math.random()*0.3-0.1, a: Math.random()*0.3+0.1 }); }
-    function loop(){
-        ctx.clearRect(0,0,c.width,c.height);
-        for (var i = 0; i < p.length; i++) { var q = p[i]; q.y += q.vy; if (q.y < 0) q.y = c.height; ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,0,0,'+q.a+')'; ctx.fill(); }
-        requestAnimationFrame(loop);
-    }
-    loop();
-})();
-
-function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    const btn = document.querySelector('.nav-btn[data-tab="' + name + '"]');
-    if(btn) btn.classList.add('active');
-    if(name === 'admin') { document.body.classList.add('admin-mode'); } 
-    else {
-        document.body.classList.remove('admin-mode');
-        if(name === 'illegal') loadGangs();
-        if(name === 'shop') loadShop();
-    }
-}
-document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); }));
-
-function switchAdminTab(name, btn) {
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('adminTab-' + name).classList.add('active');
-    if (btn) btn.classList.add('active');
-    document.getElementById('adminPageTitle').innerText = name.charAt(0).toUpperCase() + name.slice(1);
-    if (name === 'multi') { startFetchingPlayers(); }
-    if (name === 'logs') { loadFivemLogs(); }
-    if (name === 'bans') { loadBans(); }
-    if (name === 'detections') { loadDetections(); }
-    if (name === 'applications') { loadAdmin(); }
-    if (name === 'gangs') { loadAdmin(); }
-    if (name === 'shop') { loadAdmin(); }
-    if (name === 'players') { loadPlayers(); }
-}
-
-document.getElementById('copyBtn').addEventListener('click', function(){
-    var ip = document.getElementById('serverIP').innerText;
-    if (navigator.clipboard) navigator.clipboard.writeText(ip);
-    var t = this; var old = t.innerHTML;
-    t.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-    setTimeout(() => t.innerHTML = old, 2000);
-});
-
 let loggedInUser = null;
-
-async function checkLogin() {
-    try {
-        const res = await fetch('/api/auth/me'); 
-        const data = await res.json();
-        if (data.loggedIn) {
-            loggedInUser = data;
-            document.getElementById('userArea').innerHTML = `<div class="user-profile" onclick="window.location.href='/api/auth/logout'"><img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png"><span>${data.username}</span></div>`;
-            document.getElementById('loginRequiredMsg').style.display = 'none';
-            document.getElementById('appsGrid').style.display = 'grid';
-            document.getElementById('adminUsername').innerText = data.username;
-            if(data.avatar) document.getElementById('adminAvatar').src = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
-            try {
-                const adminCheck = await fetch('/api/auth/check-admin');
-                if (adminCheck.ok) { 
-                    if (!document.querySelector('.nav-btn[data-tab="admin"]')) {
-                        const nav = document.getElementById('mainNav');
-                        const adminBtn = document.createElement('button');
-                        adminBtn.className = 'nav-btn';
-                        adminBtn.setAttribute('data-tab', 'admin');
-                        adminBtn.style.color = 'var(--accent)';
-                        adminBtn.innerText = 'Admin';
-                        nav.appendChild(adminBtn);
-                        adminBtn.addEventListener('click', function(){ switchTab('admin'); });
-                    }
-                    document.getElementById('adminLoginView').style.display = 'none';
-                    document.getElementById('adminPanelView').style.display = 'grid';
-                    loadAdmin(); 
-                }
-            } catch (e) { console.log("Not admin"); }
-        } else {
-            document.getElementById('loginRequiredMsg').style.display = 'block';
-            document.getElementById('appsGrid').style.display = 'none';
-        }
-    } catch (e) { console.log("Not logged in"); }
-}
-checkLogin();
-
-const appConfigs = {
-    "Whitelist App": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
-    "Gang & Family App": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "#FF7A1A", required: true }, { label: "Members IDs *", type: "textarea", name: "members_ids", placeholder: "8+ IDs...", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
-    "Police App": { title: "Police Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why PD? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]},
-    "EMS App": { title: "EMS Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Age", required: true }, { label: "Why EMS? *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true }, { label: "Experience *", type: "textarea", name: "experience", placeholder: "Experience...", required: true } ]}
-};
-
-let currentType = '';
-
-async function openModal(title) {
-    if (!loggedInUser) return alert("You must login first!");
-    
-    currentType = title;
-    document.getElementById('modalTitle').innerText = appConfigs[title] ? appConfigs[title].title : "Application";
-    
-    try {
-        const checkRes = await fetch(`/api/check-cooldown?discordId=${loggedInUser.id}&type=${encodeURIComponent(title)}`);
-        const checkData = await checkRes.json();
-        if (checkData.blocked) {
-            alert(`❌ You have been rejected recently. Please wait ${checkData.hoursLeft} hours before applying again.`);
-            return;
-        }
-    } catch(e) { console.error(e); }
-
-    const config = appConfigs[title] || { title: "Support", fields: [] };
-    const fieldsContainer = document.getElementById('dynamicFormFields');
-    fieldsContainer.innerHTML = '';
-    config.fields.forEach(f => {
-        const group = document.createElement('div');
-        group.className = 'form-group';
-        const label = document.createElement('label');
-        label.className = 'form-label';
-        label.innerText = f.label;
-        group.appendChild(label);
-        let input;
-        if (f.type === 'textarea') { input = document.createElement('textarea'); input.className = 'form-input form-textarea'; }
-        else if (f.type === 'select') { input = document.createElement('select'); input.className = 'form-input'; f.options.forEach(opt => { const o = document.createElement('option'); o.value = opt; o.innerText = opt; input.appendChild(o); }); }
-        else { input = document.createElement('input'); input.type = f.type || 'text'; input.className = 'form-input'; }
-        input.name = f.name; input.placeholder = f.placeholder || '';
-        if (f.required) input.required = true;
-        group.appendChild(input);
-        fieldsContainer.appendChild(group);
-    });
-    document.getElementById('ticketModal').classList.add('active');
-}
-function closeModal() { document.getElementById('ticketModal').classList.remove('active'); }
-document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
-document.getElementById('ticketModal').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
-document.querySelectorAll('[data-app]').forEach(el => {
-    el.addEventListener('click', function(){ openModal(this.getAttribute('data-app')); });
-});
-
-document.getElementById('ticketForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-    if (!loggedInUser) { alert('You must be logged in to submit an application.'); return; }
-    const formData = new FormData(this); const dataObj = {};
-    formData.forEach((value, key) => dataObj[key] = value);
-    
-    try {
-        const res = await fetch('/api/tickets', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                type: currentType, 
-                subject: dataObj.char_name || 'N/A', 
-                message: JSON.stringify(dataObj), 
-                discordId: loggedInUser.id,
-                createdAt: Date.now()
-            })
-        });
-
-        if (res.ok) {
-            alert('✅ Application Submitted!');
-            closeModal(); this.reset();
-        } else {
-            const data = await res.json();
-            alert(`❌ ${data.error}`);
-        }
-    } catch(err) {
-        alert('❌ Error submitting application. Please try again.');
-    }
-});
-
-async function loadStats() {
-    try {
-        const res = await fetch('/api/stats'); const data = await res.json();
-        document.getElementById('statusText').textContent = data.online ? 'Online' : 'Offline';
-        document.getElementById('playerCount').textContent = `${data.players} / ${data.maxPlayers}`;
-        document.getElementById('serverName').textContent = data.name;
-        document.getElementById('serverIP').textContent = data.ip;
-        document.getElementById('barFill').style.width = (data.players / data.maxPlayers * 100) + '%';
-        document.getElementById('ovPlayers').innerText = data.players;
-    } catch(e) {}
-}
-loadStats();
-
-async function loadGangs() {
-    try {
-        const res = await fetch('/api/gangs'); const gangs = await res.json();
-        document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => `
-            <div class="gang-card">
-                <div class="gang-header">
-                    <div class="gang-logo">${g.logo ? `<img src="${g.logo}">` : 'G'}</div>
-                    <div>
-                        <div class="gang-title">${g.name}</div>
-                        <div class="gang-members-count">${g.members.length} MEMBERS</div>
-                    </div>
-                </div>
-                <div class="gang-roster">
-                    ${(g.boss ? `<div class="gang-member"><img src="${g.bossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.boss}</span></div>` : '')}
-                    ${(g.underboss ? `<div class="gang-member"><img src="${g.underbossAvatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${g.underboss}</span></div>` : '')}
-                    ${(g.members || []).map(m => `<div class="gang-member"><img src="${m.avatar}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"><span class="gang-member-name">${m.name || 'Member'}</span></div>`).join('')}
-                </div>
-            </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No gangs registered.</p>';
-        document.getElementById('ovGangs').innerText = gangs.length;
-    } catch(e){}
-}
-
-async function loadShop() {
-    try {
-        const res = await fetch('/api/shop'); const items = await res.json();
-        const container = document.getElementById('shopGrid');
-        
-        if (items.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
-            return;
-        }
-
-        const categories = {};
-        items.forEach(item => {
-            const cat = item.category || 'Other';
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(item);
-        });
-
-        let html = '';
-        for (const [cat, catItems] of Object.entries(categories)) {
-            html += `<div style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;">
-                <h3 style="font-family: var(--font-title); font-size: 2rem; color: var(--accent);">${cat}</h3>
-            </div>`;
-            
-            catItems.forEach(i => {
-                html += `
-                    <div class="shop-item">
-                        <div class="shop-img"><img src="${i.image}"></div>
-                        <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
-                    </div>
-                `;
-            });
-        }
-
-        container.innerHTML = html;
-    } catch(e){}
-}
-
-document.getElementById('adminLoginBtn').addEventListener('click', async function(){
-    const pass = document.getElementById('adminPassword').value;
-    const res = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
-    if(res.ok) {
-        document.getElementById('adminLoginView').style.display = 'none';
-        document.getElementById('adminPanelView').style.display = 'grid';
-        loadAdmin();
-        loadFivemLogs();
-    } else alert('Wrong Password');
-});
+let currentPlayers = [];
+let activeStreams = {};
+let streamIntervals = {};
+let selectedPlayer = null;
 
 function getAdminHeaders() {
     const pass = document.getElementById('adminPassword').value;
     return { 'Content-Type': 'application/json', 'x-admin-password': pass };
+}
+
+document.getElementById('adminLoginBtn').addEventListener('click', async function(){
+    const pass = document.getElementById('adminPassword').value;
+    if (!pass) return alert('Enter password');
+    
+    try {
+        const res = await fetch('/api/players', { headers: getAdminHeaders() });
+        if (res.ok) {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+            loadOverview();
+            setInterval(loadOverview, 5000);
+        } else {
+            alert('Wrong Password');
+        }
+    } catch(e) { alert('Error connecting'); }
+});
+
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    document.getElementById('pageTitle').innerText = name.charAt(0).toUpperCase() + name.slice(1);
+    
+    if (name === 'overview') loadOverview();
+    if (name === 'players') loadPlayers();
+    if (name === 'logs') loadFivemLogs();
+    if (name === 'bans') loadBans();
+    if (name === 'detections') loadDetections();
+    if (name === 'applications') loadAdmin();
+    if (name === 'gangs') loadAdmin();
+    if (name === 'shop') loadAdmin();
+    if (name === 'multi') startFetchingPlayers();
+}
+
+async function loadOverview() {
+    try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        document.getElementById('ovPlayers').innerText = data.players || 0;
+        document.getElementById('ovStatus').innerText = data.online ? 'Online' : 'Offline';
+        document.getElementById('ovStatus').style.color = data.online ? '#22c55e' : '#ff0000';
+    } catch(e) {}
+}
+
+async function loadPlayers() {
+    try {
+        const res = await fetch('/api/players', { headers: getAdminHeaders() });
+        const players = await res.json();
+        const container = document.getElementById('playersList');
+        if (players.length === 0) { container.innerHTML = '<p style="color: #555;">No players online.</p>'; return; }
+        container.innerHTML = `<table>
+            <tr><th>Player</th><th>ID</th><th>Discord</th><th>Stats</th><th>Actions</th></tr>
+            ${players.map(p => {
+                const stats = p.stats || { bans: 0, warns: 0, kicks: 0 };
+                const discordId = p.identifiers ? p.identifiers.discord : 'N/A';
+                return `<tr>
+                    <td>${p.name}</td>
+                    <td>${p.id}</td>
+                    <td><code>${discordId}</code></td>
+                    <td><span style="color: #ff0000;">${stats.bans}</span> / <span style="color: #f59e0b;">${stats.warns}</span> / <span style="color: #888;">${stats.kicks}</span></td>
+                    <td><button class="btn" onclick="openPlayerProfile('${p.id}')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">Info</button></td>
+                </tr>`;
+            }).join('')}
+        </table>`;
+    } catch(e) {}
+}
+
+async function loadLogs() {
+    try {
+        const res = await fetch('/api/logs', { headers: getAdminHeaders() });
+        const logs = await res.json();
+        const container = document.getElementById('fivemLogsContainer');
+        if (logs && logs.length > 0) {
+            container.innerHTML = logs.map(log => `<div style="border-bottom: 1px solid #111; padding: 0.3rem 0;"><span style="color: var(--accent);">[${new Date(log.time).toLocaleTimeString()}]</span> <b>[${log.category}]</b> ${log.message}</div>`).join('');
+        } else { container.innerHTML = '<p style="color: #555;">No logs found.</p>'; }
+    } catch(e) {}
+}
+
+async function loadBans() {
+    try {
+        const res = await fetch('/api/bans', { headers: getAdminHeaders() });
+        const bans = await res.json();
+        const container = document.getElementById('bansList');
+        if (bans.length === 0) { container.innerHTML = '<p style="color: #555;">No bans found.</p>'; return; }
+        container.innerHTML = `<table>
+            <tr><th>Player</th><th>Reason</th><th>Date</th></tr>
+            ${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}
+        </table>`;
+    } catch(e) {}
+}
+
+async function loadDetections() {
+    try {
+        const res = await fetch('/api/detections', { headers: getAdminHeaders() });
+        const dets = await res.json();
+        const container = document.getElementById('detectionsList');
+        if (dets.length === 0) { container.innerHTML = '<p style="color: #555;">No detections found.</p>'; return; }
+        container.innerHTML = `<table>
+            <tr><th>Player</th><th>Type</th><th>Date</th></tr>
+            ${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}
+        </table>`;
+    } catch(e) {}
 }
 
 async function loadAdmin() {
@@ -816,14 +411,13 @@ async function loadAdmin() {
     let html = '';
     if (!Array.isArray(t) || t.length === 0) {
         document.getElementById('adminTickets').innerHTML = '<p style="color:#555;">No tickets found.</p>';
-        document.getElementById('ovTickets').innerText = 0;
     } else {
         t.forEach(x => {
             let details = '';
             try { let parsed = JSON.parse(x.message); details = Object.entries(parsed).map(([k,v]) => `<b>${k}:</b> ${v}`).join('<br>'); } 
             catch(e) { details = x.message; }
             let statusColor = x.status === 'accepted' ? '#22c55e' : x.status === 'rejected' ? '#ef4444' : '#f59e0b';
-            let actionBtns = x.status === 'pending' ? `<button class="accept" onclick="updateTicket('${x.id || x._id}', 'accepted')">Accept</button><button class="reject" onclick="updateTicket('${x.id || x._id}', 'rejected')">Reject</button>` : '';
+            let actionBtns = x.status === 'pending' ? `<button class="btn accept" onclick="updateTicket('${x.id || x._id}', 'accepted')">Accept</button><button class="btn reject" onclick="updateTicket('${x.id || x._id}', 'rejected')">Reject</button>` : '';
             html += `<div style="background:#0b0f19; border:1px solid #1c2538; padding:1rem; margin-bottom:1rem; border-radius: 8px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                     <strong style="font-size:0.95rem; color:#fff;">${x.type}</strong>
@@ -835,31 +429,12 @@ async function loadAdmin() {
             </div>`;
         });
         document.getElementById('adminTickets').innerHTML = html;
-        document.getElementById('ovTickets').innerText = t.filter(x => x.status === 'pending').length;
     }
-
-    const g = await (await fetch('/api/gangs')).json();
-    document.getElementById('adminGangs').innerHTML = g.length ? `<table class="admin-table">${g.map(x=>`
-        <tr>
-            <td>${x.name}</td>
-            <td>${x.members ? x.members.length : 0} m</td>
-            <td>
-                <button onclick="addMember('${x.id || x._id}')">Add</button>
-                <button onclick="editGang('${x.id || x._id}')">Edit</button>
-                <button class="reject" onclick="removeGang('${x.id || x._id}')">Delete</button>
-            </td>
-        </tr>`).join('')}</table>` : '<p style="color:#555;">No gangs.</p>';
-
-    const s = await (await fetch('/api/shop')).json();
-    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td>${x.category || 'Other'}</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
 }
 
 async function updateTicket(id, st) { 
     let reason = '';
-    if (st === 'rejected') {
-        reason = prompt("Reason for rejection:");
-        if (reason === null) return;
-    }
+    if (st === 'rejected') { reason = prompt("Reason for rejection:"); if (reason === null) return; }
     await fetch('/api/tickets/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({status:st, reason:reason}) }); 
     loadAdmin(); 
 }
@@ -872,124 +447,36 @@ async function loadFivemLogs() {
         const res = await fetch('/api/logs', { headers: getAdminHeaders() });
         const data = await res.json();
         if (data.length > 0) {
-            container.innerHTML = data.map(log => `
-                <div class="log-line">
-                    <span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span>
-                    <span style="color: var(--accent);">[${log.category}]</span> - ${log.message}
-                </div>
-            `).join('');
+            container.innerHTML = data.map(log => `<div style="border-bottom: 1px solid #111; padding: 0.3rem 0;"><span style="color: var(--accent);">[${new Date(log.time).toLocaleTimeString()}]</span> <b>[${log.category}]</b> ${log.message}</div>`).join('');
         } else { container.innerHTML = '<p style="color:#555;">No logs found.</p>'; }
     } catch (e) { container.innerHTML = '<p style="color:#ef4444;">Error connecting to server.</p>'; }
-}
-
-async function loadBans() {
-    const container = document.getElementById('bansList');
-    if (!container) return;
-    container.innerHTML = '<p style="color:#555;">Loading...</p>';
-    try {
-        const res = await fetch('/api/bans', { headers: getAdminHeaders() });
-        const bans = await res.json();
-        if (bans.length === 0) { container.innerHTML = '<p style="color:#555;">No bans found.</p>'; return; }
-        container.innerHTML = `<table class="admin-table">
-            <tr><th>Player</th><th>Reason</th><th>Date</th></tr>
-            ${bans.map(b => `<tr><td>${b.name} (${b.id})</td><td>${b.reason}</td><td>${new Date(b.time).toLocaleDateString()}</td></tr>`).join('')}
-        </table>`;
-    } catch(e) {}
-}
-
-async function loadDetections() {
-    const container = document.getElementById('detectionsList');
-    if (!container) return;
-    container.innerHTML = '<p style="color:#555;">Loading...</p>';
-    try {
-        const res = await fetch('/api/detections', { headers: getAdminHeaders() });
-        const dets = await res.json();
-        if (dets.length === 0) { container.innerHTML = '<p style="color:#555;">No detections found.</p>'; return; }
-        container.innerHTML = `<table class="admin-table">
-            <tr><th>Player</th><th>Type</th><th>Date</th></tr>
-            ${dets.map(d => `<tr><td>${d.name} (${d.id})</td><td>${d.type}</td><td>${new Date(d.time).toLocaleDateString()}</td></tr>`).join('')}
-        </table>`;
-    } catch(e) {}
 }
 
 document.getElementById('addGangBtn').addEventListener('click', async function(){ 
     const name = document.getElementById('newGangName').value;
     const logo = document.getElementById('newGangLogo').value;
-    const boss = document.getElementById('newGangBoss').value;
-    const bossId = document.getElementById('newGangBossId').value;
-    const underboss = document.getElementById('newGangUnderboss').value;
-    const underbossId = document.getElementById('newGangUnderbossId').value;
     if(!name) return alert('Gang name is required');
-    await fetch('/api/gangs', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ name: name, logo: logo, boss: boss, bossId: bossId, underboss: underboss, underbossId: underbossId }) }); 
+    await fetch('/api/gangs', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ name: name, logo: logo }) }); 
     loadAdmin(); 
 });
-
-async function removeGang(id) {
-    if(confirm('Are you sure you want to delete this gang?')) {
-        await fetch('/api/gangs/'+id, { method:'DELETE', headers: getAdminHeaders() });
-        loadAdmin();
-    }
-}
-
-async function editGang(id) {
-    const res = await fetch('/api/gangs'); const gangs = await res.json();
-    const g = gangs.find(x => (x.id === id || x._id === id));
-    if(!g) return;
-    const newName = prompt("Gang Name:", g.name);
-    const newLogo = prompt("Logo URL:", g.logo);
-    const newBoss = prompt("Boss Name:", g.boss);
-    const newBossId = prompt("Boss ID:", g.bossId);
-    const newUnderboss = prompt("Underboss Name:", g.underboss);
-    const newUnderbossId = prompt("Underboss ID:", g.underbossId);
-    if(newName === null) return;
-    await fetch('/api/gangs/'+id, { method:'PUT', headers: getAdminHeaders(), body:JSON.stringify({ name: newName, logo: newLogo, boss: newBoss, bossId: newBossId, underboss: newUnderboss, underbossId: newUnderbossId }) });
-    loadAdmin();
-}
-
-async function addMember(id) { 
-    const discordId = prompt("Discord ID (e.g. 1234567890):"); 
-    if(!discordId) return;
-    const memberName = prompt("Member Name (e.g. John):") || 'Member';
-    await fetch('/api/gangs/'+id+'/members', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({ discordId: discordId, memberName: memberName }) }); 
-    loadAdmin(); 
-}
 
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
-    await fetch('/api/shop', { 
-        method:'POST', 
-        headers: getAdminHeaders(), 
-        body:JSON.stringify({
-            name: document.getElementById('newShopName').value, 
-            price: parseInt(document.getElementById('newShopPrice').value), 
-            image: document.getElementById('newShopImage').value,
-            category: document.getElementById('newShopCategory').value 
-        }) 
-    }); 
+    await fetch('/api/shop', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value}) }); 
     loadAdmin(); 
 });
 
-async function removeShopItem(id) {
-    if(confirm('Are you sure you want to delete this item?')) {
-        await fetch('/api/shop/'+id, { method:'DELETE', headers: getAdminHeaders() });
-        loadAdmin();
-    }
+// 🔴 Multi Stream Logic
+function startFetchingPlayers() {
+    fetchPlayers();
+    setInterval(fetchPlayers, 3000);
 }
 
-// 🔴 Multi Stream (مع البان والبروفايل)
-let currentPlayers = [];
-let activeStreams = {};
-let streamIntervals = {};
-let playersInterval = null;
-let selectedPlayer = null;
-
-function fetchPlayers() {
-    fetch('/api/players', { headers: getAdminHeaders() })
-        .then(res => res.json())
-        .then(players => {
-            currentPlayers = players;
-            renderPlayersList();
-        })
-        .catch(err => console.log("Error fetching players:", err));
+async function fetchPlayers() {
+    try {
+        const res = await fetch('/api/players', { headers: getAdminHeaders() });
+        currentPlayers = await res.json();
+        renderPlayersList();
+    } catch(e) {}
 }
 
 function renderPlayersList() {
@@ -1000,28 +487,19 @@ function renderPlayersList() {
         document.getElementById('playersActiveText').innerText = `0 Active`;
         return;
     }
-    
-    const onlineCount = currentPlayers.length; 
-    document.getElementById('playersActiveText').innerText = `${onlineCount} Active`;
-
-    container.innerHTML = currentPlayers.map(p => {
-        const discordId = p.identifiers ? p.identifiers.discord : 'N/A';
-        const status = 'Online'; 
-        const statusColor = status === 'Online' ? '#22c55e' : '#ff0000';
-        
-        return `
-            <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openPlayerProfile('${p.id}')">
-                <div>
-                    <span style="color: #fff; font-weight: 600;">${p.name}</span>
-                    <span style="color: #555; font-size: 0.75rem; margin-left: 0.5rem;">(${p.id})</span>
-                    <div style="font-size: 0.75rem; color: #888; margin-top: 0.2rem;">
-                        <i class="fa-brands fa-discord"></i> ${discordId}
-                    </div>
+    document.getElementById('playersActiveText').innerText = `${currentPlayers.length} Active`;
+    container.innerHTML = currentPlayers.map(p => `
+        <div class="player-item" onclick="openPlayerProfile('${p.id}')">
+            <div>
+                <span style="color: #fff; font-weight: 600;">${p.name}</span>
+                <span style="color: #555; font-size: 0.75rem; margin-left: 0.5rem;">(${p.id})</span>
+                <div style="font-size: 0.75rem; color: #888; margin-top: 0.2rem;">
+                    <i class="fa-brands fa-discord"></i> ${p.identifiers ? p.identifiers.discord : 'N/A'}
                 </div>
-                <span style="font-size: 0.7rem; font-weight: 600; color: ${statusColor}; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">${status}</span>
             </div>
-        `;
-    }).join('');
+            <span style="font-size: 0.7rem; font-weight: 600; color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">Online</span>
+        </div>
+    `).join('');
 }
 
 async function openPlayerProfile(playerId) {
@@ -1034,7 +512,7 @@ async function openPlayerProfile(playerId) {
     let idsHtml = '';
     if (selectedPlayer.identifiers) {
         for (const [key, val] of Object.entries(selectedPlayer.identifiers)) {
-            idsHtml += `<div class="id-badge"><i class="fa-solid fa-id-card"></i> ${key.toUpperCase()}: ${val}</div>`;
+            idsHtml += `<div style="background: #111; border: 1px solid #333; padding: 0.4rem 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.9rem; color: #ccc; margin-bottom: 0.5rem; display: inline-block; margin-right: 0.5rem;"><i class="fa-solid fa-id-card"></i> ${key.toUpperCase()}: ${val}</div>`;
         }
     } else { idsHtml = '<p style="color: #555;">No identifiers found.</p>'; }
     document.getElementById('profileIdentifiers').innerHTML = idsHtml;
@@ -1047,22 +525,11 @@ async function openPlayerProfile(playerId) {
         document.getElementById('profileKicks').innerText = stats.kicks || 0;
     } catch(e) {}
 
-    try {
-        const logsRes = await fetch(`/api/player-logs/${playerId}`, { headers: getAdminHeaders() });
-        const logs = await logsRes.json();
-        const logsContainer = document.getElementById('profileLogs');
-        if (logs.length > 0) {
-            logsContainer.innerHTML = logs.map(log => `<div class="log-line"><span class="log-time">[${new Date(log.time).toLocaleTimeString()}]</span> ${log.message}</div>`).join('');
-        } else {
-            logsContainer.innerHTML = '<p style="color: #555;">No logs found.</p>';
-        }
-    } catch(e) { document.getElementById('profileLogs').innerHTML = '<p style="color: #555;">Error loading logs.</p>'; }
-
-    document.getElementById('playerProfileModal').style.display = 'flex';
+    document.getElementById('playerProfileModal').classList.add('active');
 }
 
 function closeProfileModal() {
-    document.getElementById('playerProfileModal').style.display = 'none';
+    document.getElementById('playerProfileModal').classList.remove('active');
     selectedPlayer = null;
 }
 
@@ -1105,7 +572,11 @@ function startStream() {
                 if (slot) {
                     slot.innerHTML = `
                         <img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;">
-                        <button class="fs-btn" onclick="requestFullscreen('stream-${playerId}')"><i class="fa-solid fa-expand"></i></button>
+                        <div class="live-badge"><div class="dot"></div> LIVE</div>
+                        <div class="stream-footer">
+                            <span class="stream-name"><i class="fa-solid fa-user"></i> ${selectedPlayer.name}</span>
+                            <button class="stop-btn" onclick="stopStream('${playerId}')"><i class="fa-solid fa-xmark"></i> Stop</button>
+                        </div>
                     `;
                 }
             }
@@ -1113,13 +584,19 @@ function startStream() {
     }, 200); 
 
     closeProfileModal();
-    switchTab('multi', document.querySelectorAll('.nav-btn')[5]);
+    switchTab('multi', document.querySelectorAll('.nav-btn')[6]);
 }
 
-function requestFullscreen(elementId) {
-    const el = document.getElementById(elementId);
-    if (el.requestFullscreen) el.requestFullscreen();
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+function stopStream(playerId) {
+    fetch('/api/action', {
+        method: 'POST',
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ playerId, type: 'stream_stop' })
+    });
+    clearInterval(streamIntervals[playerId]);
+    delete streamIntervals[playerId];
+    delete activeStreams[playerId];
+    renderStreamGrid();
 }
 
 function renderStreamGrid() {
@@ -1129,11 +606,8 @@ function renderStreamGrid() {
     let html = '';
     activeIds.forEach(id => {
         const pName = currentPlayers.find(p => p.id == id)?.name || id;
-        html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Connecting to ${pName}...</span></div>`;
+        html += `<div id="stream-${id}" class="stream-card"><div class="connecting"><i class="fa-solid fa-circle-notch"></i></div></div>`;
     });
-    for (let i = activeIds.length; i < 16; i++) { 
-        html += `<div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>`;
-    }
     grid.innerHTML = html;
     document.getElementById('streamsActiveText').innerText = `${activeIds.length}/16 streams active`;
 }
@@ -1153,14 +627,6 @@ function resetStreams() {
     activeStreams = {};
     renderStreamGrid();
 }
-
-function startFetchingPlayers() {
-    if (playersInterval) clearInterval(playersInterval);
-    fetchPlayers();
-    playersInterval = setInterval(fetchPlayers, 3000);
-}
-
-document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
 </script>
 </body>
 </html>
