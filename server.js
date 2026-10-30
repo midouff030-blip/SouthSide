@@ -30,7 +30,7 @@ const CONFIG = {
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE,
   WEBHOOK_EMS: process.env.WEBHOOK_EMS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG,
-  WEBHOOK_APPS: process.env.WEBHOOK_APPS || process.env.WEBHOOK_WHITELIST, // Webhook khass lel applications lkol ken t7eb
+  WEBHOOK_APPS: process.env.WEBHOOK_APPS || process.env.WEBHOOK_WHITELIST,
   DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS,
   ROLE_ACCEPTED_WHITELIST: process.env.ROLE_ACCEPTED_WHITELIST || process.env.ROLE_ACCEPTED_ID,
   ROLE_ACCEPTED_POLICE: process.env.ROLE_ACCEPTED_POLICE,
@@ -97,7 +97,7 @@ async function isAdmin(req, res, next) {
   res.status(403).json({ error: 'Access Denied.' });
 }
 
-// ===== Webhook & Role Helpers =====
+// ===== Webhook Helpers =====
 function getWebhookUrl(type) {
     if (!type) return CONFIG.WEBHOOK_APPS;
     if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST || CONFIG.WEBHOOK_APPS;
@@ -210,8 +210,7 @@ async function sendServerLogWebhook(message, category) {
     } catch(e) { console.error("Log webhook error:", e); }
 }
 
-// ===== Routes =====
-
+// ===== API Routes =====
 app.get('/api/check-cooldown', (req, res) => {
     const { discordId, type } = req.query;
     if (!discordId || !type) return res.json({ blocked: false });
@@ -234,12 +233,7 @@ app.get('/api/check-cooldown', (req, res) => {
 app.post('/api/server-stats', (req, res) => {
     if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
     const db = getDB();
-    db.stats = { 
-        online: req.body.online || true, 
-        players: req.body.players || 0, 
-        maxPlayers: req.body.maxPlayers || 128, 
-        lastUpdate: Date.now() 
-    };
+    db.stats = { online: true, players: req.body.players || 0, maxPlayers: req.body.maxPlayers || 128, lastUpdate: Date.now() };
     saveDB(db);
     res.json({ success: true });
 });
@@ -247,13 +241,7 @@ app.post('/api/server-stats', (req, res) => {
 app.get('/api/stats', (req, res) => {
     const db = getDB();
     const isOnline = db.stats.lastUpdate && (Date.now() - db.stats.lastUpdate < 30000);
-    res.json({ 
-        online: isOnline, 
-        players: isOnline ? db.stats.players : 0, 
-        maxPlayers: db.stats.maxPlayers || 128, 
-        name: 'SouthSide S2', 
-        ip: `connect play.southsiderp.tn` 
-    });
+    res.json({ online: isOnline, players: isOnline ? db.stats.players : 0, maxPlayers: db.stats.maxPlayers || 128, name: 'SouthSide S2', ip: 'connect play.southsiderp.tn' });
 });
 
 app.post('/api/update-players', (req, res) => {
@@ -280,7 +268,6 @@ app.post('/api/send-log', async (req, res) => {
     db.logs.push({ time: new Date().toISOString(), message: req.body.message, category: req.body.category });
     if (db.logs.length > 500) db.logs.shift();
     saveDB(db);
-
     await sendServerLogWebhook(req.body.message, req.body.category);
     res.json({ success: true });
 });
@@ -307,21 +294,16 @@ app.get('/api/stream-frame/:id', isAdmin, (req, res) => {
 app.post('/api/action', isAdmin, (req, res) => {
     const { playerId, type, reason } = req.body;
     if (!playerId || !type) return res.status(400).json({ error: 'Missing data' });
-    
     const db = getDB();
     if (!db.actions) db.actions = [];
     if (!db.playerStats) db.playerStats = {};
-    
     db.actions.push({ playerId, type, reason, time: new Date().toISOString() });
-    
     if (!db.playerStats[playerId]) db.playerStats[playerId] = { bans: 0, warns: 0, kicks: 0 };
     if (type === 'ban') db.playerStats[playerId].bans++;
     if (type === 'warn') db.playerStats[playerId].warns++;
     if (type === 'kick') db.playerStats[playerId].kicks++;
-    
     db.logs.push({ time: new Date().toISOString(), message: `Action: ${type.toUpperCase()} on Player ID ${playerId} | Reason: ${reason || 'N/A'}`, category: 'ADMIN' });
     saveDB(db);
-
     res.json({ success: true });
 });
 
@@ -334,69 +316,36 @@ app.post('/api/get-actions', (req, res) => {
     res.json({ actions });
 });
 
-app.get('/api/bans', isAdmin, (req, res) => {
-    const db = getDB();
-    res.json(db.bans || []);
-});
-
-app.get('/api/detections', isAdmin, (req, res) => {
-    const db = getDB();
-    res.json(db.detections || []);
-});
-
+app.get('/api/bans', isAdmin, (req, res) => res.json(getDB().bans || []));
+app.get('/api/detections', isAdmin, (req, res) => res.json(getDB().detections || []));
 app.get('/api/player-stats/:id', isAdmin, (req, res) => {
     const db = getDB();
-    const stats = (db.playerStats && db.playerStats[req.params.id]) || { bans: 0, warns: 0, kicks: 0 };
-    res.json(stats);
+    res.json((db.playerStats && db.playerStats[req.params.id]) || { bans: 0, warns: 0, kicks: 0 });
 });
-
 app.get('/api/player-logs/:id', isAdmin, (req, res) => {
     const db = getDB();
-    const logs = db.logs.filter(l => l.message.includes(req.params.id)).reverse();
-    res.json(logs);
+    res.json(db.logs.filter(l => l.message.includes(req.params.id)).reverse());
 });
 
-// Tickets & Applications Routes
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets || []));
-
 app.post('/api/tickets', async (req, res) => {
     const db = getDB(); 
     if (!db.tickets) db.tickets = [];
-    
     const { discordId, type } = req.body;
-    
-    const lastRejected = (db.tickets || [])
-        .filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected')
-        .sort((a, b) => b.createdAt - a.createdAt)[0];
-        
-    if (lastRejected) {
-        const hoursPassed = (Date.now() - (lastRejected.createdAt || Date.now())) / (1000 * 60 * 60);
-        if (hoursPassed < 24) {
-            return res.status(400).json({ error: `You must wait 24 hours before applying for ${type} again.` });
-        }
+    const lastRejected = (db.tickets || []).filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected').sort((a, b) => b.createdAt - a.createdAt)[0];
+    if (lastRejected && (Date.now() - lastRejected.createdAt) / (1000 * 60 * 60) < 24) {
+        return res.status(400).json({ error: `You must wait 24 hours before applying for ${type} again.` });
     }
-
     const username = req.user ? req.user.username : 'Guest';
-    const ticket = { 
-        id: Date.now().toString(), 
-        status: 'pending', 
-        user: username,
-        createdAt: Date.now(),
-        ...req.body 
-    };
+    const ticket = { id: Date.now().toString(), status: 'pending', user: username, createdAt: Date.now(), ...req.body };
     db.tickets.push(ticket); 
     saveDB(db); 
-
     try {
         let parsedMsg = '';
-        try {
-            let obj = JSON.parse(ticket.message);
-            parsedMsg = Object.entries(obj).map(([k, v]) => `**${k}:** ${v}`).join('\n');
-        } catch(e) { parsedMsg = ticket.message; }
-        
+        try { let obj = JSON.parse(ticket.message); parsedMsg = Object.entries(obj).map(([k, v]) => `**${k}:** ${v}`).join('\n'); } 
+        catch(e) { parsedMsg = ticket.message; }
         await sendAppWebhook(ticket.type, ticket.subject, username, parsedMsg, ticket.discordId);
     } catch(e) {}
-
     res.json(ticket);
 });
 
@@ -407,11 +356,7 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
         t.status = req.body.status; 
         t.reason = req.body.reason || ''; 
         saveDB(db); 
-
-        if (t.status === 'accepted') {
-            await assignDiscordRole(t.discordId, t.type);
-        }
-
+        if (t.status === 'accepted') await assignDiscordRole(t.discordId, t.type);
         await sendStatusWebhook(t, t.status, t.reason);
     } 
     res.json(t);
@@ -443,7 +388,6 @@ app.get('/api/auth/me', (req, res) => {
 });
 app.get('/api/auth/logout', (req, res) => req.logout(() => res.redirect('/')));
 app.get('/api/auth/check-admin', isAdmin, (req, res) => res.json({ isAdmin: true }));
-
 app.post('/api/admin-login', (req, res) => {
   if (req.body.password === CONFIG.ADMIN_PASSWORD) { req.session.isAdmin = true; res.json({ success: true }); } 
   else { res.status(401).json({ success: false }); }
