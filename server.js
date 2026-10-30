@@ -30,6 +30,7 @@ const CONFIG = {
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE,
   WEBHOOK_EMS: process.env.WEBHOOK_EMS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG,
+  WEBHOOK_APPS: process.env.WEBHOOK_APPS || process.env.WEBHOOK_WHITELIST, // Webhook khass lel applications lkol ken t7eb
   DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS,
   ROLE_ACCEPTED_WHITELIST: process.env.ROLE_ACCEPTED_WHITELIST || process.env.ROLE_ACCEPTED_ID,
   ROLE_ACCEPTED_POLICE: process.env.ROLE_ACCEPTED_POLICE,
@@ -98,12 +99,12 @@ async function isAdmin(req, res, next) {
 
 // ===== Webhook & Role Helpers =====
 function getWebhookUrl(type) {
-    if (!type) return CONFIG.WEBHOOK_WHITELIST;
-    if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST;
-    if (type.includes('Police')) return CONFIG.WEBHOOK_POLICE;
-    if (type.includes('EMS')) return CONFIG.WEBHOOK_EMS;
-    if (type.includes('Gang')) return CONFIG.WEBHOOK_GANG;
-    return CONFIG.WEBHOOK_WHITELIST;
+    if (!type) return CONFIG.WEBHOOK_APPS;
+    if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST || CONFIG.WEBHOOK_APPS;
+    if (type.includes('Police')) return CONFIG.WEBHOOK_POLICE || CONFIG.WEBHOOK_APPS;
+    if (type.includes('EMS')) return CONFIG.WEBHOOK_EMS || CONFIG.WEBHOOK_APPS;
+    if (type.includes('Gang')) return CONFIG.WEBHOOK_GANG || CONFIG.WEBHOOK_APPS;
+    return CONFIG.WEBHOOK_APPS;
 }
 
 async function assignDiscordRole(discordId, type) {
@@ -141,11 +142,12 @@ async function sendAppWebhook(type, subject, username, details, discordId) {
                 content: `<@${discordId || ''}>`,
                 embeds: [{
                     title: `📥 New ${appTitle}`,
-                    color: 16711680,
+                    description: `A new application has been submitted by **${username}**.\n\n**Subject / Name:** ${subject}`,
+                    color: 3447003,
                     fields: [
-                        { name: "Subject / Name", value: subject, inline: true },
-                        { name: "Submitted By", value: username, inline: true },
-                        { name: "Details", value: details || 'N/A', inline: false }
+                        { name: "📋 Details", value: details || 'N/A', inline: false },
+                        { name: "🛡️ Submitted By", value: username, inline: true },
+                        { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
                     ],
                     timestamp: new Date().toISOString()
                 }]
