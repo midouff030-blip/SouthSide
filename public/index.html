@@ -495,6 +495,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <button class="admin-btn reject" onclick="actionPlayer('ban')"><i class="fa-solid fa-ban"></i> Ban</button>
             <button class="admin-btn" onclick="actionPlayer('kick')"><i class="fa-solid fa-shoe-prints"></i> Kick</button>
             <button class="admin-btn" style="background: #f59e0b; color: #fff;" onclick="actionPlayer('warn')"><i class="fa-solid fa-triangle-exclamation"></i> Warn</button>
+            <button class="admin-btn primary" onclick="startStream()"><i class="fa-solid fa-camera"></i> Start Stream</button>
         </div>
 
         <h3 style="color: #555; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Recent Logs</h3>
@@ -898,7 +899,7 @@ let currentPlayers = [];
 let activeStreams = {};
 let streamIntervals = {};
 let playersInterval = null;
-let selectedPlayer = null; // اللاعب اللي فاتحين بروفايلو
+let selectedPlayer = null;
 
 function fetchPlayers() {
     fetch('/api/players', { headers: getAdminHeaders() })
@@ -937,18 +938,14 @@ async function openPlayerProfile(playerId) {
     document.getElementById('profileName').innerText = selectedPlayer.name;
     document.getElementById('profileId').innerText = `ID: ${selectedPlayer.id}`;
     
-    // Identifiers
     let idsHtml = '';
     if (selectedPlayer.identifiers) {
         for (const [key, val] of Object.entries(selectedPlayer.identifiers)) {
             idsHtml += `<div class="id-badge"><i class="fa-solid fa-id-card"></i> ${key.toUpperCase()}: ${val}</div>`;
         }
-    } else {
-        idsHtml = '<p style="color: #555;">No identifiers found.</p>';
-    }
+    } else { idsHtml = '<p style="color: #555;">No identifiers found.</p>'; }
     document.getElementById('profileIdentifiers').innerHTML = idsHtml;
 
-    // Stats
     try {
         const statsRes = await fetch(`/api/player-stats/${playerId}`, { headers: getAdminHeaders() });
         const stats = await statsRes.json();
@@ -957,7 +954,6 @@ async function openPlayerProfile(playerId) {
         document.getElementById('profileKicks').innerText = stats.kicks || 0;
     } catch(e) {}
 
-    // Logs
     try {
         const logsRes = await fetch(`/api/player-logs/${playerId}`, { headers: getAdminHeaders() });
         const logs = await logsRes.json();
@@ -993,11 +989,20 @@ async function actionPlayer(type) {
     fetchPlayers();
 }
 
-function selectPlayerForStream(playerId) {
+function startStream() {
+    if (!selectedPlayer) return;
+    const playerId = selectedPlayer.id;
     if (activeStreams[playerId]) return;
+
+    fetch('/api/action', {
+        method: 'POST',
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ playerId, type: 'stream_start' })
+    });
+
     activeStreams[playerId] = true;
     renderStreamGrid();
-    
+
     streamIntervals[playerId] = setInterval(async () => {
         try {
             const res = await fetch(`/api/stream-frame/${playerId}`, { headers: getAdminHeaders() });
@@ -1005,7 +1010,6 @@ function selectPlayerForStream(playerId) {
             if (data.frame) {
                 const slot = document.getElementById(`stream-${playerId}`);
                 if (slot) {
-                    // زر Full Screen
                     slot.innerHTML = `
                         <img src="${data.frame}" style="width:100%; height:100%; object-fit:cover;">
                         <button class="fs-btn" onclick="requestFullscreen('stream-${playerId}')"><i class="fa-solid fa-expand"></i></button>
@@ -1013,7 +1017,10 @@ function selectPlayerForStream(playerId) {
                 }
             }
         } catch(e) {}
-    }, 300); // 300ms
+    }, 200); 
+
+    closeProfileModal();
+    switchTab('multi', document.querySelectorAll('.nav-btn')[5]);
 }
 
 function requestFullscreen(elementId) {
@@ -1031,7 +1038,7 @@ function renderStreamGrid() {
         const pName = currentPlayers.find(p => p.id == id)?.name || id;
         html += `<div id="stream-${id}" class="stream-slot"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Connecting to ${pName}...</span></div>`;
     });
-    for (let i = activeIds.length; i < 16; i++) { // 🔴 حيّدنا الليموت (دائماً 16 مربع، تنجم تبدلها لـ 32 ولا أي رقم)
+    for (let i = activeIds.length; i < 16; i++) { 
         html += `<div class="stream-slot"><i class="fa-solid fa-video-slash"></i><span>No Stream</span></div>`;
     }
     grid.innerHTML = html;
@@ -1056,8 +1063,8 @@ function resetStreams() {
 
 function startFetchingPlayers() {
     if (playersInterval) clearInterval(playersInterval);
-    fetchPlayers(); // نجيبو أول مرة
-    playersInterval = setInterval(fetchPlayers, 3000); // من بعد كل 3 ثواني
+    fetchPlayers();
+    playersInterval = setInterval(fetchPlayers, 3000);
 }
 
 document.getElementById('loginBtn').addEventListener('click', () => window.location.href = '/api/auth/discord');
