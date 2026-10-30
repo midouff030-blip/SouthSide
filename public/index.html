@@ -68,7 +68,7 @@ main { padding: 8rem 4rem 5rem 4rem; max-width: 1400px; margin: 0 auto; min-heig
 .ip-row i { color: var(--accent); }
 .btn-copy { width: 100%; background: var(--accent); color: #fff; border: none; padding: 1rem; font-family: var(--font-sub); font-weight: 600; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
 .btn-copy:hover { background: #cc0000; }
-.apps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.apps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .app-card { position: relative; height: 420px; overflow: hidden; cursor: pointer; background-size: cover; background-position: center; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 2rem; transition: 0.4s; }
 .app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9)); transition: 0.4s; z-index: 1; }
 .app-card:hover::before { background: linear-gradient(to bottom, rgba(255,0,0,0.4), rgba(0,0,0,0.95)); }
@@ -959,10 +959,9 @@ img{image-rendering:auto}
         </div>
         <div class="apps-grid" id="appsGrid" style="display: none;">
             <div class="app-card" data-app="Whitelist" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
-            <div class="app-card" data-app="Gang & Family" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang & Family</div></div>
-            <div class="app-card" data-app="Police Dept" style="background-image: url('https://i.ibb.co/3Wq0zR5/police.jpg');"><i class="fa-solid fa-shield-halved app-icon"></i><div class="app-title">Police Dept</div></div>
-            <div class="app-card" data-app="EMS Dept" style="background-image: url('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-briefcase-medical app-icon"></i><div class="app-title">EMS Dept</div></div>
-        </div>
+            <div class="app-card" data-app="Gang Application" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang Application</div></div>
+            <div class="app-card" data-app="Staff Application" style="background-image:linear-gradient(135deg,rgba(255,0,0,.22),rgba(0,0,0,.7)),url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-user-shield app-icon"></i><div class="app-title">Staff Application</div></div>
+                                </div>
     </div>
 
     <div id="tab-illegal" class="tab">
@@ -1363,9 +1362,8 @@ checkLogin();
 
 const appConfigs = {
     "Whitelist": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
-    "Gang & Family": { title: "Gang & Family", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
-    "Police Dept": { title: "Police Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Motivation *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true } ]},
-    "EMS Dept": { title: "EMS Dept", fields: [ { label: "Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Motivation *", type: "textarea", name: "motivation", placeholder: "Motivation...", required: true } ]}
+    "Gang Application": { title: "Gang Application", fields: [ { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Name", required: true }, { label: "Objective *", type: "textarea", name: "gang_objective", placeholder: "Goals...", required: true } ]},
+    "Staff Application": { title: "Staff Application", fields: [ { label: "Full Name *", type: "input", name: "char_name", placeholder: "Your name", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Discord Username *", type: "input", name: "discord_username", placeholder: "Your Discord username", required: true }, { label: "Previous Staff Experience *", type: "textarea", name: "experience", placeholder: "Describe your experience", required: true }, { label: "Why do you want to join the staff team? *", type: "textarea", name: "motivation", placeholder: "Your motivation", required: true }, { label: "Weekly Availability *", type: "textarea", name: "availability", placeholder: "Days and hours", required: true } ]},
 };
 
 let currentType = '';
@@ -1395,7 +1393,7 @@ async function openModal(title) {
         group.appendChild(label);
         let input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
         input.className = f.type === 'textarea' ? 'form-input form-textarea' : 'form-input';
-        input.name = f.name; input.placeholder = f.placeholder || '';
+        input.name = f.name; input.placeholder = f.placeholder || ''; if (f.type === 'number') input.type = 'number';
         if (f.required) input.required = true;
         group.appendChild(input);
         fieldsContainer.appendChild(group);

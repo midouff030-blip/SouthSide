@@ -30,15 +30,19 @@ const CONFIG = {
   DISCORD_CALLBACK_URL: process.env.DISCORD_CALLBACK_URL,
   FIVEM_LOG_KEY: process.env.FIVEM_LOG_KEY || 'southside-secret-123',
   WEBHOOK_WHITELIST: process.env.WEBHOOK_WHITELIST,
+  WEBHOOK_NEW_WHITELIST: process.env.WEBHOOK_NEW_WHITELIST,
+  WEBHOOK_NEW_APPLICATIONS: process.env.WEBHOOK_NEW_APPLICATIONS,
   WEBHOOK_POLICE: process.env.WEBHOOK_POLICE,
   WEBHOOK_EMS: process.env.WEBHOOK_EMS,
   WEBHOOK_GANG: process.env.WEBHOOK_GANG,
+  WEBHOOK_STAFF: process.env.WEBHOOK_STAFF,
   WEBHOOK_APPS: process.env.WEBHOOK_APPS || process.env.WEBHOOK_WHITELIST,
   DISCORD_WEBHOOK_LOGS: process.env.DISCORD_WEBHOOK_LOGS,
   ROLE_ACCEPTED_WHITELIST: process.env.ROLE_ACCEPTED_WHITELIST || process.env.ROLE_ACCEPTED_ID,
   ROLE_ACCEPTED_POLICE: process.env.ROLE_ACCEPTED_POLICE,
   ROLE_ACCEPTED_EMS: process.env.ROLE_ACCEPTED_EMS,
-  ROLE_ACCEPTED_GANG: process.env.ROLE_ACCEPTED_GANG
+  ROLE_ACCEPTED_GANG: process.env.ROLE_ACCEPTED_GANG,
+  ROLE_ACCEPTED_STAFF: process.env.ROLE_ACCEPTED_STAFF
 };
 
 // ===== Database =====
@@ -103,10 +107,9 @@ async function isAdmin(req, res, next) {
 // ===== Webhook Helpers =====
 function getWebhookUrl(type) {
     if (!type) return CONFIG.WEBHOOK_APPS;
-    if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST || CONFIG.WEBHOOK_APPS;
-    if (type.includes('Police')) return CONFIG.WEBHOOK_POLICE || CONFIG.WEBHOOK_APPS;
-    if (type.includes('EMS')) return CONFIG.WEBHOOK_EMS || CONFIG.WEBHOOK_APPS;
-    if (type.includes('Gang')) return CONFIG.WEBHOOK_GANG || CONFIG.WEBHOOK_APPS;
+    if (type.includes('Whitelist')) return CONFIG.WEBHOOK_WHITELIST;
+    if (type.includes('Staff')) return CONFIG.WEBHOOK_STAFF;
+    if (type.includes('Gang')) return CONFIG.WEBHOOK_GANG;
     return CONFIG.WEBHOOK_APPS;
 }
 
@@ -114,8 +117,7 @@ async function assignDiscordRole(discordId, type) {
     if (!CONFIG.DISCORD_BOT_TOKEN || !CONFIG.GUILD_ID || !discordId) return;
     let roleId = '';
     if (type.includes('Whitelist')) roleId = CONFIG.ROLE_ACCEPTED_WHITELIST;
-    else if (type.includes('Police')) roleId = CONFIG.ROLE_ACCEPTED_POLICE;
-    else if (type.includes('EMS')) roleId = CONFIG.ROLE_ACCEPTED_EMS;
+    else if (type.includes('Staff')) roleId = CONFIG.ROLE_ACCEPTED_STAFF;
     else if (type.includes('Gang')) roleId = CONFIG.ROLE_ACCEPTED_GANG;
 
     if (!roleId) return;
@@ -128,35 +130,35 @@ async function assignDiscordRole(discordId, type) {
     } catch(e) { console.error("Error assigning role:", e); }
 }
 
+// Dedicated inbox for NEW submissions. Review decisions continue to use the type webhook.
+function getSubmissionWebhookUrl(type) {
+    // One dedicated inbox for all NEW applications (Whitelist, Gang, Staff).
+    // Accepted/rejected decisions still use their category-specific webhooks.
+    return CONFIG.WEBHOOK_NEW_APPLICATIONS || getWebhookUrl(type);
+}
+
 async function sendAppWebhook(type, subject, username, details, discordId) {
-    const webhookUrl = getWebhookUrl(type);
-    if (!webhookUrl) return;
-
-    let appTitle = type;
-    if (!appTitle.toLowerCase().includes('application')) {
-        appTitle = `${type} Application`;
-    }
-
-    try {
-        await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: `<@${discordId || ''}>`,
-                embeds: [{
-                    title: `📥 New ${appTitle}`,
-                    description: `A new application has been submitted by **${username}**.\n\n**Subject / Name:** ${subject}`,
-                    color: 3447003,
-                    fields: [
-                        { name: "📋 Details", value: details || 'N/A', inline: false },
-                        { name: "🛡️ Submitted By", value: username, inline: true },
-                        { name: "📅 Date", value: new Date().toLocaleDateString(), inline: true }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            })
-        });
-    } catch(e) { console.error("App webhook send error:", e); }
+    const webhookUrl = getSubmissionWebhookUrl(type);
+    if (!webhookUrl) throw new Error(`Webhook not configured for ${type}. Configure WEBHOOK_NEW_APPLICATIONS in Render.`);
+    const clean = value => String(value ?? 'N/A').replace(/@/g, '@\u200b');
+    const chunks = (clean(details).match(/[\s\S]{1,1000}/g) || ['N/A']).slice(0, 20);
+    const fields = chunks.map((chunk, i) => ({ name: i ? `📋 Details (${i + 1})` : '📋 Details', value: chunk, inline: false }));
+    fields.push({ name: '🛡️ Submitted By', value: clean(username).slice(0, 1024), inline: true });
+    fields.push({ name: '📅 Date', value: new Date().toLocaleDateString(), inline: true });
+    const response = await fetch(webhookUrl, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: 'SouthSide S2 Applications',
+            allowed_mentions: { parse: [] },
+            embeds: [{
+                title: `📥 New ${type} Application`,
+                description: `New application submitted by **${clean(username).slice(0, 100)}**.\n\n**Subject / Name:** ${clean(subject).slice(0, 300)}\n**Discord ID:** ${clean(discordId)}`,
+                color: 16711680, fields, timestamp: new Date().toISOString(),
+                footer: { text: 'SouthSide S2 • Applications' }
+            }]
+        })
+    });
+    if (!response.ok) throw new Error(`Discord webhook returned HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
 }
 
 async function sendStatusWebhook(ticket, status, reason) {
@@ -353,24 +355,36 @@ app.get('/api/player-logs/:id', isAdmin, (req, res) => {
 
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets || []));
 app.post('/api/tickets', async (req, res) => {
-    const db = getDB(); 
+    const allowed = ['Whitelist', 'Gang Application', 'Staff Application'];
+    const { type, subject, message } = req.body;
+    if (!allowed.includes(type)) return res.status(400).json({ error: 'Invalid application type.' });
+    if (!req.user?.id) return res.status(401).json({ error: 'Please login with Discord first.' });
+    if (typeof message !== 'string' || !message.trim() || message.length > 12000)
+        return res.status(400).json({ error: 'Invalid application details.' });
+    let answers;
+    try { answers = JSON.parse(message); } catch { return res.status(400).json({ error: 'Invalid application format.' }); }
+    if (!answers || typeof answers !== 'object' || Array.isArray(answers) || !Object.values(answers).length ||
+        Object.values(answers).some(v => typeof v !== 'string' || !v.trim()))
+        return res.status(400).json({ error: 'Please complete all application fields.' });
+    const discordId = req.user.id;
+    const db = getDB();
     if (!db.tickets) db.tickets = [];
-    const { discordId, type } = req.body;
-    const lastRejected = (db.tickets || []).filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected').sort((a, b) => b.createdAt - a.createdAt)[0];
-    if (lastRejected && (Date.now() - lastRejected.createdAt) / (1000 * 60 * 60) < 24) {
+    const lastRejected = db.tickets.filter(t => t.discordId === discordId && t.type === type && t.status === 'rejected').sort((a,b) => b.createdAt - a.createdAt)[0];
+    if (lastRejected && Date.now() - lastRejected.createdAt < 24 * 60 * 60 * 1000)
         return res.status(400).json({ error: `You must wait 24 hours before applying for ${type} again.` });
-    }
-    const username = req.user ? req.user.username : 'Guest';
-    const ticket = { id: Date.now().toString(), status: 'pending', user: username, createdAt: Date.now(), ...req.body };
-    db.tickets.push(ticket); 
-    saveDB(db); 
+    const username = req.user.username || 'Discord User';
+    const details = Object.entries(answers).map(([k,v]) => `**${k.replace(/@/g,'')}**: ${String(v).replace(/@/g,'@\u200b')}`).join('\n');
     try {
-        let parsedMsg = '';
-        try { let obj = JSON.parse(ticket.message); parsedMsg = Object.entries(obj).map(([k, v]) => `**${k}:** ${v}`).join('\n'); } 
-        catch(e) { parsedMsg = ticket.message; }
-        await sendAppWebhook(ticket.type, ticket.subject, username, parsedMsg, ticket.discordId);
-    } catch(e) {}
-    res.json(ticket);
+        await sendAppWebhook(type, subject, username, details, discordId);
+    } catch (err) {
+        console.error('Application webhook failed:', err.message);
+        return res.status(502).json({ error: 'Discord webhook delivery failed. Please contact staff or try again.' });
+    }
+    const ticket = { id: Date.now().toString(), type, subject: String(subject || 'N/A').slice(0,200), message,
+        discordId, user: username, status: 'pending', createdAt: Date.now() };
+    db.tickets.push(ticket);
+    saveDB(db);
+    return res.status(201).json(ticket);
 });
 
 app.put('/api/tickets/:id', isAdmin, async (req, res) => {
