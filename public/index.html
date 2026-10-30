@@ -377,14 +377,6 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                         <h3 style="font-size: 1.8rem; margin: 0; color: #fff;" id="ovTickets">0</h3>
                     </div>
                 </div>
-                <div class="admin-card">
-                    <h3>Quick Actions</h3>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button class="admin-btn" onclick="switchAdminTab('applications', document.querySelectorAll('.admin-nav-btn')[1])">Review Applications</button>
-                        <button class="admin-btn" onclick="switchAdminTab('logs', document.querySelectorAll('.admin-nav-btn')[2])">View Logs</button>
-                        <button class="admin-btn" onclick="switchAdminTab('gangs', document.querySelectorAll('.admin-nav-btn')[3])">Manage Gangs</button>
-                    </div>
-                </div>
             </div>
             <!-- Applications Tab -->
             <div id="adminTab-applications" class="admin-tab">
@@ -414,7 +406,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
             <div id="adminTab-players" class="admin-tab">
                 <div class="admin-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Players Online</h3>
+                        <h3 style="margin: 0;">All Members</h3>
                         <button class="admin-btn" onclick="loadPlayers()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                     </div>
                     <div id="playersList"><p style="color: #555;">Click refresh to load...</p></div>
@@ -456,7 +448,15 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                         <input class="admin-input" type="text" id="newShopName" placeholder="Item Name">
                         <input class="admin-input" type="number" id="newShopPrice" placeholder="Price (DT)">
-                        <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL" style="grid-column: 1 / -1;">
+                        <input class="admin-input" type="text" id="newShopImage" placeholder="Image URL">
+                        <select class="admin-input" id="newShopCategory" style="background: #000; border: 1px solid #1f1f1f; padding: 0.8rem 1rem; border-radius: 8px; color: #fff; outline: none;">
+                            <option value="Car">Car</option>
+                            <option value="Motor">Motor</option>
+                            <option value="MLO">MLO</option>
+                            <option value="Ped">Ped</option>
+                            <option value="House">House</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                     <button class="admin-btn primary" id="addShopBtn">Add Item</button>
                 </div>
@@ -475,7 +475,7 @@ body.admin-mode { background: #050505; overflow: hidden !important; }
                     <div id="streamGrid" class="stream-grid-container"></div>
                     <div class="admin-card" style="margin: 0; height: 100%; display: flex; flex-direction: column;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0;">Players Online</h3>
+                            <h3 style="margin: 0;">All Members</h3>
                             <span style="color: #555; font-size: 0.75rem;" id="playersActiveText">0 Active</span>
                         </div>
                         <input class="admin-input" type="text" placeholder="Search players..." id="playerSearch" onkeyup="filterPlayers()" style="margin-bottom: 1rem;">
@@ -587,6 +587,7 @@ function switchAdminTab(name, btn) {
     if (name === 'applications') { loadAdmin(); }
     if (name === 'gangs') { loadAdmin(); }
     if (name === 'shop') { loadAdmin(); }
+    if (name === 'players') { loadPlayers(); }
 }
 
 document.getElementById('copyBtn').addEventListener('click', function(){
@@ -756,11 +757,37 @@ async function loadGangs() {
 async function loadShop() {
     try {
         const res = await fetch('/api/shop'); const items = await res.json();
-        document.getElementById('shopGrid').innerHTML = items.length ? items.map(i => `
-            <div class="shop-item">
-                <div class="shop-img"><img src="${i.image}"></div>
-                <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
-            </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
+        const container = document.getElementById('shopGrid');
+        
+        if (items.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">Shop is empty.</p>';
+            return;
+        }
+
+        const categories = {};
+        items.forEach(item => {
+            const cat = item.category || 'Other';
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(item);
+        });
+
+        let html = '';
+        for (const [cat, catItems] of Object.entries(categories)) {
+            html += `<div style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;">
+                <h3 style="font-family: var(--font-title); font-size: 2rem; color: var(--accent);">${cat}</h3>
+            </div>`;
+            
+            catItems.forEach(i => {
+                html += `
+                    <div class="shop-item">
+                        <div class="shop-img"><img src="${i.image}"></div>
+                        <div class="shop-body"><div class="shop-price">${i.price} DT</div><div class="shop-title">${i.name}</div></div>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
     } catch(e){}
 }
 
@@ -824,7 +851,7 @@ async function loadAdmin() {
         </tr>`).join('')}</table>` : '<p style="color:#555;">No gangs.</p>';
 
     const s = await (await fetch('/api/shop')).json();
-    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
+    document.getElementById('adminShop').innerHTML = s.length ? `<table class="admin-table">${s.map(x=>`<tr><td>${x.name}</td><td>${x.price} DT</td><td>${x.category || 'Other'}</td><td><button onclick="removeShopItem('${x.id || x._id}')">Delete</button></td></tr>`).join('')}</table>` : '<p style="color:#555;">Empty.</p>';
 }
 
 async function updateTicket(id, st) { 
@@ -928,7 +955,16 @@ async function addMember(id) {
 }
 
 document.getElementById('addShopBtn').addEventListener('click', async function(){ 
-    await fetch('/api/shop', { method:'POST', headers: getAdminHeaders(), body:JSON.stringify({name:document.getElementById('newShopName').value, price:parseInt(document.getElementById('newShopPrice').value), image:document.getElementById('newShopImage').value}) }); 
+    await fetch('/api/shop', { 
+        method:'POST', 
+        headers: getAdminHeaders(), 
+        body:JSON.stringify({
+            name: document.getElementById('newShopName').value, 
+            price: parseInt(document.getElementById('newShopPrice').value), 
+            image: document.getElementById('newShopImage').value,
+            category: document.getElementById('newShopCategory').value 
+        }) 
+    }); 
     loadAdmin(); 
 });
 
@@ -964,16 +1000,28 @@ function renderPlayersList() {
         document.getElementById('playersActiveText').innerText = `0 Active`;
         return;
     }
-    document.getElementById('playersActiveText').innerText = `${currentPlayers.length} Active`;
-    container.innerHTML = currentPlayers.map(p => `
-        <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openPlayerProfile('${p.id}')">
-            <div>
-                <span style="color: #fff;">${p.name} (ID: ${p.id})</span>
-                <span style="color: #555; font-size: 0.8rem;">${p.ping}ms</span>
+    
+    const onlineCount = currentPlayers.length; 
+    document.getElementById('playersActiveText').innerText = `${onlineCount} Active`;
+
+    container.innerHTML = currentPlayers.map(p => {
+        const discordId = p.identifiers ? p.identifiers.discord : 'N/A';
+        const status = 'Online'; 
+        const statusColor = status === 'Online' ? '#22c55e' : '#ff0000';
+        
+        return `
+            <div class="player-item" style="padding: 0.8rem; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="openPlayerProfile('${p.id}')">
+                <div>
+                    <span style="color: #fff; font-weight: 600;">${p.name}</span>
+                    <span style="color: #555; font-size: 0.75rem; margin-left: 0.5rem;">(${p.id})</span>
+                    <div style="font-size: 0.75rem; color: #888; margin-top: 0.2rem;">
+                        <i class="fa-brands fa-discord"></i> ${discordId}
+                    </div>
+                </div>
+                <span style="font-size: 0.7rem; font-weight: 600; color: ${statusColor}; background: rgba(34, 197, 94, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">${status}</span>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #555;"></i>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function openPlayerProfile(playerId) {
