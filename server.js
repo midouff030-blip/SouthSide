@@ -3,6 +3,8 @@ const http = require('http');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const session = require('express-session');
 const passport = require('passport');
 const fetch = require('node-fetch');
@@ -14,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
 app.use(cors({ origin: true, credentials: true })); 
 app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const CONFIG = {
@@ -277,12 +280,33 @@ app.get('/api/logs', isAdmin, (req, res) => {
     res.json(db.logs.slice(-150).reverse());
 });
 
-app.post('/api/stream-frame', (req, res) => {
-    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+app.post('/api/stream-frame', upload.single('file'), (req, res) => {
     const db = getDB();
     if (!db.liveFrames) db.liveFrames = {};
-    if (req.body.playerId && req.body.frame) db.liveFrames[req.body.playerId] = req.body.frame;
-    saveDB(db);
+
+    // Support multipart file upload from screenshot-basic
+    if (req.file) {
+        try {
+            const bitmap = fs.readFileSync(req.file.path);
+            const base64Str = `data:image/jpeg;base64,${bitmap.toString('base64')}`;
+            const playerId = req.body.playerId || req.query.playerId;
+            if (playerId) {
+                db.liveFrames[playerId] = base64Str;
+                saveDB(db);
+            }
+            fs.unlinkSync(req.file.path);
+            return res.json({ success: true });
+        } catch(e) {
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    // Support JSON body
+    if (req.body.key !== CONFIG.FIVEM_LOG_KEY) return res.status(403).json({ error: 'Unauthorized' });
+    if (req.body.playerId && req.body.frame) {
+        db.liveFrames[req.body.playerId] = req.body.frame;
+        saveDB(db);
+    }
     res.json({ success: true });
 });
 
