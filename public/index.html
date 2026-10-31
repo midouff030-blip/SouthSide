@@ -898,6 +898,98 @@ img{image-rendering:auto}
 @keyframes ssHalo{from{opacity:.55;transform:scale(.93)}to{opacity:1;transform:scale(1.13)}}
 @media(max-width:650px){.brand .ss-coin-stage{width:42px;height:42px;flex-basis:42px}.brand .ss-coin-rotator{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.brand .ss-coin-rotator,.brand .ss-coin-stage::before{animation:none}}
+
+/* PREMIUM APPLICATION EXPERIENCE - RED / BLACK */
+#ticketModal { background: rgba(0,0,0,.76); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+#ticketModal .modal-body { width: min(94vw,650px); border-radius: 22px; border: 1px solid rgba(255,0,0,.45); background: linear-gradient(148deg,#292929 0%,#1c1c1c 50%,#111 100%); box-shadow: 0 35px 100px rgba(0,0,0,.75),0 0 45px rgba(255,0,0,.12); padding: clamp(1.4rem,4vw,2.8rem); animation: ssAppEnter .35s cubic-bezier(.2,.8,.2,1) both; }
+#ticketModal .modal-body::before { content: ''; position: absolute; left: 2.5rem; right: 2.5rem; top: 0; height: 3px; border-radius: 0 0 8px 8px; background: linear-gradient(90deg,transparent,#ff0000,transparent); box-shadow: 0 0 22px rgba(255,0,0,.48); }
+#ticketModal #modalTitle { color:#fff; letter-spacing: .7px; text-shadow: 0 2px 16px rgba(255,0,0,.17); }
+#ticketModal .form-group { margin-bottom: 1.15rem; }
+#ticketModal .form-label { color:#e3e3e3; font-size:.82rem; letter-spacing:1px; margin-bottom:.55rem; }
+#ticketModal .form-input { min-height: 49px; background: rgba(8,8,8,.62); border:1px solid #515151; border-radius:11px; padding: .85rem 1rem; transition: border-color .2s,box-shadow .2s,background .2s; color:#fff; }
+#ticketModal .form-input::placeholder { color:#9b9b9b; }
+#ticketModal .form-input:focus { border-color:#ff0000; background:#171717; box-shadow:0 0 0 3px rgba(255,0,0,.13),0 8px 25px rgba(0,0,0,.18); }
+#ticketModal select.form-input { appearance:none; cursor:pointer; padding-right:2.5rem; background-image:linear-gradient(45deg,transparent 50%,#ff0000 50%),linear-gradient(135deg,#ff0000 50%,transparent 50%); background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px; background-size:6px 6px; background-repeat:no-repeat; }
+#ticketModal select.form-input option { background:#202020; color:white; }
+#ticketModal .btn-main,#ticketModal button[type="submit"] { border-radius:10px; background:linear-gradient(115deg,#d60000,#ff0000); box-shadow:0 8px 22px rgba(255,0,0,.18); transition:transform .2s,box-shadow .2s; }
+#ticketModal .btn-main:hover,#ticketModal button[type="submit"]:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,0,0,.3); }
+#ticketModal .modal-close:hover { color:#ff0000; transform:rotate(90deg); }
+@keyframes ssAppEnter { from { opacity:0; transform:translateY(16px) scale(.975); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media (prefers-reduced-motion:reduce) { #ticketModal .modal-body { animation:none; } }
+
+/* ================================================================
+   SOUTHSIDE S2 — EDITORIAL / NO-CARDS DESIGN
+   Plain content and strong typography instead of boxed UI.
+   Application forms, clickable application choices, API and JS remain.
+   ================================================================ */
+:root{--card:transparent;--border:rgba(255,255,255,.11);--text-muted:#c6c6c6}
+#tab-home .stats-row{gap:0!important;border-top:1px solid rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.2);padding:24px 0;margin-bottom:5rem}
+#tab-home .stat-block{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:1.8rem 1rem!important;transform:none!important;animation:none!important;backdrop-filter:none!important}
+#tab-home .stat-block:not(:last-child){border-right:1px solid rgba(255,255,255,.2)!important}
+#tab-home .stat-block::before,#tab-home .stat-block::after{display:none!important}
+#tab-home .stat-block h3{font-size:clamp(2.8rem,5vw,5.3rem)!important;text-shadow:none!important}
+#tab-home .stat-block p{color:#ff3030!important}
+#tab-home .status-box{background:transparent!important;border:0!important;border-top:1px solid rgba(255,255,255,.2)!important;border-bottom:1px solid rgba(255,255,255,.2)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;animation:none!important;padding:2.8rem 0!important;transform:none!important}
+#tab-home .status-box::before,#tab-home .status-box::after{display:none!important}
+#tab-home .status-box .ip-row{background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.25)!important;border-radius:0!important;box-shadow:none!important;padding-left:0!important;padding-right:0!important}
+#tab-home .status-box .bar{border-radius:2px!important}
+#tab-applications .apps-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:clamp(1rem,3vw,3rem)!important}
+#tab-applications .app-card{height:auto!important;min-height:220px!important;background-image:none!important;background-color:transparent!important;border:0!important;border-bottom:2px solid rgba(255,255,255,.3)!important;border-radius:0!important;box-shadow:none!important;padding:2.5rem 0 1.5rem!important;transform:none!important;justify-content:space-between!important;backdrop-filter:none!important}
+#tab-applications .app-card::before{background:none!important;display:none!important}
+#tab-applications .app-card::after{display:none!important}
+#tab-applications .app-card:hover{border-bottom-color:#ff0000!important;transform:none!important;box-shadow:none!important}
+#tab-applications .app-card .app-title{font-size:clamp(1.4rem,2.5vw,2.4rem)!important;line-height:1.2!important}
+#tab-applications .app-card .app-icon{font-size:2.5rem!important;color:#ff0000!important}
+#tab-rules .rules-grid{display:block!important;columns:2;column-gap:clamp(2rem,5vw,6rem)!important}
+#tab-rules .rule-card{display:inline-block!important;width:100%!important;break-inside:avoid!important;background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.23)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;transform:none!important;animation:none!important;padding:1.5rem 0 2rem!important;margin:0 0 1rem!important;min-height:0!important}
+#tab-rules .rule-card::before,#tab-rules .rule-card::after{display:none!important}
+#tab-rules .rule-card:hover{background:transparent!important;box-shadow:none!important;transform:none!important;border-bottom-color:#ff0000!important}
+#tab-rules .rule-card h3{font-size:clamp(1.35rem,2vw,1.85rem)!important;line-height:1.2!important;margin-bottom:1rem!important}
+#tab-rules .rule-card li{line-height:1.85!important;color:#eee!important}
+#tab-rules .rule-icon{background:transparent!important;box-shadow:none!important;border:0!important;color:#ff0000!important}
+#tab-rules .rule-top{margin-bottom:.75rem!important}
+#tab-illegal .gang-card,#tab-shop .shop-card{background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.24)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:1.5rem 0!important;transform:none!important}
+#tab-illegal .gang-card::before,#tab-shop .shop-card::before{display:none!important}
+#tab-illegal .gang-card:hover,#tab-shop .shop-card:hover{box-shadow:none!important;transform:none!important;border-bottom-color:#ff0000!important}
+/* Forms stay readable and functional, but with minimal line-based fields. */
+.modal-body{background:#171717!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:10px!important;box-shadow:0 20px 80px rgba(0,0,0,.65)!important}
+.modal-body .form-input{background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.35)!important;border-radius:0!important;box-shadow:none!important;padding:1rem .2rem!important}
+.modal-body .form-input:focus{border-bottom-color:#ff0000!important;box-shadow:0 2px 0 rgba(255,0,0,.25)!important}
+@media(max-width:800px){#tab-rules .rules-grid{columns:1!important}#tab-applications .apps-grid{grid-template-columns:1fr!important}#tab-applications .app-card{min-height:145px!important;padding:1.5rem 0!important}#tab-home .status-box{padding:2rem 0!important}#tab-home .stats-row{grid-template-columns:1fr!important}#tab-home .stat-block:not(:last-child){border-right:0!important;border-bottom:1px solid rgba(255,255,255,.18)!important}}
+
+
+/* HERO FRAME REMOVAL — only the oversized outer rectangle */
+#tab-home .hero-doc {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+#tab-home .hero-doc::before, #tab-home .hero-doc::after { border: 0 !important; box-shadow: none !important; }
+
+/* SOUTHSIDE TITLE — softer red glow, crisp lettering */
+#tab-home .hero-doc h1 em {
+  color: #ff0000 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 0 7px rgba(255,0,0,.16), 0 2px 12px rgba(0,0,0,.28) !important;
+  filter: none !important;
+}
+#tab-home .hero-doc::before {
+  opacity: .48 !important;
+}
+
+/* SouthSide S2: supplied application artwork, one image per card */
+#tab-applications .apps-grid .app-card {position:relative!important;min-height:330px!important;height:330px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:14px!important;overflow:hidden!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;padding:22px!important;box-shadow:0 12px 35px rgba(0,0,0,.4)!important;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease!important;}
+#tab-applications .apps-grid .app-card[data-app="Whitelist"]{background-image:url('whitelist-application.png')!important}
+#tab-applications .apps-grid .app-card[data-app="Gang Application"]{background-image:url('gang-application.png')!important}
+#tab-applications .apps-grid .app-card[data-app="Staff Application"]{background-image:url('staff-application.png')!important}
+#tab-applications .apps-grid .app-card::before{content:''!important;display:block!important;position:absolute!important;inset:0!important;background:linear-gradient(180deg,rgba(0,0,0,.04) 15%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.64) 100%)!important;z-index:1!important;pointer-events:none!important}
+#tab-applications .apps-grid .app-card .app-icon{position:relative!important;z-index:2!important;filter:drop-shadow(0 2px 6px #000)!important}
+#tab-applications .apps-grid .app-card .app-title{position:relative!important;z-index:2!important;text-shadow:0 2px 9px #000,0 0 15px #000!important}
+#tab-applications .apps-grid .app-card:hover{transform:translateY(-7px)!important;border-color:#ff0000!important;box-shadow:0 20px 55px rgba(0,0,0,.6),0 0 22px rgba(255,0,0,.24)!important}
+@media(max-width:650px){#tab-applications .apps-grid .app-card{height:300px!important;min-height:300px!important}}
 </style>
 </head>
 <body>
@@ -912,7 +1004,7 @@ img{image-rendering:auto}
                 <span class="ss-coin-face ss-coin-back"><img src="/logo.png" alt="" aria-hidden="true"></span>
             </span>
         </span>
-        <div><h1>SOUTHSIDE S2</h1><p>Roleplay</p></div>
+        
     </div>
     <nav id="mainNav">
         <button class="nav-btn active" data-tab="home">Home</button>
@@ -930,7 +1022,7 @@ img{image-rendering:auto}
     <div id="tab-home" class="tab active">
         <div class="hero-doc">
             <div class="home-eyebrow">SOUTHSIDE S2 · TUNISIAN ROLEPLAY</div>
-            <h1>Join The <em>Elite.</em></h1>
+            <h1>Join <em>SouthSide.</em></h1>
             <p>A serious roleplay experience where your story matters. No pay-to-win, just pure immersion.</p>
             <div class="hero-buttons">
                 <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Connect Discord</button>
@@ -960,7 +1052,7 @@ img{image-rendering:auto}
             </div>
             <div>
                 <h5 style="color: var(--text-muted); font-family: var(--font-sub); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">Direct Connect</h5>
-                <div class="ip-row"><span id="serverIP">Soon !!</span><i class="fa-solid fa-signal"></i></div>
+                <div class="ip-row"><span id="serverIP">connect play.southsiderp.tn</span><i class="fa-solid fa-signal"></i></div>
                 <button class="btn-copy" id="copyBtn"><i class="fa-solid fa-copy"></i> Copy IP Address</button>
             </div>
         </div>
@@ -1379,7 +1471,12 @@ async function checkLogin() {
 checkLogin();
 
 const appConfigs = {
-    "Whitelist": { title: "Whitelist", fields: [ { label: "Character Name *", type: "input", name: "char_name", placeholder: "First Last", required: true }, { label: "Age *", type: "number", name: "age", placeholder: "Your age", required: true }, { label: "Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your story...", required: true } ]},
+    "Whitelist": { title: "Whitelist Application", fields: [
+        { label: "Real First Name *", type: "input", name: "real_first_name", placeholder: "Your real first name", required: true },
+        { label: "Real Last Name *", type: "input", name: "real_last_name", placeholder: "Your real last name", required: true },
+        { label: "Character Name *", type: "input", name: "char_name", placeholder: "Your RP character's full name", required: true },
+        { label: "RP Path *", type: "select", name: "rp_path", options: ["Legal", "Illegal"], required: true }
+    ]},
     "Gang Application": { title: "Gang Application", fields: [
         { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Gang Name", required: true },
         { label: "Gang Color *", type: "input", name: "gang_color", placeholder: "Gang Color", required: true },
@@ -1418,9 +1515,25 @@ async function openModal(title) {
         label.className = 'form-label';
         label.innerText = f.label;
         group.appendChild(label);
-        let input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+        let input;
+        if (f.type === 'select') {
+            input = document.createElement('select');
+            const empty = document.createElement('option');
+            empty.value = ''; empty.textContent = 'Choose your RP path';
+            empty.disabled = true; empty.selected = true;
+            input.appendChild(empty);
+            (f.options || []).forEach(value => {
+                const option = document.createElement('option');
+                option.value = value; option.textContent = value;
+                input.appendChild(option);
+            });
+        } else {
+            input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+            input.placeholder = f.placeholder || '';
+            if (f.type === 'number') input.type = 'number';
+        }
         input.className = f.type === 'textarea' ? 'form-input form-textarea' : 'form-input';
-        input.name = f.name; input.placeholder = f.placeholder || ''; if (f.type === 'number') input.type = 'number';
+        input.name = f.name;
         if (f.required) input.required = true;
         group.appendChild(input);
         fieldsContainer.appendChild(group);
