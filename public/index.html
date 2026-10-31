@@ -1468,7 +1468,11 @@ async function checkLogin() {
                     document.getElementById('adminPanelView').style.display = 'grid';
                     loadAdmin(); 
                 }
-            } catch (e) {}
+                else {
+                    const detail = await adminCheck.json().catch(() => ({}));
+                    console.warn('[SouthSide Admin] Role check:', detail.reason || adminCheck.status);
+                }
+            } catch (e) { console.warn('[SouthSide Admin] Role check failed:', e); }
         } else {
             document.getElementById('loginRequiredMsg').style.display = 'block';
             document.getElementById('appsGrid').style.display = 'none';
