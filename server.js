@@ -437,9 +437,11 @@ async function guildProfile(id) {
             headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }, signal: AbortSignal.timeout(6000)
         });
         if (!response.ok) {
-            console.warn('[GANG ROSTER] Member lookup HTTP', response.status, 'for', id);
-            rosterCache.set(id, { value: null, until: Date.now() + 60000 });
-            return null;
+            const body = await response.json().catch(() => ({}));
+            console.warn('[GANG ROSTER] Member lookup HTTP', response.status, 'Discord code', body.code || 'unknown', 'for', id, 'guild', CONFIG.GUILD_ID);
+            const fallback = { id, name: 'ID ' + id, avatar: null, verified: false };
+            rosterCache.set(id, { value: fallback, until: Date.now() + 30000 });
+            return fallback;
         }
         const member = await response.json();
         const user = member.user;
@@ -447,7 +449,7 @@ async function guildProfile(id) {
         const avatar = member.avatar
             ? `https://cdn.discordapp.com/guilds/${CONFIG.GUILD_ID}/users/${id}/avatars/${member.avatar}.png?size=128`
             : user.avatar ? `https://cdn.discordapp.com/avatars/${id}/${user.avatar}.png?size=128` : null;
-        const value = { id, name: member.nick || user.global_name || user.username || 'Member', avatar };
+        const value = { id, name: member.nick || user.global_name || user.username || 'Member', avatar, verified: true };
         rosterCache.set(id, { value, until: Date.now() + 120000 });
         return value;
     } catch (error) {
@@ -465,11 +467,13 @@ app.get('/api/gangs', async (req, res) => {
     res.json(output);
 });
 app.post('/api/gangs', isAdmin, (req, res) => {
-    const { name, boss, bossId, logo, memberIds } = req.body || {};
+    const { name, boss, bossId, underBoss, underBossId, logo, memberIds } = req.body || {};
     if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
         typeof boss !== 'string' || !boss.trim() || boss.length > 80 ||
-        typeof bossId !== 'string' || !bossId.trim() || bossId.length > 80) {
-        return res.status(400).json({ error: 'Gang name, Boss Name and Boss ID are required (max 80 characters).' });
+        typeof bossId !== 'string' || !/^\d{17,20}$/.test(bossId) ||
+        typeof underBoss !== 'string' || !underBoss.trim() || underBoss.length > 80 ||
+        typeof underBossId !== 'string' || !/^\d{17,20}$/.test(underBossId)) {
+        return res.status(400).json({ error: 'Gang, Boss and Under Boss names and valid Discord IDs are required.' });
     }
     if (logo && (typeof logo !== 'string' ||
         !/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(logo) || logo.length > 2_800_000)) {
@@ -479,7 +483,7 @@ app.post('/api/gangs', isAdmin, (req, res) => {
         return res.status(400).json({ error: 'Enter up to 30 valid Discord member IDs.' });
     }
     const db = getDB(); if (!Array.isArray(db.gangs)) db.gangs = [];
-    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), logo: logo || '', memberIds: [...new Set(memberIds)], members: [] };
+    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), underBoss: underBoss.trim(), underBossId: underBossId.trim(), logo: logo || '', memberIds: [...new Set(memberIds)], members: [] };
     db.gangs.push(gang);
     try { saveDB(db); } catch (e) { console.error('[GANG ADD]', e); return res.status(500).json({error:'Could not save gang. Check Render disk/storage.'}); }
     res.status(201).json(gang);

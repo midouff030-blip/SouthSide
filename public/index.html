@@ -1315,8 +1315,12 @@ img{image-rendering:auto}
                         <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name">
                         <input class="admin-input" type="file" id="newGangLogo" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="Choose gang logo from PC">
                         <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
-                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss Discord ID" style="grid-column:1/-1">
-                        <textarea class="admin-input" id="newGangMemberIds" rows="4" placeholder="Under Boss — Discord Member IDs (one per line, max 30)" style="grid-column:1/-1;resize:vertical"></textarea>
+                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss Discord ID">
+                        <div style="grid-column:1/-1;border-top:1px solid #444;padding-top:12px;color:#ddd;font-weight:700">UNDER BOSS</div>
+                        <input class="admin-input" type="text" id="newGangUnderBoss" placeholder="Under Boss Name">
+                        <input class="admin-input" type="text" id="newGangUnderBossId" placeholder="Under Boss Discord ID">
+                        <div style="grid-column:1/-1;border-top:1px solid #444;padding-top:12px;color:#ddd;font-weight:700">GANG MEMBERS</div>
+                        <textarea class="admin-input" id="newGangMemberIds" rows="4" placeholder="Members Discord IDs (one per line, max 30)" style="grid-column:1/-1;resize:vertical"></textarea>
                     </div>
                     <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
                 </div>
@@ -1629,7 +1633,8 @@ async function loadGangs() {
                 <div class="gang-header"><div class="gang-logo">${g.logo ? `<img src="${ss2Escape(g.logo)}" alt="Gang logo">` : 'G'}</div>
                 <div><div class="gang-title">${ss2Escape(g.name)}</div><div class="gang-members-count">${roster.length} VERIFIED MEMBERS</div></div></div>
                 <div class="ss2-boss-info">BOSS: ${ss2Escape(g.boss || '—')} <span>Discord ID: ${ss2Escape(g.bossId || '—')}</span></div>
-                <div class="ss2-roster-label">UNDER BOSS · ROSTER MEMBERS</div>
+                <div class="ss2-boss-info">UNDER BOSS: ${ss2Escape(g.underBoss || '—')} <span>Discord ID: ${ss2Escape(g.underBossId || '—')}</span></div>
+                <div class="ss2-roster-label">ROSTER MEMBERS</div>
                 <div class="ss2-roster-grid">${roster.length ? roster.map(m => `<div class="ss2-roster-person">${m.avatar ? `<img src="${ss2Escape(m.avatar)}" loading="lazy" alt="">` : `<div class="ss2-roster-no-avatar">?</div>`}<span title="${ss2Escape(m.name)}">${ss2Escape(m.name)}</span></div>`).join('') : '<p class="ss2-empty-roster">No verified Discord server members yet.</p>'}</div>
             </div>`;
         }).join('') : '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;">No gangs registered.</p>';
@@ -1974,7 +1979,7 @@ async function ss2LoadAdminGangs() {
         img.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:8px'; row.append(img);
       }
       const label = document.createElement('span'); label.style.flex = '1';
-      label.textContent = `${g.name || 'Gang'} — Boss: ${g.boss || '—'} — ID: ${g.bossId || '—'}`;
+      label.textContent = `${g.name || 'Gang'} — Boss: ${g.boss || '—'} (${g.bossId || '—'}) — Under Boss: ${g.underBoss || '—'} (${g.underBossId || '—'})`; 
       const del = document.createElement('button'); del.className = 'admin-btn'; del.textContent = 'Delete';
       del.addEventListener('click', async () => {
         if (!confirm('Delete gang ' + g.name + '?')) return;
@@ -2002,16 +2007,18 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
   const name = document.getElementById('newGangName').value.trim();
   const boss = document.getElementById('newGangBoss').value.trim();
   const bossId = document.getElementById('newGangBossId').value.trim();
+  const underBoss = document.getElementById('newGangUnderBoss').value.trim();
+  const underBossId = document.getElementById('newGangUnderBossId').value.trim();
   const memberIds = [...new Set(document.getElementById('newGangMemberIds').value.split(/[\s,;]+/).map(x => x.trim()).filter(Boolean))];
   if (memberIds.length > 30 || memberIds.some(x => !/^\d{17,20}$/.test(x))) return ssNotify('Use up to 30 valid Discord IDs (one per line).', 'error');
-  if (!name || !boss || !bossId) return ssNotify('Fill Gang Name, Boss Name and Boss ID.', 'error');
+  if (!name || !boss || !/^\d{17,20}$/.test(bossId) || !underBoss || !/^\d{17,20}$/.test(underBossId)) return ssNotify('Fill Boss and Under Boss names with valid Discord IDs.', 'error');
   btn.disabled = true; btn.textContent = 'Adding...';
   try {
     const logo = await ss2ReadGangImage(document.getElementById('newGangLogo').files[0]);
-    const res = await fetch('/api/gangs', { method:'POST', credentials:'same-origin', headers:getAdminHeaders(), body:JSON.stringify({name,boss,bossId,logo,memberIds}) });
+    const res = await fetch('/api/gangs', { method:'POST', credentials:'same-origin', headers:getAdminHeaders(), body:JSON.stringify({name,boss,bossId,underBoss,underBossId,logo,memberIds}) });
     const data = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(data.error || 'HTTP ' + res.status);
-    ['newGangName','newGangBoss','newGangBossId','newGangLogo','newGangMemberIds'].forEach(id => document.getElementById(id).value = '');
+    ['newGangName','newGangBoss','newGangBossId','newGangUnderBoss','newGangUnderBossId','newGangLogo','newGangMemberIds'].forEach(id => document.getElementById(id).value = '');
     ssNotify('Gang added successfully!', 'success');
     await ss2LoadAdminGangs(); await loadGangs();
   } catch(e) { ssNotify('Add Gang failed: ' + e.message, 'error'); }
