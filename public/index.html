@@ -1294,9 +1294,9 @@ img{image-rendering:auto}
                     <h3>Add New Gang</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                         <input class="admin-input" type="text" id="newGangName" placeholder="Gang Name">
-                        <input class="admin-input" type="text" id="newGangLogo" placeholder="Logo URL">
+                        <input class="admin-input" type="file" id="newGangLogo" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="Choose gang logo from PC">
                         <input class="admin-input" type="text" id="newGangBoss" placeholder="Boss Name">
-                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID">
+                        <input class="admin-input" type="text" id="newGangBossId" placeholder="Boss ID" style="grid-column:1/-1">
                     </div>
                     <button class="admin-btn primary" id="addGangBtn">Add Gang</button>
                 </div>
@@ -1428,7 +1428,7 @@ function switchAdminTab(name, btn) {
     if (name === 'bans') { loadBans(); }
     if (name === 'detections') { loadDetections(); }
     if (name === 'applications') { loadAdmin(); }
-    if (name === 'gangs') { loadAdmin(); }
+    if (name === 'gangs') { ss2LoadAdminGangs(); }
     if (name === 'shop') { loadAdmin(); ss2LoadAdminShop(); }
     if (name === 'players') { loadPlayers(); }
 }
@@ -1607,7 +1607,7 @@ async function loadGangs() {
             <div class="gang-card">
                 <div class="gang-header">
                     <div class="gang-logo">${g.logo ? `<img src="${g.logo}">` : 'G'}</div>
-                    <div><div class="gang-title">${g.name}</div><div class="gang-members-count">${g.members ? g.members.length : 0} MEMBERS</div></div>
+                    <div><div class="gang-title">${ss2Escape(g.name)}</div><div class="gang-members-count">${g.members ? g.members.length : 0} MEMBERS</div><div class="gang-members-count">Boss: ${ss2Escape(g.boss || '—')} · ID: ${ss2Escape(g.bossId || '—')}</div></div>
                 </div>
             </div>`).join('') : '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No gangs registered.</p>';
         document.getElementById('ovGangs').innerText = gangs.length;
@@ -1931,6 +1931,67 @@ document.getElementById('loginBtn').addEventListener('click', () => window.locat
     while(stack.children.length>4)stack.lastElementChild.remove();
   };
 })();
+</script>
+
+<script>
+/* Gang administration: PC image picker, validated add, list and delete. */
+async function ss2LoadAdminGangs() {
+  const el = document.getElementById('adminGangs');
+  try {
+    const r = await fetch('/api/gangs', { credentials:'same-origin' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const gangs = await r.json();
+    el.replaceChildren();
+    if (!gangs.length) { el.textContent = 'No gangs registered.'; return; }
+    gangs.forEach(g => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #333;flex-wrap:wrap';
+      if (g.logo && (/^data:image\/(png|jpeg|webp|gif);base64,/.test(g.logo) || /^https:\/\//.test(g.logo))) {
+        const img = document.createElement('img'); img.src = g.logo; img.alt = 'Gang logo';
+        img.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:8px'; row.append(img);
+      }
+      const label = document.createElement('span'); label.style.flex = '1';
+      label.textContent = `${g.name || 'Gang'} — Boss: ${g.boss || '—'} — ID: ${g.bossId || '—'}`;
+      const del = document.createElement('button'); del.className = 'admin-btn'; del.textContent = 'Delete';
+      del.addEventListener('click', async () => {
+        if (!confirm('Delete gang ' + g.name + '?')) return;
+        try {
+          const r = await fetch('/api/gangs/' + encodeURIComponent(g.id), { method:'DELETE', headers:getAdminHeaders(), credentials:'same-origin' });
+          if (!r.ok) throw new Error((await r.json().catch(()=>({}))).error || 'HTTP ' + r.status);
+          ssNotify('Gang deleted successfully'); await ss2LoadAdminGangs(); await loadGangs();
+        } catch(e) { ssNotify('Delete failed: ' + e.message, 'error'); }
+      });
+      row.append(label,del); el.append(row);
+    });
+  } catch(e) { el.textContent = 'Could not load gangs: ' + e.message; }
+}
+function ss2ReadGangImage(file) {
+  return new Promise((resolve,reject) => {
+    if (!file) return resolve('');
+    if (!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)) return reject(new Error('Choose PNG, JPG, WEBP or GIF image.'));
+    if (file.size > 2*1024*1024) return reject(new Error('Image must be 2 MB or smaller.'));
+    const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error('Could not read image.'));
+    reader.readAsDataURL(file);
+  });
+}
+document.getElementById('addGangBtn').addEventListener('click', async function() {
+  const btn = this;
+  const name = document.getElementById('newGangName').value.trim();
+  const boss = document.getElementById('newGangBoss').value.trim();
+  const bossId = document.getElementById('newGangBossId').value.trim();
+  if (!name || !boss || !bossId) return ssNotify('Fill Gang Name, Boss Name and Boss ID.', 'error');
+  btn.disabled = true; btn.textContent = 'Adding...';
+  try {
+    const logo = await ss2ReadGangImage(document.getElementById('newGangLogo').files[0]);
+    const res = await fetch('/api/gangs', { method:'POST', credentials:'same-origin', headers:getAdminHeaders(), body:JSON.stringify({name,boss,bossId,logo}) });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data.error || 'HTTP ' + res.status);
+    ['newGangName','newGangBoss','newGangBossId','newGangLogo'].forEach(id => document.getElementById(id).value = '');
+    ssNotify('Gang added successfully!', 'success');
+    await ss2LoadAdminGangs(); await loadGangs();
+  } catch(e) { ssNotify('Add Gang failed: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Add Gang'; }
+});
 </script>
 </body>
 </html>

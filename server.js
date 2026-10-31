@@ -428,11 +428,27 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
 
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
 app.post('/api/gangs', isAdmin, (req, res) => {
-    const db = getDB(); if (!db.gangs) db.gangs = [];
-    const gang = { id: Date.now().toString(), members: [], ...req.body }; db.gangs.push(gang); saveDB(db); res.json(gang);
+    const { name, boss, bossId, logo } = req.body || {};
+    if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
+        typeof boss !== 'string' || !boss.trim() || boss.length > 80 ||
+        typeof bossId !== 'string' || !bossId.trim() || bossId.length > 80) {
+        return res.status(400).json({ error: 'Gang name, Boss Name and Boss ID are required (max 80 characters).' });
+    }
+    // File image is stored as a data URL, avoiding separate image upload/storage paths.
+    if (logo && (typeof logo !== 'string' ||
+        !/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(logo) ||
+        logo.length > 2_800_000)) {
+        return res.status(400).json({ error: 'Invalid gang image. Use PNG, JPG, WEBP or GIF up to 2 MB.' });
+    }
+    const db = getDB(); if (!Array.isArray(db.gangs)) db.gangs = [];
+    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), logo: logo || '', members: [] };
+    db.gangs.push(gang);
+    try { saveDB(db); } catch (e) { console.error('[GANG ADD]', e); return res.status(500).json({error:'Could not save gang. Check Render disk/storage.'}); }
+    res.status(201).json(gang);
 });
 app.delete('/api/gangs/:id', isAdmin, (req, res) => {
-    const db = getDB(); db.gangs = db.gangs.filter(g => g.id !== req.params.id && g._id !== req.params.id); saveDB(db); res.json({ success: true });
+    const db = getDB(); db.gangs = (db.gangs || []).filter(g => String(g.id || g._id) !== req.params.id);
+    saveDB(db); res.json({ success: true });
 });
 
 app.get('/api/shop', (req, res) => res.json(getDB().shop || []));
