@@ -14,3 +14,21 @@ Added required IRL Age and Character Backstory questions. Existing application s
 
 ## Important
 No live deployment or end-to-end Discord test was performed. Existing admin password login remains enabled; use a strong password. If the bot lookup logs 404, the ID allowlist works independently of that lookup.
+
+
+## Discord login / application session fix
+- Session cookie uses SameSite=Lax (appropriate for OAuth top-level redirects) and secure HTTPS in production.
+- OAuth callback waits for session save before redirect.
+- /api/auth/me is no-store; frontend includes same-origin credentials.
+- Set NODE_ENV=production on Render and a stable SESSION_SECRET.
+- Important: Express MemoryStore loses sessions on service restarts/redeploys. Log in again after deployment. For production persistence across restarts/multiple instances, use Redis/session store.
+- Confirm the deployed website and API share the same domain.
+
+## Accepted Discord role fix
+When admin accepts Whitelist, Gang or Staff applications, the backend now checks the actual Discord HTTP response, logs errors, and returns `roleAssigned` and `roleError` in the API response. Re-clicking Accepted retries role assignment without duplicating the decision webhook.
+
+Render variables: `DISCORD_BOT_TOKEN`, `GUILD_ID`, `ROLE_ACCEPTED_ID` (common fallback) or `ROLE_ACCEPTED_WHITELIST`, `ROLE_ACCEPTED_GANG`, `ROLE_ACCEPTED_STAFF` (category-specific). `ROLE_ACCEPTED_ID` from your screenshot is supported.
+
+Discord bot must be in the guild, have Manage Roles permission, and its highest role must be ABOVE the accepted role. Applicant must be a member of that guild. Discord 403 means missing permission/role hierarchy; 404 means unknown member/guild/role or incorrect IDs; 401 means invalid bot token. Check Render logs for `[ACCEPT ROLE]`.
+
+Existing previously accepted applications: click Accepted again to retry the role assignment. No live Discord test was performed.

@@ -70,7 +70,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   proxy: true, 
-  cookie: { secure: true, sameSite: 'none', maxAge: 24 * 60 * 60 * 1000 }
+  name: 'ss2.sid',
+  cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production' ? true : 'auto', sameSite: 'lax', path: '/', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
 // ===== Auth =====
@@ -119,20 +120,34 @@ function getWebhookUrl(type) {
 }
 
 async function assignDiscordRole(discordId, type) {
-    if (!CONFIG.DISCORD_BOT_TOKEN || !CONFIG.GUILD_ID || !discordId) return;
-    let roleId = '';
-    if (type.includes('Whitelist')) roleId = CONFIG.ROLE_ACCEPTED_WHITELIST;
-    else if (type.includes('Staff')) roleId = CONFIG.ROLE_ACCEPTED_STAFF;
-    else if (type.includes('Gang')) roleId = CONFIG.ROLE_ACCEPTED_GANG;
-
-    if (!roleId) return;
-
+    const category = String(type || '').toLowerCase();
+    const roleId = category.includes('whitelist')
+        ? (process.env.ROLE_ACCEPTED_WHITELIST || process.env.ROLE_ACCEPTED_ID || process.env.ROLE_ACCEPTED_WHITELIST_ID)
+        : category.includes('staff')
+        ? (process.env.ROLE_ACCEPTED_STAFF || process.env.ROLE_ACCEPTED_ID)
+        : category.includes('gang')
+        ? (process.env.ROLE_ACCEPTED_GANG || process.env.ROLE_ACCEPTED_ID)
+        : null;
+    if (!roleId) return { success: false, error: `No accepted role configured for ${type}. Set ROLE_ACCEPTED_ID or category-specific ROLE_ACCEPTED_* in Render.` };
+    if (!CONFIG.DISCORD_BOT_TOKEN || !CONFIG.GUILD_ID) return { success: false, error: 'Missing DISCORD_BOT_TOKEN or GUILD_ID in Render.' };
+    if (!/^\d{17,22}$/.test(String(discordId || ''))) return { success: false, error: 'Missing/invalid applicant Discord ID.' };
     try {
-        await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${discordId}/roles/${roleId}`, {
+        const url = `https://discord.com/api/v10/guilds/${encodeURIComponent(CONFIG.GUILD_ID)}/members/${encodeURIComponent(discordId)}/roles/${encodeURIComponent(roleId)}`;
+        const response = await fetch(url, {
             method: 'PUT',
             headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
         });
-    } catch(e) { console.error("Error assigning role:", e); }
+        if (!response.ok) {
+            const body = (await response.text()).slice(0, 500);
+            console.error(`[ACCEPT ROLE] Discord HTTP ${response.status} | type=${type} | user=${discordId} | ${body}`);
+            return { success: false, error: `Discord HTTP ${response.status}: ${body}` };
+        }
+        console.log(`[ACCEPT ROLE] Assigned successfully | type=${type} | user=${discordId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('[ACCEPT ROLE] Network error:', error.message);
+        return { success: false, error: `Discord request failed: ${error.message}` };
+    }
 }
 
 // Dedicated inbox for NEW submissions. Review decisions continue to use the type webhook.
@@ -360,6 +375,7 @@ app.get('/api/player-logs/:id', isAdmin, (req, res) => {
 
 app.get('/api/tickets', isAdmin, (req, res) => res.json(getDB().tickets || []));
 app.post('/api/tickets', async (req, res) => {
+    res.set('Cache-Control', 'no-store');
     const allowed = ['Whitelist', 'Gang Application', 'Staff Application'];
     const { type, subject, message } = req.body;
     if (!allowed.includes(type)) return res.status(400).json({ error: 'Invalid application type.' });
@@ -393,16 +409,21 @@ app.post('/api/tickets', async (req, res) => {
 });
 
 app.put('/api/tickets/:id', isAdmin, async (req, res) => {
-    const db = getDB(); 
-    const t = db.tickets.find(x => x.id === req.params.id || x._id === req.params.id);
-    if (t) { 
-        t.status = req.body.status; 
-        t.reason = req.body.reason || ''; 
-        saveDB(db); 
-        if (t.status === 'accepted') await assignDiscordRole(t.discordId, t.type);
-        await sendStatusWebhook(t, t.status, t.reason);
-    } 
-    res.json(t);
+    if (!['accepted', 'rejected'].includes(req.body.status)) return res.status(400).json({ error: 'Invalid status' });
+    const db = getDB();
+    const t = (db.tickets || []).find(x => x.id === req.params.id || x._id === req.params.id);
+    if (!t) return res.status(404).json({ error: 'Application not found' });
+    // Retry role assignment when admin clicks Accepted again, even if already accepted.
+    const roleResult = req.body.status === 'accepted' ? await assignDiscordRole(t.discordId, t.type) : null;
+    const previousStatus = t.status;
+    t.status = req.body.status;
+    t.reason = req.body.reason || '';
+    t.roleAssigned = roleResult ? roleResult.success : null;
+    t.roleError = roleResult && !roleResult.success ? roleResult.error : null;
+    saveDB(db);
+    // Avoid duplicate Discord decision notifications on a retry.
+    if (previousStatus !== t.status) await sendStatusWebhook(t, t.status, t.reason);
+    res.json({ ...t, roleResult, warning: roleResult && !roleResult.success ? 'Application accepted, but Discord role assignment FAILED. See roleError and Render logs.' : undefined });
 });
 
 app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
@@ -427,8 +448,12 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => {
 app.get('/api/discord-invite', (req, res) => res.redirect(302, 'https://discord.gg/ggtuaRk34'));
 
 app.get('/api/auth/discord', passport.authenticate('discord'));
-app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
+app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res, next) => {
+  // Persist the authenticated Passport session before redirecting to the frontend.
+  req.session.save(err => err ? next(err) : res.redirect('/?login=success'));
+});
 app.get('/api/auth/me', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (req.user) res.json({ loggedIn: true, username: req.user.username, id: req.user.id, avatar: req.user.avatar });
   else res.json({ loggedIn: false });
 });
