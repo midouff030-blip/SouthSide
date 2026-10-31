@@ -1468,11 +1468,7 @@ async function checkLogin() {
                     document.getElementById('adminPanelView').style.display = 'grid';
                     loadAdmin(); 
                 }
-                else {
-                    const detail = await adminCheck.json().catch(() => ({}));
-                    console.warn('[SouthSide Admin] Role check:', detail.reason || adminCheck.status);
-                }
-            } catch (e) { console.warn('[SouthSide Admin] Role check failed:', e); }
+            } catch (e) {}
         } else {
             document.getElementById('loginRequiredMsg').style.display = 'block';
             document.getElementById('appsGrid').style.display = 'none';
@@ -1485,8 +1481,10 @@ const appConfigs = {
     "Whitelist": { title: "Whitelist Application", fields: [
         { label: "Real First Name *", type: "input", name: "real_first_name", placeholder: "Your real first name", required: true },
         { label: "Real Last Name *", type: "input", name: "real_last_name", placeholder: "Your real last name", required: true },
+        { label: "IRL Age *", type: "number", name: "irl_age", placeholder: "Your real age", required: true },
         { label: "Character Name *", type: "input", name: "char_name", placeholder: "Your RP character's full name", required: true },
-        { label: "RP Path *", type: "select", name: "rp_path", options: ["Legal", "Illegal"], required: true }
+        { label: "RP Path *", type: "select", name: "rp_path", options: ["Legal", "Illegal"], required: true },
+        { label: "Character Backstory *", type: "textarea", name: "backstory", placeholder: "Tell us your character backstory...", required: true }
     ]},
     "Gang Application": { title: "Gang Application", fields: [
         { label: "Gang Name *", type: "input", name: "gang_name", placeholder: "Gang Name", required: true },

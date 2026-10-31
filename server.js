@@ -87,36 +87,26 @@ passport.use(new DiscordStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Verify Discord role on every request, so role changes take effect without re-login.
-async function checkDiscordAdmin(userId) {
-  const { GUILD_ID, ADMIN_ROLE_ID, DISCORD_BOT_TOKEN } = CONFIG;
-  if (!GUILD_ID || !ADMIN_ROLE_ID || !DISCORD_BOT_TOKEN) {
-    console.error('[ADMIN ROLE] Missing GUILD_ID, ADMIN_ROLE_ID or DISCORD_BOT_TOKEN');
-    return { allowed: false, reason: 'configuration_missing' };
-  }
-  try {
-    const response = await fetch(`https://discord.com/api/v10/guilds/${encodeURIComponent(GUILD_ID)}/members/${encodeURIComponent(userId)}`, {
-      headers: { Authorization: `Bot ${DISCORD_BOT_TOKEN}` }
-    });
-    if (!response.ok) {
-      console.error(`[ADMIN ROLE] Discord member lookup HTTP ${response.status} for user ${userId}`);
-      return { allowed: false, reason: response.status === 404 ? 'not_in_guild' : 'discord_api_error' };
-    }
-    const member = await response.json();
-    return { allowed: Array.isArray(member.roles) && member.roles.map(String).includes(String(ADMIN_ROLE_ID).trim()), reason: 'role_checked' };
-  } catch (error) {
-    console.error('[ADMIN ROLE] Discord lookup failed:', error.message);
-    return { allowed: false, reason: 'discord_api_error' };
-  }
-}
+// Comma/space/newline-separated Discord IDs. Verified against the OAuth session.
+const ADMIN_DISCORD_IDS = new Set(String(process.env.ADMIN_DISCORD_IDS || '')
+  .split(/[\s,;]+/).map(id => id.trim()).filter(id => /^\d{17,20}$/.test(id)));
 
 async function isAdmin(req, res, next) {
-  if (req.headers['x-admin-password'] && req.headers['x-admin-password'] === CONFIG.ADMIN_PASSWORD) return next();
-  if (req.session && req.session.isAdmin) return next();
-  if (!req.user?.id) return res.status(401).json({ error: 'Discord login required', reason: 'not_logged_in' });
-  const result = await checkDiscordAdmin(req.user.id);
-  if (result.allowed) return next();
-  return res.status(403).json({ error: 'Admin role not verified', reason: result.reason });
+  if (req.user?.id && ADMIN_DISCORD_IDS.has(String(req.user.id))) return next();
+  if (req.headers['x-admin-password'] === CONFIG.ADMIN_PASSWORD) return next();
+  if (req.session && req.session.isAdmin) return next(); 
+  if (req.user && req.user.id && CONFIG.GUILD_ID && CONFIG.DISCORD_BOT_TOKEN && CONFIG.ADMIN_ROLE_ID) {
+    try {
+      const response = await fetch(`https://discord.com/api/v10/guilds/${CONFIG.GUILD_ID}/members/${req.user.id}`, {
+        headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }
+      });
+      if (response.ok) {
+        const memberData = await response.json();
+        if (memberData.roles && memberData.roles.includes(CONFIG.ADMIN_ROLE_ID)) return next(); 
+      }
+    } catch (e) { console.error("Role check error:", e); }
+  }
+  res.status(403).json({ error: 'Access Denied.' });
 }
 
 // ===== Webhook Helpers =====
