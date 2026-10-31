@@ -426,71 +426,99 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     res.json({ ...t, roleResult, warning: roleResult && !roleResult.success ? 'Application accepted, but Discord role assignment FAILED. See roleError and Render logs.' : undefined });
 });
 
-// Only display Discord profiles confirmed as members of this guild.
+// Guild membership is verified with the bot; public Discord profiles are a fallback
+// for avatar display only and must NEVER be marked verified.
 const rosterCache = new Map();
 async function guildProfile(id) {
-    if (!/^\d{17,20}$/.test(String(id)) || !CONFIG.GUILD_ID || !CONFIG.DISCORD_BOT_TOKEN) return null;
+    id = String(id || '').trim();
+    if (!/^\d{17,20}$/.test(id)) return null;
     const cached = rosterCache.get(id);
     if (cached && cached.until > Date.now()) return cached.value;
+    let value = { id, name: 'Discord User', avatar: null, verified: false };
+    if (!CONFIG.DISCORD_BOT_TOKEN) return value;
     try {
-        const response = await fetch(`https://discord.com/api/v10/guilds/${encodeURIComponent(CONFIG.GUILD_ID)}/members/${id}`, {
-            headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }, signal: AbortSignal.timeout(6000)
-        });
-        if (!response.ok) {
-            const body = await response.json().catch(() => ({}));
-            console.warn('[GANG ROSTER] Member lookup HTTP', response.status, 'Discord code', body.code || 'unknown', 'for', id, 'guild', CONFIG.GUILD_ID);
-            const fallback = { id, name: 'ID ' + id, avatar: null, verified: false };
-            rosterCache.set(id, { value: fallback, until: Date.now() + 30000 });
-            return fallback;
+        if (CONFIG.GUILD_ID) {
+            const response = await fetch(`https://discord.com/api/v10/guilds/${encodeURIComponent(CONFIG.GUILD_ID)}/members/${id}`, {
+                headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }, signal: AbortSignal.timeout(7000)
+            });
+            if (response.ok) {
+                const member = await response.json();
+                const user = member.user || {};
+                value = { id, name: member.nick || user.global_name || user.username || 'Discord User',
+                    avatar: member.avatar ? `https://cdn.discordapp.com/guilds/${CONFIG.GUILD_ID}/users/${id}/avatars/${member.avatar}.png?size=128`
+                      : user.avatar ? `https://cdn.discordapp.com/avatars/${id}/${user.avatar}.png?size=128` : null,
+                    verified: true };
+            } else {
+                const body = await response.json().catch(() => ({}));
+                console.warn('[GANG ROSTER] Guild member lookup', response.status, body.code || '', 'user', id, 'guild', CONFIG.GUILD_ID);
+            }
         }
-        const member = await response.json();
-        const user = member.user;
-        if (!user || user.id !== String(id)) return null;
-        const avatar = member.avatar
-            ? `https://cdn.discordapp.com/guilds/${CONFIG.GUILD_ID}/users/${id}/avatars/${member.avatar}.png?size=128`
-            : user.avatar ? `https://cdn.discordapp.com/avatars/${id}/${user.avatar}.png?size=128` : null;
-        const value = { id, name: member.nick || user.global_name || user.username || 'Member', avatar, verified: true };
-        rosterCache.set(id, { value, until: Date.now() + 120000 });
-        return value;
-    } catch (error) {
-        console.error('[GANG ROSTER]', error.message);
-        return null;
-    }
+        // Bot GET /users/{id} may expose public avatar even if member endpoint fails.
+        // This does not prove membership; UI displays an unverified label.
+        if (!value.avatar) {
+            const r = await fetch(`https://discord.com/api/v10/users/${id}`, {
+                headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }, signal: AbortSignal.timeout(7000)
+            });
+            if (r.ok) {
+                const u = await r.json();
+                value.name = value.name === 'Discord User' ? (u.global_name || u.username || value.name) : value.name;
+                if (u.avatar) value.avatar = `https://cdn.discordapp.com/avatars/${id}/${u.avatar}.png?size=128`;
+            } else console.warn('[GANG ROSTER] User profile lookup', r.status, 'user', id);
+        }
+    } catch (e) { console.error('[GANG ROSTER]', e.message); }
+    rosterCache.set(id, { value, until: Date.now() + (value.verified ? 120000 : 30000) });
+    return value;
+}
+function validGang(body) {
+    const { name, boss, bossId, underBoss, underBossId, logo, memberIds } = body || {};
+    if (![name,boss,underBoss].every(x => typeof x === 'string' && x.trim() && x.length <= 80)
+      || ![bossId,underBossId].every(x => typeof x === 'string' && /^\d{17,20}$/.test(x)))
+        return 'Fill Gang, Boss and Under Boss names and valid Discord IDs.';
+    if (logo && (typeof logo !== 'string' ||
+      !/^(data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+|https:\/\/[^\s]+)$/.test(logo) || logo.length > 2800000))
+        return 'Invalid gang logo.';
+    if (!Array.isArray(memberIds) || memberIds.length > 30 ||
+      memberIds.some(id => typeof id !== 'string' || !/^\d{17,20}$/.test(id)))
+        return 'Enter up to 30 valid Discord member IDs.';
+    return null;
 }
 app.get('/api/gangs', async (req, res) => {
     const gangs = getDB().gangs || [];
     const output = await Promise.all(gangs.map(async g => {
         const ids = Array.isArray(g.memberIds) ? g.memberIds.slice(0, 30) : [];
-        const roster = (await Promise.all(ids.map(guildProfile))).filter(Boolean);
-        return { ...g, memberIds: undefined, members: roster };
+        const [bossProfile, underBossProfile, members] = await Promise.all([
+            guildProfile(g.bossId), guildProfile(g.underBossId),
+            Promise.all(ids.map(guildProfile))
+        ]);
+        return { ...g, members: members.filter(Boolean), bossProfile, underBossProfile };
     }));
     res.json(output);
 });
 app.post('/api/gangs', isAdmin, (req, res) => {
-    const { name, boss, bossId, underBoss, underBossId, logo, memberIds } = req.body || {};
-    if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
-        typeof boss !== 'string' || !boss.trim() || boss.length > 80 ||
-        typeof bossId !== 'string' || !/^\d{17,20}$/.test(bossId) ||
-        typeof underBoss !== 'string' || !underBoss.trim() || underBoss.length > 80 ||
-        typeof underBossId !== 'string' || !/^\d{17,20}$/.test(underBossId)) {
-        return res.status(400).json({ error: 'Gang, Boss and Under Boss names and valid Discord IDs are required.' });
-    }
-    if (logo && (typeof logo !== 'string' ||
-        !/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(logo) || logo.length > 2_800_000)) {
-        return res.status(400).json({ error: 'Invalid gang image. Use PNG, JPG, WEBP or GIF up to 2 MB.' });
-    }
-    if (!Array.isArray(memberIds) || memberIds.length > 30 || memberIds.some(id => typeof id !== 'string' || !/^\d{17,20}$/.test(id))) {
-        return res.status(400).json({ error: 'Enter up to 30 valid Discord member IDs.' });
-    }
+    const error = validGang(req.body);
+    if (error) return res.status(400).json({error});
+    const {name,boss,bossId,underBoss,underBossId,logo,memberIds} = req.body;
     const db = getDB(); if (!Array.isArray(db.gangs)) db.gangs = [];
-    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), underBoss: underBoss.trim(), underBossId: underBossId.trim(), logo: logo || '', memberIds: [...new Set(memberIds)], members: [] };
+    const gang = {id: Date.now().toString(),name:name.trim(),boss:boss.trim(),bossId,
+      underBoss:underBoss.trim(),underBossId,logo:logo||'',memberIds:[...new Set(memberIds)]};
     db.gangs.push(gang);
-    try { saveDB(db); } catch (e) { console.error('[GANG ADD]', e); return res.status(500).json({error:'Could not save gang. Check Render disk/storage.'}); }
+    try {saveDB(db);} catch(e) {return res.status(500).json({error:'Could not save gang: check Render storage.'});}
     res.status(201).json(gang);
 });
+app.put('/api/gangs/:id', isAdmin, (req, res) => {
+    const error = validGang(req.body);
+    if (error) return res.status(400).json({error});
+    const db = getDB(), gang = (db.gangs||[]).find(g => String(g.id||g._id) === req.params.id);
+    if (!gang) return res.status(404).json({error:'Gang not found'});
+    const {name,boss,bossId,underBoss,underBossId,logo,memberIds} = req.body;
+    Object.assign(gang,{name:name.trim(),boss:boss.trim(),bossId,underBoss:underBoss.trim(),underBossId,
+      logo:logo||'',memberIds:[...new Set(memberIds)]});
+    try {saveDB(db);} catch(e) {return res.status(500).json({error:'Could not save gang: check Render storage.'});}
+    res.json(gang);
+});
 app.delete('/api/gangs/:id', isAdmin, (req, res) => {
-    const db = getDB(); db.gangs = (db.gangs || []).filter(g => String(g.id || g._id) !== req.params.id);
-    saveDB(db); res.json({ success: true });
+    const db = getDB(); db.gangs = (db.gangs||[]).filter(g => String(g.id||g._id) !== req.params.id);
+    saveDB(db); res.json({success:true});
 });
 
 app.get('/api/shop', (req, res) => res.json(getDB().shop || []));

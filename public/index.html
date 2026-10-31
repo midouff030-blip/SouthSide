@@ -1018,6 +1018,23 @@ img{image-rendering:auto}
 #shopGrid .shop-body{padding:12px}#shopGrid .shop-price{color:#a7a7b0;font-size:12px}#shopGrid .shop-title{font-weight:800;color:white}
 @media(max-width:900px){#shopGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:580px){#shopGrid{grid-template-columns:1fr}.ss2-roster-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
+<style id="ss2-gang-roster-reference-style">
+#tab-illegal .ss2-roster-card{background:#08090d!important;border:1px solid #303139!important;border-radius:0!important;padding:16px!important;box-shadow:none!important;max-width:420px}
+#tab-illegal .ss2-roster-card .gang-header{display:flex;gap:12px;align-items:center;border-bottom:1px solid #252631;padding-bottom:15px}
+#tab-illegal .ss2-roster-card .gang-logo{width:44px;height:44px;border:1px solid #ddd;border-radius:0;display:grid;place-items:center}
+#tab-illegal .ss2-roster-card .gang-title{font-weight:900;font-size:17px;color:#fff;text-transform:uppercase}
+#tab-illegal .ss2-roster-card .gang-members-count{display:inline-block;border:1px solid #777;padding:2px 6px;font-size:9px;font-weight:900;color:#eee}
+#tab-illegal .ss2-roster-label{font-size:10px;color:#747787;letter-spacing:.13em;font-weight:900;margin:16px 0 10px}
+#tab-illegal .ss2-roster-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 8px}
+#tab-illegal .ss2-roster-grid.ss2-leaders{grid-template-columns:repeat(2,minmax(0,1fr));max-width:210px}
+#tab-illegal .ss2-roster-person{text-align:center;min-width:0}
+#tab-illegal .ss2-avatar-wrap{width:52px;height:52px;position:relative;margin:0 auto 6px}
+#tab-illegal .ss2-avatar-wrap img,#tab-illegal .ss2-roster-no-avatar{width:52px;height:52px;object-fit:cover;border-radius:50%;border:2px solid #9c1641;background:#14151b;box-sizing:border-box}
+#tab-illegal .ss2-roster-no-avatar{display:grid;place-items:center;color:#ddd;font-weight:700}
+#tab-illegal .ss2-roster-person span{display:block;font-size:10px;font-weight:700;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-illegal .ss2-roster-person small{display:block;font-size:8px;color:#888}
+#tab-illegal .ss2-roster-person .ss2-unverified{color:#c8a35b}
+</style>
 </head>
 <body>
 
@@ -1624,22 +1641,26 @@ async function loadStats() {
 }
 loadStats();
 
+function ss2Person(profile, fallbackName, role) {
+ const m = profile || {}, name = fallbackName || m.name || 'Discord User';
+ const avatar = m.avatar ? `<img src="${ss2Escape(m.avatar)}" loading="lazy" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">` : '';
+ return `<div class="ss2-roster-person" title="${ss2Escape(m.id || '')}"><div class="ss2-avatar-wrap">${avatar}<div class="ss2-roster-no-avatar" style="${m.avatar ? 'display:none' : ''}">${ss2Escape(name.charAt(0).toUpperCase())}</div></div><span>${ss2Escape(name)}</span>${role ? `<small>${ss2Escape(role)}</small>` : ''}${m.verified === false ? '<small class="ss2-unverified">Not verified in server</small>' : ''}</div>`;
+}
 async function loadGangs() {
-    try {
-        const res = await fetch('/api/gangs'); const gangs = await res.json();
-        document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => {
-            const roster = Array.isArray(g.members) ? g.members : [];
-            return `<div class="gang-card ss2-roster-card">
-                <div class="gang-header"><div class="gang-logo">${g.logo ? `<img src="${ss2Escape(g.logo)}" alt="Gang logo">` : 'G'}</div>
-                <div><div class="gang-title">${ss2Escape(g.name)}</div><div class="gang-members-count">${roster.length} VERIFIED MEMBERS</div></div></div>
-                <div class="ss2-boss-info">BOSS: ${ss2Escape(g.boss || '—')} <span>Discord ID: ${ss2Escape(g.bossId || '—')}</span></div>
-                <div class="ss2-boss-info">UNDER BOSS: ${ss2Escape(g.underBoss || '—')} <span>Discord ID: ${ss2Escape(g.underBossId || '—')}</span></div>
-                <div class="ss2-roster-label">ROSTER MEMBERS</div>
-                <div class="ss2-roster-grid">${roster.length ? roster.map(m => `<div class="ss2-roster-person">${m.avatar ? `<img src="${ss2Escape(m.avatar)}" loading="lazy" alt="">` : `<div class="ss2-roster-no-avatar">?</div>`}<span title="${ss2Escape(m.name)}">${ss2Escape(m.name)}</span></div>`).join('') : '<p class="ss2-empty-roster">No verified Discord server members yet.</p>'}</div>
-            </div>`;
-        }).join('') : '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;">No gangs registered.</p>';
-        document.getElementById('ovGangs').innerText = gangs.length;
-    } catch(e){console.error('Gangs:',e)}
+ try {
+  const res = await fetch('/api/gangs'); if(!res.ok) throw Error('HTTP '+res.status);
+  const gangs = await res.json();
+  document.getElementById('gangsGrid').innerHTML = gangs.length ? gangs.map(g => {
+   const roster = Array.isArray(g.members) ? g.members : [];
+   const count = [g.bossProfile,g.underBossProfile,...roster].filter(m => m && m.verified).length;
+   return `<div class="gang-card ss2-roster-card">
+    <div class="gang-header"><div class="gang-logo">${g.logo ? `<img src="${ss2Escape(g.logo)}" alt="Gang logo">` : 'G'}</div><div><div class="gang-title">${ss2Escape(g.name)}</div><div class="gang-members-count">${count} VERIFIED PROFILES</div></div></div>
+    <div class="ss2-roster-label">LEADERSHIP</div><div class="ss2-roster-grid ss2-leaders">${ss2Person(g.bossProfile,g.boss,'BOSS')}${ss2Person(g.underBossProfile,g.underBoss,'UNDER BOSS')}</div>
+    <div class="ss2-roster-label">ROSTER MEMBERS</div><div class="ss2-roster-grid">${roster.length ? roster.map(m => ss2Person(m,m.name,'')).join('') : '<p class="ss2-empty-roster">No members added.</p>'}</div>
+   </div>`;
+  }).join('') : '<p style="color:#999;text-align:center">No gangs registered.</p>';
+  document.getElementById('ovGangs').innerText = gangs.length;
+ } catch(e) { console.error('Gangs:',e); }
 }
 
 const SS2_SHOP_CATEGORIES = ['Cars', 'Motor', 'House', 'Ped'];
@@ -1989,7 +2010,19 @@ async function ss2LoadAdminGangs() {
           ssNotify('Gang deleted successfully'); await ss2LoadAdminGangs(); await loadGangs();
         } catch(e) { ssNotify('Delete failed: ' + e.message, 'error'); }
       });
-      row.append(label,del); el.append(row);
+      const edit = document.createElement('button'); edit.className='admin-btn'; edit.textContent='Edit';
+      edit.addEventListener('click', () => {
+        document.getElementById('newGangName').value=g.name||'';
+        document.getElementById('newGangBoss').value=g.boss||'';
+        document.getElementById('newGangBossId').value=g.bossId||'';
+        document.getElementById('newGangUnderBoss').value=g.underBoss||'';
+        document.getElementById('newGangUnderBossId').value=g.underBossId||'';
+        document.getElementById('newGangMemberIds').value=(g.memberIds||[]).join('\n');
+        window.ss2EditingGang={id:g.id,logo:g.logo||''};
+        document.getElementById('addGangBtn').textContent='Save Gang Changes';
+        document.getElementById('newGangName').scrollIntoView({behavior:'smooth',block:'center'});
+      });
+      row.append(label,edit,del); el.append(row);
     });
   } catch(e) { el.textContent = 'Could not load gangs: ' + e.message; }
 }
@@ -2014,15 +2047,16 @@ document.getElementById('addGangBtn').addEventListener('click', async function()
   if (!name || !boss || !/^\d{17,20}$/.test(bossId) || !underBoss || !/^\d{17,20}$/.test(underBossId)) return ssNotify('Fill Boss and Under Boss names with valid Discord IDs.', 'error');
   btn.disabled = true; btn.textContent = 'Adding...';
   try {
-    const logo = await ss2ReadGangImage(document.getElementById('newGangLogo').files[0]);
-    const res = await fetch('/api/gangs', { method:'POST', credentials:'same-origin', headers:getAdminHeaders(), body:JSON.stringify({name,boss,bossId,underBoss,underBossId,logo,memberIds}) });
+    const logo = document.getElementById('newGangLogo').files[0] ? await ss2ReadGangImage(document.getElementById('newGangLogo').files[0]) : (window.ss2EditingGang?.logo || '');
+    const editing=window.ss2EditingGang;
+    const res = await fetch(editing ? '/api/gangs/'+encodeURIComponent(editing.id) : '/api/gangs', { method:editing?'PUT':'POST', credentials:'same-origin', headers:getAdminHeaders(), body:JSON.stringify({name,boss,bossId,underBoss,underBossId,logo,memberIds}) });
     const data = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(data.error || 'HTTP ' + res.status);
     ['newGangName','newGangBoss','newGangBossId','newGangUnderBoss','newGangUnderBossId','newGangLogo','newGangMemberIds'].forEach(id => document.getElementById(id).value = '');
-    ssNotify('Gang added successfully!', 'success');
+    window.ss2EditingGang=null; ssNotify(editing?'Gang updated successfully!':'Gang added successfully!', 'success');
     await ss2LoadAdminGangs(); await loadGangs();
   } catch(e) { ssNotify('Add Gang failed: ' + e.message, 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'Add Gang'; }
+  finally { btn.disabled = false; btn.textContent = window.ss2EditingGang ? 'Save Gang Changes' : 'Add Gang'; }
 });
 </script>
 </body>
