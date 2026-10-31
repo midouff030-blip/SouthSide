@@ -418,6 +418,9 @@ app.delete('/api/shop/:id', isAdmin, (req, res) => {
     const db = getDB(); db.shop = db.shop.filter(i => i.id !== req.params.id && i._id !== req.params.id); saveDB(db); res.json({ success: true });
 });
 
+// Public Discord community invite; separate from OAuth login.
+app.get('/api/discord-invite', (req, res) => res.redirect(302, 'https://discord.gg/ggtuaRk34'));
+
 app.get('/api/auth/discord', passport.authenticate('discord'));
 app.get('/api/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/?login=failed' }), (req, res) => res.redirect('/?login=success'));
 app.get('/api/auth/me', (req, res) => {

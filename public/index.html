@@ -982,10 +982,10 @@ img{image-rendering:auto}
 
 /* SouthSide S2: supplied application artwork, one image per card */
 #tab-applications .apps-grid .app-card {position:relative!important;min-height:330px!important;height:330px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:14px!important;overflow:hidden!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;padding:22px!important;box-shadow:0 12px 35px rgba(0,0,0,.4)!important;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease!important;}
-#tab-applications .apps-grid .app-card[data-app="Whitelist"]{background-image:url('/images/whitelist.png') !important}
-#tab-applications .apps-grid .app-card[data-app="Gang Application"]{background-image:url('/images/gang.png') !important}
-#tab-applications .apps-grid .app-card[data-app="Staff Application"]{background-image:url('/images/staff.png') !important}
-#tab-applications .apps-grid .app-card::before{content:''!important;display:block!important;position:absolute!important;inset:0!important;background:linear-gradient(180deg,rgba(0,0,0,.01) 15%,rgba(0,0,0,.05) 60%,rgba(0,0,0,.42) 100%)!important;z-index:1!important;pointer-events:none!important}
+#tab-applications .apps-grid .app-card[data-app="Whitelist"]{background-image:url('whitelist-application.png')!important}
+#tab-applications .apps-grid .app-card[data-app="Gang Application"]{background-image:url('gang-application.png')!important}
+#tab-applications .apps-grid .app-card[data-app="Staff Application"]{background-image:url('staff-application.png')!important}
+#tab-applications .apps-grid .app-card::before{content:''!important;display:block!important;position:absolute!important;inset:0!important;background:linear-gradient(180deg,rgba(0,0,0,.04) 15%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.64) 100%)!important;z-index:1!important;pointer-events:none!important}
 #tab-applications .apps-grid .app-card .app-icon{position:relative!important;z-index:2!important;filter:drop-shadow(0 2px 6px #000)!important}
 #tab-applications .apps-grid .app-card .app-title{position:relative!important;z-index:2!important;text-shadow:0 2px 9px #000,0 0 15px #000!important}
 #tab-applications .apps-grid .app-card:hover{transform:translateY(-7px)!important;border-color:#ff0000!important;box-shadow:0 20px 55px rgba(0,0,0,.6),0 0 22px rgba(255,0,0,.24)!important}
@@ -1025,7 +1025,7 @@ img{image-rendering:auto}
             <h1>Join <em>SouthSide.</em></h1>
             <p>A serious roleplay experience where your story matters. No pay-to-win, just pure immersion.</p>
             <div class="hero-buttons">
-                <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Connect Discord</button>
+                <a class="btn-main" id="homeDiscordInvite" href="https://discord.gg/ggtuaRk34" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;"><i class="fa-brands fa-discord"></i> Connect Discord</a>
                 <button class="btn-outline" onclick="document.querySelector('[data-tab=apps]').click()">Apply Whitelist</button>
             </div>
             <div class="hero-micro"><span>Immersive Roleplay</span><span>Custom Experience</span><span>Active Community</span></div>
@@ -1068,9 +1068,9 @@ img{image-rendering:auto}
             <button class="btn-main" onclick="document.getElementById('loginBtn').click()"><i class="fa-brands fa-discord"></i> Login with Discord</button>
         </div>
         <div class="apps-grid" id="appsGrid" style="display: none;">
-            <div class="app-card" data-app="Whitelist" style="background-image: url('/images/whitelist.png') !important; background-size: cover !important; background-position: center !important;"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
-            <div class="app-card" data-app="Gang Application" style="background-image: url('/images/gang.png') !important; background-size: cover !important; background-position: center !important;"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang Application</div></div>
-            <div class="app-card" data-app="Staff Application" style="background-image: url('/images/staff.png') !important; background-size: cover !important; background-position: center !important;"><i class="fa-solid fa-user-shield app-icon"></i><div class="app-title">Staff Application</div></div>
+            <div class="app-card" data-app="Whitelist" style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop');"><i class="fa-regular fa-user app-icon"></i><div class="app-title">Whitelist</div></div>
+            <div class="app-card" data-app="Gang Application" style="background-image: url('https://i.ibb.co/6PZ4Z6t/gang.jpg');"><i class="fa-solid fa-crosshairs app-icon"></i><div class="app-title">Gang Application</div></div>
+            <div class="app-card" data-app="Staff Application" style="background-image:linear-gradient(135deg,rgba(255,0,0,.22),rgba(0,0,0,.7)),url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop');"><i class="fa-solid fa-user-shield app-icon"></i><div class="app-title">Staff Application</div></div>
                                 </div>
     </div>
 
