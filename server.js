@@ -426,22 +426,60 @@ app.put('/api/tickets/:id', isAdmin, async (req, res) => {
     res.json({ ...t, roleResult, warning: roleResult && !roleResult.success ? 'Application accepted, but Discord role assignment FAILED. See roleError and Render logs.' : undefined });
 });
 
-app.get('/api/gangs', (req, res) => res.json(getDB().gangs || []));
+// Only display Discord profiles confirmed as members of this guild.
+const rosterCache = new Map();
+async function guildProfile(id) {
+    if (!/^\d{17,20}$/.test(String(id)) || !CONFIG.GUILD_ID || !CONFIG.DISCORD_BOT_TOKEN) return null;
+    const cached = rosterCache.get(id);
+    if (cached && cached.until > Date.now()) return cached.value;
+    try {
+        const response = await fetch(`https://discord.com/api/v10/guilds/${encodeURIComponent(CONFIG.GUILD_ID)}/members/${id}`, {
+            headers: { Authorization: `Bot ${CONFIG.DISCORD_BOT_TOKEN}` }, signal: AbortSignal.timeout(6000)
+        });
+        if (!response.ok) {
+            console.warn('[GANG ROSTER] Member lookup HTTP', response.status, 'for', id);
+            rosterCache.set(id, { value: null, until: Date.now() + 60000 });
+            return null;
+        }
+        const member = await response.json();
+        const user = member.user;
+        if (!user || user.id !== String(id)) return null;
+        const avatar = member.avatar
+            ? `https://cdn.discordapp.com/guilds/${CONFIG.GUILD_ID}/users/${id}/avatars/${member.avatar}.png?size=128`
+            : user.avatar ? `https://cdn.discordapp.com/avatars/${id}/${user.avatar}.png?size=128` : null;
+        const value = { id, name: member.nick || user.global_name || user.username || 'Member', avatar };
+        rosterCache.set(id, { value, until: Date.now() + 120000 });
+        return value;
+    } catch (error) {
+        console.error('[GANG ROSTER]', error.message);
+        return null;
+    }
+}
+app.get('/api/gangs', async (req, res) => {
+    const gangs = getDB().gangs || [];
+    const output = await Promise.all(gangs.map(async g => {
+        const ids = Array.isArray(g.memberIds) ? g.memberIds.slice(0, 30) : [];
+        const roster = (await Promise.all(ids.map(guildProfile))).filter(Boolean);
+        return { ...g, memberIds: undefined, members: roster };
+    }));
+    res.json(output);
+});
 app.post('/api/gangs', isAdmin, (req, res) => {
-    const { name, boss, bossId, logo } = req.body || {};
+    const { name, boss, bossId, logo, memberIds } = req.body || {};
     if (typeof name !== 'string' || !name.trim() || name.length > 80 ||
         typeof boss !== 'string' || !boss.trim() || boss.length > 80 ||
         typeof bossId !== 'string' || !bossId.trim() || bossId.length > 80) {
         return res.status(400).json({ error: 'Gang name, Boss Name and Boss ID are required (max 80 characters).' });
     }
-    // File image is stored as a data URL, avoiding separate image upload/storage paths.
     if (logo && (typeof logo !== 'string' ||
-        !/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(logo) ||
-        logo.length > 2_800_000)) {
+        !/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(logo) || logo.length > 2_800_000)) {
         return res.status(400).json({ error: 'Invalid gang image. Use PNG, JPG, WEBP or GIF up to 2 MB.' });
     }
+    if (!Array.isArray(memberIds) || memberIds.length > 30 || memberIds.some(id => typeof id !== 'string' || !/^\d{17,20}$/.test(id))) {
+        return res.status(400).json({ error: 'Enter up to 30 valid Discord member IDs.' });
+    }
     const db = getDB(); if (!Array.isArray(db.gangs)) db.gangs = [];
-    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), logo: logo || '', members: [] };
+    const gang = { id: Date.now().toString(), name: name.trim(), boss: boss.trim(), bossId: bossId.trim(), logo: logo || '', memberIds: [...new Set(memberIds)], members: [] };
     db.gangs.push(gang);
     try { saveDB(db); } catch (e) { console.error('[GANG ADD]', e); return res.status(500).json({error:'Could not save gang. Check Render disk/storage.'}); }
     res.status(201).json(gang);
